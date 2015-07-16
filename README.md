@@ -93,7 +93,10 @@ A range of hash lengths were used and the best assembly selected for subsequent 
 
 
 ```bash
-
+	F_Read=qc_dna/paired/N.ditissima/NG-R0905/F/NG-R0905_qc_F.fastq.gz
+	R_Read=qc_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_qc_R.fastq.gz
+	Outdir=assembly/spades/N.ditissima/NG-R0905/
+	qsub $ProgDir/sumit_SPAdes.sh $F_Read $R_Read $Outdir correct
 ```
 
 Assemblies were summarised to allow the best assembly to be determined by eye.
