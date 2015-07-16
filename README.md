@@ -26,12 +26,12 @@ and annotation.
 
 ```bash
   cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-  Species=
-  Strain=
+  Species=N.ditissima
+  Strain=NG-R0905
   mkdir -p raw_dna/paired/$Species/$Strain/F
   mkdir -p raw_dna/paired/$Species/$Strain/R
-  cp /home/groups/harrisonlab/raw_data/raw_seq/<PATH_TO_F_READ> raw_dna/paired/$Species/$Strain/F/.
-  cp /home/groups/harrisonlab/raw_data/raw_seq/<PATH_TO_R_READ> raw_dna/paired/$Species/$Strain/R/.
+  cp /home/groups/harrisonlab/project_files/neonectria/NG-R0905_S4_L001_R1_001.fastq raw_dna/paired/$Species/$Strain/F/.
+  cp /home/groups/harrisonlab/project_files/neonectria/NG-R0905_S4_L001_R2_001.fastq raw_dna/paired/$Species/$Strain/R/.
 ```
 
 
