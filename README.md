@@ -42,7 +42,11 @@ programs: fastqc fastq-mcf kmc
 Data quality was visualised using fastqc:
 
 ```bash
-  
+  for RawData in $(ls raw_dna/paired/*/*/*/*.fastq); do 
+	  echo $RawData; 
+	  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc; 
+	  qsub $ProgDir/run_fastqc.sh $RawData;
+  done
 ```
 
 Trimming was performed on data to trim adapters from sequences and remove poor quality data.
