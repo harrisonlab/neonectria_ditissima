@@ -54,7 +54,11 @@ This was done with fastq-mcf
 
 
 ```bash
-
+	Read_F=raw_dna/paired/N.ditissima/NG-R0905/F/NG-R0905_S4_L001_R1_001.fastq
+	Read_R=raw_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_S4_L001_R2_001.fastq
+	IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+	qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
 ```
 
 Data quality was visualised once again following trimming:
