@@ -76,7 +76,10 @@ kmer counting was performed using kmc.
 This allowed estimation of sequencing depth and total genome size:
 
 ```bash
-
+	Trim_F=qc_dna/paired/N.ditissima/NG-R0905/F/NG-R0905_qc_F.fastq.gz
+	Trim_R=qc_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_qc_R.fastq.gz
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
+	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
 ```
 
 ** Estimated Genome Size is: **
