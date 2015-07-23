@@ -1,10 +1,10 @@
 # neonectria_ditissima
 Scripts used during analysis of neonectria_ditissima genomes.
 
-neonectria_galligena
+neonectria_ditissima
 ====================
 
-Commands used during analysis of the neonectria_galligena genome. Note - all this work was performed in the directory: /home/groups/harrisonlab/project_files/neonectria_galligena
+Commands used during analysis of the neonectria_ditissima genome. Note - all this work was performed in the directory: /home/groups/harrisonlab/project_files/neonectria_ditissima
 
 The following is a summary of the work presented in this Readme:
 Data organisation:
@@ -82,9 +82,9 @@ This allowed estimation of sequencing depth and total genome size:
 	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
 ```
 
-** Estimated Genome Size is: **
+** Estimated Genome Size is: 48490129
 
-** Esimated Coverage is: **
+** Esimated Coverage is: 
 
 #Assembly
 Assembly was performed using: Velvet / Abyss / Spades
@@ -97,7 +97,7 @@ A range of hash lengths were used and the best assembly selected for subsequent 
 	R_Read=qc_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_qc_R.fastq.gz
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
 	Outdir=assembly/spades/N.ditissima/NG-R0905/
-	qsub $ProgDir/sumit_SPAdes.sh $F_Read $R_Read $Outdir correct
+	qsub $ProgDir/sumit_SPAdes2.sh $F_Read $R_Read $Outdir correct
 ```
 
 Assemblies were summarised to allow the best assembly to be determined by eye.
