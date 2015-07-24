@@ -122,8 +122,12 @@ Repeat masking was performed and used the following programs: Repeatmasker Repea
 The best assembly was used to perform repeatmasking
 
 ```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
+	BestAss=/assembly/spades/N.ditissima/NG-R0905/scaffolds.fasta
+	qsub $ProgDir/rep_modeling.sh $BestAss
+	qsub $ProgDir/transposonPSI.sh $BestAss
+ ```
 
-```
 
 ** % bases maked by repeatmasker: **
 
