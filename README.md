@@ -100,14 +100,19 @@ A range of hash lengths were used and the best assembly selected for subsequent 
 	qsub $ProgDir/sumit_SPAdes2.sh $F_Read $R_Read $Outdir correct
 ```
 
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
+	Outdir=assembly/spades/N.ditissima/NG-R0905/
+	qsub $ProgDir/sumit_SPAdes3.sh $F_Read $R_Read $Outdir correct
+```
 Assemblies were summarised to allow the best assembly to be determined by eye.
 
 ** Assembly stats are:
   * Assembly size:
-  * N50:
+  * N50:126848
   * N80:
   * N20:
-  * Longest contig:
+  * Longest contig:728907
   **
 
 # Repeatmasking
