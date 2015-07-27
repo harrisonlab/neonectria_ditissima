@@ -143,7 +143,9 @@ Gene models were used to predict genes in the Neonectria genome. This used resul
 Quality of genome assemblies was assessed by looking for the gene space in the assemblies.
 
 ```bash
-
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
+  	Assembly=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
+  	qsub $ProgDir/sub_cegma.sh $Assembly dna
 ```
 
 ** Number of cegma genes present and complete: **
@@ -155,7 +157,10 @@ Gene prediction was performed for the neonectria genome.
 CEGMA genes were used as Hints for the location of CDS.
 
 ```bash
-
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/augustus
+  	Assembly=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
+  	GeneModel=fusarium_graminearum
+  	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly
 ```
 
 ** Number of genes predicted: **
