@@ -170,7 +170,9 @@ CEGMA genes were used as Hints for the location of CDS.
 Interproscan was used to give gene models functional annotations.
 
 ```bash
-
+	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan/
+  	Genes=gene_pred/augustus/spades/N.ditissima/N.ditissima_aug_out.aa
+  	$ProgDir/sub_interproscan.sh $Genes
 ```
 
 
