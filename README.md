@@ -84,7 +84,7 @@ This allowed estimation of sequencing depth and total genome size:
 
 ** Estimated Genome Size is: 48490129
 
-** Esimated Coverage is: 
+** Esimated Coverage is: 42
 
 #Assembly
 Assembly was performed using: Velvet / Abyss / Spades
@@ -129,7 +129,7 @@ The best assembly was used to perform repeatmasking
  ```
 
 
-** % bases maked by repeatmasker: **
+** % bases masked by repeatmasker: 12.53 %
 
 ** % bases masked by transposon psi: **
 
@@ -148,8 +148,8 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
   	qsub $ProgDir/sub_cegma.sh $Assembly dna
 ```
 
-** Number of cegma genes present and complete: **
-** Number of cegma genes present and partial: **
+** Number of cegma genes present and complete: 95.56
+** Number of cegma genes present and partial: 97.18
 
 ##Gene prediction
 
