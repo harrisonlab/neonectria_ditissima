@@ -163,18 +163,24 @@ CEGMA genes were used as Hints for the location of CDS.
   	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly
 ```
 
-** Number of genes predicted: **
+** Number of genes predicted: 13587
 
 #Functional annotation
 
 Interproscan was used to give gene models functional annotations.
 
 ```bash
-	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan/
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan/
   	Genes=gene_pred/augustus/spades/N.ditissima/N.ditissima_aug_out.aa
   	$ProgDir/sub_interproscan.sh $Genes
 ```
 
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
+	Genes=gene_pred/augustus/spades/N.ditissima/N.ditissima_aug_out.aa
+	InterProRaw=gene_pred/interproscan/spades/N.ditissima/raw
+	ProgDir/append_interpro.sh $Genes $InterProRaw
+```
 
 #Genomic analysis
 The first analysis was based upon BLAST searches for genes known to be involved in toxin production
