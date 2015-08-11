@@ -64,7 +64,7 @@ This was done with fastq-mcf
 Data quality was visualised once again following trimming:
 
 ```bash
-for RawData in $(ls qc_dna/paired/*/*/*/*.fastq.gz); do 
+	for RawData in $(ls qc_dna/paired/*/*/*/*.fastq.gz); do 
 	echo $RawData; 
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc; 
 	qsub $ProgDir/run_fastqc.sh $RawData;
@@ -105,6 +105,7 @@ A range of hash lengths were used and the best assembly selected for subsequent 
 	Outdir=assembly/spades/N.ditissima/NG-R0905/
 	qsub $ProgDir/sumit_SPAdes3.sh $F_Read $R_Read $Outdir correct
 ```
+
 Assemblies were summarised to allow the best assembly to be determined by eye.
 
 ** Assembly stats are:
@@ -114,6 +115,23 @@ Assemblies were summarised to allow the best assembly to be determined by eye.
   * N20:
   * Longest contig:728907
   **
+
+# Filter contigs
+
+The assembled contigs were filtered to remove all contigs shorter than 1kb from
+the assembly. This was done using the following commands:
+
+```bash
+	InDir=assembly/spades/N.ditissima/NG-R0905
+	OutDir=assembly/spades/N.ditissima/NG-R0905_filtered
+	mkdir –p $OutDir
+  	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/abyss
+  	Assembly=$InDir/scaffolds.fasta
+  	AssFiltered=$OutDir/scaffolds_filtered_500.fasta
+  	$ProgDir/filter_abyss_contigs.py $Assembly 500 > $AssFiltered
+  	AssFiltered=$OutDir/scaffolds_filtered_1000.fasta
+  	$ProgDir/filter_abyss_contigs.py $Assembly 1000 > $AssFiltered
+```
 
 # Repeatmasking
 
@@ -127,7 +145,6 @@ The best assembly was used to perform repeatmasking
 	qsub $ProgDir/rep_modeling.sh $BestAss
 	qsub $ProgDir/transposonPSI.sh $BestAss
  ```
-
 
 ** % bases masked by repeatmasker: 12.53 %
 
@@ -163,7 +180,7 @@ CEGMA genes were used as Hints for the location of CDS.
   	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly
 ```
 
-** Number of genes predicted: 13587
+** Number of genes predicted: 13589
 
 #Functional annotation
 
@@ -190,7 +207,10 @@ The first analysis was based upon BLAST searches for genes known to be involved 
 Predicted gene models were searched against the PHIbase database using tBLASTx.
 
 ```bash
-
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/blast
+	Query=../../phibase/v3.8/PHI_accessions.fa
+	Subject=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
+	qsub $ProgDir/blast_pipe.sh $Query protein $Subject
 ```
 
 Top BLAST hits were used to annotate gene models.
@@ -201,3 +221,4 @@ Top BLAST hits were used to annotate gene models.
 
 ** Blast results of note: **
   * 'Result A'
+  
