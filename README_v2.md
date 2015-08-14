@@ -119,8 +119,27 @@ Assemblies were summarised to allow the best assembly to be determined by eye.
   * Longest contig:687738
   **
 
+As SPADes was run with the option to autodetect a minimum coverage the assembly was assessed to identify the coverage of assembled contigs. This was done using the following command:
 
-# Repeatmasking
+	BestAss=assembly/spades/N.ditissima/R0905_v2/filtered_contigs/contigs_min_500bp.fasta
+	cat $BestAss | grep '>' | cut -f6 -d'_' | sort -n | cut -f1 -d '.' | sort -n | uniq -c | less
+
+From this it was determined that SPades could not be trusted to set its own minimum threshold for coverage.
+In future an option will be be used to set a coverage for spades.
+In the meantime contigs with a coverage lower than 10 were filtered out using the following commands:
+
+	Headers=assembly/spades/N.ditissima/R0905_v2/filtered_contigs/contigs_min_500bp_10x_headers.txt
+	cat $BestAss | grep '>' | grep -E -v 'cov_.\..*_' > $Headers
+	FastaMinCov=assembly/spades/N.ditissima/R0905_v2/filtered_contigs/contigs_min_500bp_10x_headers.fasta
+	cat $BestAss | sed -e 's/\(^>.*$\)/#\1#/' | tr -d "\r" | tr -d "\n" | sed -e 's/$/#/' | tr "#" "\n" | sed -e '/^$/d' | grep -A1 -f $Headers | grep -v -E '^\-\-' > $FastaMinCov
+
+We run Quast again.
+
+	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+	Assembly=assembly/spades/N.ditissima/R0905_v2/filtered_contigs/contigs_min_500bp_10x_headers.fasta
+	OutDir=assembly/spades/N.ditissima/R0905_v2/contigs_min_500bp_10x_headers
+	qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+
 
 Repeat masking was performed and used the following programs: Repeatmasker Repeatmodeler
 
@@ -128,12 +147,12 @@ The best assembly was used to perform repeatmasking
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-	BestAss=/assembly/spades/N.ditissima/R0905_v2/scaffolds.fasta
+	BestAss=/assembly/spades/N.ditissima/R0905_v2/filtered_contigs/contigs_min_500bp_10x_headers.fasta
 	qsub $ProgDir/rep_modeling.sh $BestAss
 	qsub $ProgDir/transposonPSI.sh $BestAss
  ```
 
-** % bases masked by repeatmasker: 12.53 %
+** % bases masked by repeatmasker: 
 
 ** % bases masked by transposon psi: **
 
