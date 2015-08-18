@@ -152,7 +152,7 @@ The best assembly was used to perform repeatmasking
 	qsub $ProgDir/transposonPSI.sh $BestAss
  ```
 
-** % bases masked by repeatmasker: 
+** % bases masked by repeatmasker: 11.67% 
 
 ** % bases masked by transposon psi: **
 
@@ -167,11 +167,11 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
-  	Assembly=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
+  	Assembly=/repeat_masked/N.ditissima/R0905_v2/filtered_contigs_repmask/R0905_v2_contigs_unmasked.fa
   	qsub $ProgDir/sub_cegma.sh $Assembly dna
 ```
 
-** Number of cegma genes present and complete: 95.56
+** Number of cegma genes present and complete: 95.16 
 ** Number of cegma genes present and partial: 97.18
 
 ##Gene prediction
@@ -181,12 +181,12 @@ CEGMA genes were used as Hints for the location of CDS.
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/augustus
-  	Assembly=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
+  	Assembly=/repeat_masked/N.ditissima/R0905_v2/filtered_contigs_repmask/R0905_v2_contigs_unmasked.fa
   	GeneModel=fusarium_graminearum
   	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly
 ```
 
-** Number of genes predicted: 13589
+** Number of genes predicted: 13391
 
 #Functional annotation
 
