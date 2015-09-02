@@ -191,7 +191,10 @@ CEGMA genes were used as Hints for the location of CDS.
 Now we predict genes using the Fusarium gene model so we can make the comparison.
 
 I rename the file to avoid overwriting.
+		
+```bash
 	mv augustus/N.ditissima/R0905_v2 augustus/spades/N.ditissima/ 
+```
 	
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/augustus
