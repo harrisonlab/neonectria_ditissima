@@ -140,7 +140,7 @@ We run Quast again.
 	OutDir=assembly/spades/N.ditissima/R0905_v2/contigs_min_500bp_10x_headers
 	qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 
-
+# Repeat masking
 Repeat masking was performed and used the following programs: Repeatmasker Repeatmodeler
 
 The best assembly was used to perform repeatmasking
@@ -187,6 +187,19 @@ CEGMA genes were used as Hints for the location of CDS.
 ```
 
 ** Number of genes predicted: 13391
+
+Now we predict genes using the Fusarium gene model so we can make the comparison.
+
+I rename the file to avoid overwriting.
+	mv augustus/N.ditissima/R0905_v2 augustus/spades/N.ditissima/ 
+	
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/augustus
+  	Assembly=/repeat_masked/N.ditissima/R0905_v2/filtered_contigs_repmask/R0905_v2_contigs_unmasked.fa
+  	GeneModel=fusarium
+  	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly
+```	
+** Number of genes predicted: 12712
 
 #Functional annotation
 
