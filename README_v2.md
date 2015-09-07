@@ -133,6 +133,9 @@ In the meantime contigs with a coverage lower than 10 were filtered out using th
 	FastaMinCov=assembly/spades/N.ditissima/R0905_v2/filtered_contigs/contigs_min_500bp_10x_headers.fasta
 	cat $BestAss | sed -e 's/\(^>.*$\)/#\1#/' | tr -d "\r" | tr -d "\n" | sed -e 's/$/#/' | tr "#" "\n" | sed -e '/^$/d' | grep -A1 -f $Headers | grep -v -E '^\-\-' > $FastaMinCov
 
+```bash
+	~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants/remove_contaminants.py --inp ../neonectria_ditissima/assembly/spades/N.ditissima/R0905_v2/filtered_contigs/contigs_min_500bp_10x_headers.fasta  --out assembly/spades/N.galligena/R0905_v2/filtered_contigs/contigs_min_500bp_10x_filtered_renamed.fasta  --coord_file editfile.tab
+
 We run Quast again.
 
 	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
@@ -152,7 +155,7 @@ The best assembly was used to perform repeatmasking
 	qsub $ProgDir/transposonPSI.sh $BestAss
  ```
 
-** % bases masked by repeatmasker: 11.67% 
+** % bases masked by repeatmasker: 11.73% 
 
 ** % bases masked by transposon psi: **
 
@@ -167,7 +170,7 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
-  	Assembly=/repeat_masked/N.ditissima/R0905_v2/filtered_contigs_repmask/R0905_v2_contigs_unmasked.fa
+  	Assembly=/repeat_masked/spades/N.ditissima/R0905_v2/filtered_contigs_repmask/R0905_v2_contigs_unmasked.fa
   	qsub $ProgDir/sub_cegma.sh $Assembly dna
 ```
 
@@ -181,27 +184,11 @@ CEGMA genes were used as Hints for the location of CDS.
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/augustus
-  	Assembly=/repeat_masked/N.ditissima/R0905_v2/filtered_contigs_repmask/R0905_v2_contigs_unmasked.fa
-  	GeneModel=fusarium_graminearum
-  	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly
-```
-
-** Number of genes predicted: 13391
-
-Now we predict genes using the Fusarium gene model so we can make the comparison.
-
-I rename the file to avoid overwriting.
-		
-```bash
-	mv augustus/N.ditissima/R0905_v2 augustus/spades/N.ditissima/ 
+  	Assembly=/repeat_masked/spades/N.ditissima/R0905_v2/filtered_contigs_repmask/R0905_v2_contigs_unmasked.fa
+  	GeneModel=fusarium
+  	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly false
 ```
 	
-```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/augustus
-  	Assembly=/repeat_masked/N.ditissima/R0905_v2/filtered_contigs_repmask/R0905_v2_contigs_unmasked.fa
-  	GeneModel=fusarium
-  	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly
-```	
 ** Number of genes predicted: 12712
 
 #Functional annotation
