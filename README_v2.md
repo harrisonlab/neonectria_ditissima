@@ -189,7 +189,7 @@ CEGMA genes were used as Hints for the location of CDS.
   	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly false
 ```
 	
-** Number of genes predicted: 12712
+** Number of genes predicted: 12711
 
 #Functional annotation
 
@@ -197,7 +197,7 @@ Interproscan was used to give gene models functional annotations.
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan/
-  	Genes=gene_pred/augustus/spades/N.ditissima/N.ditissima_aug_out.aa
+  	Genes=gene_pred/augustus/N.ditissima/R0905_v2/N.ditissima_aug_out.aa
   	$ProgDir/sub_interproscan.sh $Genes
 ```
 
