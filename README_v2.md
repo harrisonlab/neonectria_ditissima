@@ -100,7 +100,7 @@ A range of hash lengths were used and the best assembly selected for subsequent 
   	qsub $ProgDir/submit_SPAdes.sh $F_Read $R_Read $OutDir only-assembler
 ```
 
-Quast
+#Quast
 
 ```bash
 	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
@@ -197,15 +197,15 @@ Interproscan was used to give gene models functional annotations.
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan/
-  	Genes=gene_pred/augustus/N.ditissima/R0905_v2/N.ditissima_aug_out.aa
+  	Genes=gene_pred/augustus/N.ditissima/R0905_v2/R0905_v2_EMR_aug_out.aa
   	$ProgDir/sub_interproscan.sh $Genes
 ```
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	Genes=gene_pred/augustus/spades/N.ditissima/N.ditissima_aug_out.aa
-	InterProRaw=gene_pred/interproscan/spades/N.ditissima/raw
-	ProgDir/append_interpro.sh $Genes $InterProRaw
+	Genes=gene_pred/augustus/N.ditissima/R0905_v2/R0905_v2_EMR_aug_out.aa
+	InterProRaw=gene_pred/interproscan/N.ditissima/R0905_v2/raw
+	$ProgDir/append_interpro.sh $Genes $InterProRaw
 ```
 
 #Genomic analysis
