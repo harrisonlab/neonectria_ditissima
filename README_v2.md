@@ -193,6 +193,8 @@ CEGMA genes were used as Hints for the location of CDS.
 
 #Functional annotation
 
+#A)Interproscan
+
 Interproscan was used to give gene models functional annotations.
 
 ```bash
@@ -206,6 +208,26 @@ Interproscan was used to give gene models functional annotations.
 	Genes=gene_pred/augustus/N.ditissima/R0905_v2/R0905_v2_EMR_aug_out.aa
 	InterProRaw=gene_pred/interproscan/N.ditissima/R0905_v2/raw
 	$ProgDir/append_interpro.sh $Genes $InterProRaw
+```
+
+#B) SwissProt
+
+Putative ID's were given to genes with homology to SwissProt (the highly curated gene subset of UniProt). IDs were given by through BLASTP searches.
+
+```bash
+	qlogin
+  	ProjDir=/home/groups/harrisonlab/project_files/neonectria_ditissima
+  	cd $ProjDir
+  	OutDir=$ProjDir/gene_pred/uniprot/N.ditissima/R0905
+  	mkdir -p $OutDir
+  	blastp \
+  	-db /home/groups/harrisonlab/uniprot/swissprot/uniprot_sprot \
+  	-query $ProjDir/gene_pred/augustus/N.ditissima/R0905_v2/R0905_v2_EMR_aug_out.aa \
+  	-out $OutDir/swissprot_v2015_09_hits.tbl  \
+  	-evalue 1e-100 \
+  	-outfmt 6 \
+  	-num_threads 16 \
+  	-num_alignments 10
 ```
 
 #Genomic analysis
