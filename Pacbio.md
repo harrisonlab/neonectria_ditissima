@@ -10,7 +10,7 @@ for N. ditissima data:
   	cp -r $RawDatDir/D08_1 raw_dna/pacbio/N.ditissima/R0905/.
   	cp -r $RawDatDir/E08_1 raw_dna/pacbio/N.ditissima/R0905/.
   	cp -r $RawDatDir/F08_1 raw_dna/pacbio/N.ditissima/R0905/.
-  	OutDir=raw_dna/pacbio/N.ditissima/R0905/extracted
+	OutDir=raw_dna/pacbio/N.ditissima/R0905/extracted
   	mkdir -p $OutDir
   	cat raw_dna/pacbio/N.ditissima/R0905/*/Analysis_Results/*.subreads.fastq > $OutDir/concatenated_pacbio.fastq
 ```
@@ -33,20 +33,20 @@ for N. ditissima data:
 ```
 
 ```bash
-  ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  for Assembly in $(ls assembly/canu/*/*/*_canu.contigs.fasta); do
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/canu/*/*/*_canu.contigs.fasta); do
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
     OutDir=assembly/canu/$Organism/$Strain/filtered_contigs
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-  done
+  	done
 ```
 
 Assemblies were polished using Pilon
 
 ```bash
-  for Assembly in $(ls assembly/canu/*/Fus2/*_canu.contigs.fasta); do
-  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  	for Assembly in $(ls assembly/canu/*/R0905/*_canu.contigs.fasta); do
+  	Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 	Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     IlluminaDir=$(ls -d qc_dna/paired/$Organism/NG-R0905)
     TrimF1_Read=$(ls $IlluminaDir/F/NG-R0905_qc_F.fastq.gz);
@@ -54,7 +54,7 @@ Assemblies were polished using Pilon
     OutDir=assembly/canu/$Organism/$Strain/polished
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
     qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
-  done
+  	done
 ```
 
 
