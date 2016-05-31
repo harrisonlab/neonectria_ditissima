@@ -10,7 +10,7 @@ for N. ditissima data:
   	cp -r $RawDatDir/D08_1 raw_dna/pacbio/N.ditissima/R0905/.
   	cp -r $RawDatDir/E08_1 raw_dna/pacbio/N.ditissima/R0905/.
   	cp -r $RawDatDir/F08_1 raw_dna/pacbio/N.ditissima/R0905/.
-	OutDir=raw_dna/pacbio/N.ditissima/R0905/extracted
+    OutDir=raw_dna/pacbio/N.ditissima/R0905/extracted
   	mkdir -p $OutDir
   	cat raw_dna/pacbio/N.ditissima/R0905/*/Analysis_Results/*.subreads.fastq > $OutDir/concatenated_pacbio.fastq
 ```
@@ -47,7 +47,7 @@ Assemblies were polished using Pilon
 ```bash
   	for Assembly in $(ls assembly/canu/*/R0905/*_canu.contigs.fasta); do
   	Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-	Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+	  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     IlluminaDir=$(ls -d qc_dna/paired/$Organism/NG-R0905)
     TrimF1_Read=$(ls $IlluminaDir/F/NG-R0905_qc_F.fastq.gz);
     TrimR1_Read=$(ls $IlluminaDir/R/NG-R0905_qc_R.fastq.gz);
@@ -56,7 +56,8 @@ Assemblies were polished using Pilon
     qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
   	done
 ```
-
+cat pilon.fasta | grep 'tig' | wc -l
+125
 
 ### Spades Assembly
 
@@ -93,7 +94,7 @@ cat contigs.fasta | grep 'NODE' | wc -l
   	done
 ```
 
-Contigs shorter thaan 500bp were renomed from the assembly
+Contigs shorter than 500bp were removed from the assembly
 
 ```bash
   for Contigs in $(ls assembly/spades_pacbio/*/*/contigs.fasta); do
@@ -129,7 +130,7 @@ Quast
     # HybridAssembly=$(ls assembly/spades_pacbio/$Organism/Fus2/contigs.fasta)
     OutDir=assembly/merged_canu_spades/$Organism/$Strain
     # OutDir=assembly/pacbio_test/$Organism/$Strain
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
     qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir
   done
 ```
