@@ -66,7 +66,7 @@ For N. ditissima
 ```bash
   	for PacBioDat in $(ls raw_dna/pacbio/*/*/extracted/concatenated_pacbio.fastq); do
     echo $StrainPath
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/spades
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
     Organism=$(echo $PacBioDat | rev | cut -f4 -d '/' | rev)
     Strain=$(echo $PacBioDat | rev | cut -f3 -d '/' | rev)
     IlluminaDir=$(ls -d qc_dna/paired/$Organism/NG-R0905)
@@ -80,8 +80,8 @@ For N. ditissima
     qsub $ProgDir/sub_spades_pacbio.sh $PacBioDat $TrimF1_Read $TrimR1_Read $OutDir 15
   	done
 ```
-# cat contigs.fasta | grep 'NODE' | wc -l
-# 641
+cat contigs.fasta | grep 'NODE' | wc -l
+641
 
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
@@ -103,8 +103,8 @@ Contigs shorter thaan 500bp were renomed from the assembly
     $FilterDir/filter_abyss_contigs.py $Contigs 500 > $AssemblyDir/filtered_contigs_min_500bp/contigs_min_500bp.fasta
   done
 ```
-#cat contigs_min_500bp.fasta | grep 'NODE' | wc -l
-#364
+cat contigs_min_500bp.fasta | grep 'NODE' | wc -l
+364
 
 Quast
 
