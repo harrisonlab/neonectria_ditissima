@@ -135,6 +135,16 @@ Quast
   done
 ```
 
+```bash
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
+    OutDir=assembly/merged_canu_spades/$Organism/$Strain/quast
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
+
 This merged assembly was polished using Pilon
 
 ```bash
@@ -153,6 +163,7 @@ This merged assembly was polished using Pilon
   done
 ```
 
+
 Contigs were renamed in accordance with ncbi recomendations.
 
 ```bash
@@ -165,4 +176,23 @@ Contigs were renamed in accordance with ncbi recomendations.
     $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/contigs_min_500bp_renamed.fasta --coord_file tmp.csv
   done
   rm tmp.csv
+```
+
+# Preliminary analysis
+
+## Checking PacBio coverage against Fus2 contigs
+
+The accuracy of PacBio assembly pipelines is currently unknown. To help identify
+regions that may have been missassembled the pacbio reads were aligned back to
+the assembled genome. Coverage was determined using bedtools genomecov and
+regions with low coverage flagged using a python script flag_low_coverage.py.
+These low coverage regions were visually inspected using IGV.
+
+```bash
+    Assembly=assembly/merged_canu_spades/N.ditissima/R0905/merged.fasta
+    Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
+    OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
+    qsub $ProgDir/sub_bwa_pacbio.sh $Assembly $Reads $OutDir
+  done
 ```
