@@ -164,19 +164,72 @@ This merged assembly was polished using Pilon
 ```
 
 
+#Contigs were renamed in accordance with ncbi recomendations.
+
+```bash
+  #ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+  #touch tmp.csv
+  #for Assembly in $(ls assembly/spades_pacbio/*/*/filtered_contigs_min_500bp/contigs_min_500bp.fasta); do
+  #  Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  #  Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+  #  OutDir=assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp
+  #  $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/contigs_min_500bp_renamed.fasta --coord_file tmp.csv
+  #done
+  #rm tmp.csv
+```
+
 Contigs were renamed in accordance with ncbi recomendations.
 
 ```bash
   ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
   touch tmp.csv
-  for Assembly in $(ls assembly/spades_pacbio/*/*/filtered_contigs/contigs_min_500bp.fasta); do
-    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  # for Assembly in $(ls assembly/merged_canu_spades/*/*/polished/pilon.fasta); do
+  for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/R0905/polished/pilon.fasta); do
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
-    OutDir=assembly/spades_pacbio/$Organism/$Strain/filtered_contigs
-    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/contigs_min_500bp_renamed.fasta --coord_file tmp.csv
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    # OutDir=assembly/merged_canu_spades/$Organism/$Strain/filtered_contigs
+    OutDir=assembly/merged_canu_spades/$Organism/$Strain/filtered_contigs
+    mkdir -p $OutDir
+    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_contigs_renamed.fasta --coord_file tmp.csv
   done
   rm tmp.csv
 ```
+
+Assembly stats were collected using quast
+
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  # for Assembly in $(ls assembly/merged_canu_spades/*/*/filtered_contigs/Fus2_contigs_renamed.fasta); do
+  for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
+    OutDir=$(dirname $Assembly)
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  done
+```
+
+## Renaming assemblies - temporarily
+Fus2 was temporarily renamed for preliminary analysis
+
+```bash
+  cp -r assembly/canu/F.oxysporum_fsp_cepae/Fus2 assembly/canu/F.oxysporum_fsp_cepae/Fus2_pacbio_test_canu
+  cp -r assembly/merged_canu_spades/F.oxysporum_fsp_cepae/Fus2 assembly/merged_canu_spades/F.oxysporum_fsp_cepae/Fus2_pacbio_test_merged
+  cp -r assembly/pacbio_test/F.oxysporum_fsp_cepae/Fus2_pacbio_merged assembly/pacbio_test/F.oxysporum_fsp_cepae/Fus2_pacbio_merged_richards
+```
+
+# Repeatmasking assemblies
+
+```bash
+  # Fus2_pacbio_canu=$(ls assembly/canu/F.oxysporum_fsp_cepae/Fus2_pacbio_test_canu/filtered_contigs/Fus2_canu_contigs_renamed.fasta)
+  R0905_pacbio_merged=$(ls assembly/merged_canu_spades/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
+  # for Assembly in $(ls $Fus2_pacbio_merged $Fus2_pacbio_canu); do
+  for Assembly in $(ls $R0905_pacbio_merged); do
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
+    qsub $ProgDir/rep_modeling.sh $Assembly
+    qsub $ProgDir/transposonPSI.sh $Assembly
+  done
+```
+
 
 # Preliminary analysis
 
@@ -189,7 +242,16 @@ regions with low coverage flagged using a python script flag_low_coverage.py.
 These low coverage regions were visually inspected using IGV.
 
 ```bash
-    Assembly=assembly/merged_canu_spades/N.ditissima/R0905/merged.fasta
+    #Assembly=assembly/merged_canu_spades/N.ditissima/R0905/merged.fasta
+    #Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
+    #OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/
+    #ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
+    #qsub $ProgDir/sub_bwa_pacbio.sh $Assembly $Reads $OutDir
+  #done
+```
+
+```bash
+    Assembly=assembly/md erged_canu_spades/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta
     Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
     OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
