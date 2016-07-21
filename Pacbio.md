@@ -241,17 +241,22 @@ the assembled genome. Coverage was determined using bedtools genomecov and
 regions with low coverage flagged using a python script flag_low_coverage.py.
 These low coverage regions were visually inspected using IGV.
 
-```bash
-    #Assembly=assembly/merged_canu_spades/N.ditissima/R0905/merged.fasta
-    #Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
-    #OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/
-    #ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
-    #qsub $ProgDir/sub_bwa_pacbio.sh $Assembly $Reads $OutDir
-  #done
-```
+
+Merged canu spades assembly
 
 ```bash
-    Assembly=assembly/md erged_canu_spades/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta
+    Assembly=assembly/merged_canu_spades/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta
+    Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
+    OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
+    qsub $ProgDir/sub_bwa_pacbio.sh $Assembly $Reads $OutDir
+  done
+```
+
+Canu assembly
+
+```bash
+    Assembly=assembly/canu/N.ditissima/R0905/polished/pilon.fasta
     Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
     OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
