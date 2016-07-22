@@ -34,6 +34,21 @@ and annotation.
   cp /home/groups/harrisonlab/project_files/neonectria/NG-R0905_S4_L001_R2_001.fastq raw_dna/paired/$Species/$Strain/R/.
 ```
 
+RNA data was also copied into the project area:
+
+```bash
+  cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+  mkdir -p raw_rna/paired/N.ditissima/Hg199/F
+  mkdir -p raw_rna/paired/N.ditissima/Hg199/R
+  mkdir -p raw_dna/paired/N.ditissima/R0905/F
+  mkdir -p raw_dna/paired/N.ditissima/R0905/R
+  RawDat=/home/groups/harrisonlab/raw_data/raw_seq/raw_reads/160718_M04465_0018_ANU02
+  cp $RawDat/Hg199_S1_L001_R1_001.fastq.gz raw_rna/paired/N.ditissima/Hg199/F/.
+  cp $RawDat/Hg199_S1_L001_R2_001.fastq.gz raw_rna/paired/N.ditissima/Hg199/R/.
+  cp $RawDat/R09-05_S2_L001_R1_001.fastq.gz raw_rna/paired/N.ditissima/R0905/F/.
+  cp $RawDat/R09-05_S2_L001_R2_001.fastq.gz raw_rna/paired/N.ditissima/R0905/R/.
+```
+
 
 #Data qc
 
@@ -42,9 +57,9 @@ programs: fastqc fastq-mcf kmc
 Data quality was visualised using fastqc:
 
 ```bash
-  for RawData in $(ls raw_dna/paired/*/*/*/*.fastq); do 
-	  echo $RawData; 
-	  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc; 
+  for RawData in $(ls raw_dna/paired/*/*/*/*.fastq); do
+	  echo $RawData;
+	  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	  qsub $ProgDir/run_fastqc.sh $RawData;
   done
 ```
@@ -64,9 +79,9 @@ This was done with fastq-mcf
 Data quality was visualised once again following trimming:
 
 ```bash
-	for RawData in $(ls qc_dna/paired/*/*/*/*.fastq.gz); do 
-	echo $RawData; 
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc; 
+	for RawData in $(ls qc_dna/paired/*/*/*/*.fastq.gz); do
+	echo $RawData;
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	qsub $ProgDir/run_fastqc.sh $RawData;
   done
 ```
@@ -221,4 +236,3 @@ Top BLAST hits were used to annotate gene models.
 
 ** Blast results of note: **
   * 'Result A'
-  
