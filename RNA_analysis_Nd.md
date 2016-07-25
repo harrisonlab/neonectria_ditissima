@@ -36,8 +36,33 @@ Trimming was performed on data to trim adapters from sequences and remove poor q
 	done
 ```
 
----
+There was an error with one of the R0905 files:
 
+gzip: stdin: unexpected end of file
+Malformed fastq record (length mismatch) at line 14759539
+# of rows in mate file 'R09-05_S2_L001_R2_001.fastq' doesn't match, quitting!
+
+The file was copied again. fastqc and fastq-mcf were repeated with this new file.
+
+```bash
+	for RawData in $(ls raw_rna/paired/*/R0905/*/*.fastq.gz); do
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
+	echo $RawData;
+	qsub $ProgDir/run_fastqc.sh $RawData
+done
+
+```bash
+	for StrainPath in $(ls -d raw_rna/paired/*/R0905); do
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+		IlluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
+		ReadsF=$(ls $StrainPath/F/*.fastq*)
+		ReadsR=$(ls $StrainPath/R/*.fastq*)
+		echo $ReadsF
+		echo $ReadsR
+		qsub $ProgDir/rna_qc_fastq-mcf.sh $ReadsF $ReadsR $IlluminaAdapters DNA
+	done
+```
+----
 Data quality was visualised once again following trimming:
 ```bash
 	for RawData in $(ls qc_dna/paired/*/*/*/*.fq.gz | grep 'FOP2'); do
