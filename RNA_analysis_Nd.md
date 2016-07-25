@@ -6,6 +6,7 @@ Note - all this work was performed in the directory:
 
 #Data qc
 
+
 programs:
   fastqc
   fastq-mcf
@@ -19,35 +20,14 @@ Data quality was visualised using fastqc:
 		qsub $ProgDir/run_fastqc.sh $RawData
 	done
 ```
-----
-Trimming was performed on data to trim adapters from
-sequences and remove poor quality data. This was done with fastq-mcf
 
-Firstly, those strains with more than one run were identified:
+Trimming was performed on data to trim adapters from sequences and remove poor quality data. This was done with fastq-mcf:
+
 
 ```bash
-	for Strain in $(ls -d raw_dna/paired/*/*); do
-	NumReads=$(ls $Strain/F/*.gz | wc -l);
-		if [ $NumReads -gt 1 ]; then
-			echo "$Strain";
-			echo "$NumReads";
-		fi;
-	done
-```
-
-```
-	raw_dna/paired/F.oxysporum_fsp_cepae/Fus2
-	2
-	raw_dna/paired/F.oxysporum_fsp_cepae/HB6
-	2
-```
-
-Trimming was first performed on all strains that had a single run of data:
-
-```bash
-	for StrainPath in $(ls -d raw_dna/paired/*/* | grep -v -e 'Fus2' -e 'HB6'); do
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/rna_qc
-		IlluminaAdapters=/home/armita/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
+	for StrainPath in $(ls -d raw_rna/paired/*/*); do
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+		IlluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
 		ReadsF=$(ls $StrainPath/F/*.fastq*)
 		ReadsR=$(ls $StrainPath/R/*.fastq*)
 		echo $ReadsF
@@ -56,31 +36,7 @@ Trimming was first performed on all strains that had a single run of data:
 	done
 ```
 
-Trimming was then performed for strains with multiple runs of data
-
-```bash
-	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/rna_qc
-	IlluminaAdapters=/home/armita/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
-	echo "Fus2"
-	StrainPath=raw_dna/paired/F.oxysporum_fsp_cepae/Fus2
-	ReadsF=$(ls $StrainPath/F/s_6_1_sequence.fastq.gz)
-	ReadsR=$(ls $StrainPath/R/s_6_2_sequence.fastq.gz)
-	qsub $ProgDir/rna_qc_fastq-mcf.sh $ReadsF $ReadsR $IlluminaAdapters DNA
-	StrainPath=raw_dna/paired/F.oxysporum_fsp_cepae/Fus2
-	ReadsF=$(ls $StrainPath/F/FUS2_S2_L001_R1_001.fastq.gz)
-	ReadsR=$(ls $StrainPath/R/FUS2_S2_L001_R2_001.fastq.gz)
-	qsub $ProgDir/rna_qc_fastq-mcf.sh $ReadsF $ReadsR $IlluminaAdapters DNA
-	echo "HB6"
-	StrainPath=raw_dna/paired/F.oxysporum_fsp_cepae/HB6
-	ReadsF=$(ls $StrainPath/F/HB6_S4_L001_R1_001.fastq.gz)
-	ReadsR=$(ls $StrainPath/R/HB6_S4_L001_R2_001.fastq.gz)
-	qsub $ProgDir/rna_qc_fastq-mcf.sh $ReadsF $ReadsR $IlluminaAdapters DNA
-	StrainPath=raw_dna/paired/F.oxysporum_fsp_cepae/HB6
-	ReadsF=$(ls $StrainPath/F/HB6_S5_L001_R1_001.fastq.gz)
-	ReadsR=$(ls $StrainPath/R/HB6_S5_L001_R2_001.fastq.gz)
-	qsub $ProgDir/rna_qc_fastq-mcf.sh $ReadsF $ReadsR $IlluminaAdapters DNA
-```
-
+---
 
 Data quality was visualised once again following trimming:
 ```bash
