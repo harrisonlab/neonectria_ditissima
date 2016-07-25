@@ -62,11 +62,11 @@ done
 		qsub $ProgDir/rna_qc_fastq-mcf.sh $ReadsF $ReadsR $IlluminaAdapters DNA
 	done
 ```
-----
+
 Data quality was visualised once again following trimming:
 ```bash
-	for RawData in $(ls qc_dna/paired/*/*/*/*.fq.gz | grep 'FOP2'); do
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+	for RawData in $(ls qc_dna/paired/*/*/*/*.fq.gz); do
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
 		echo $RawData;
 		qsub $ProgDir/run_fastqc.sh $RawData
 	done
