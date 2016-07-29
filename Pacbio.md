@@ -348,26 +348,25 @@ R09-05_S2_L001_R1_001_fastqc  R09-05_S2_L001_R1_001.fastq.gz
 R09-05_S2_L001_R2_001_fastqc  R09-05_S2_L001_R2_001.fastq.gz
 ```
 
-Perform qc of RNAseq timecourse data
+Perform qc of RNAseq data
+
 ```bash
-	for num in $(qstat | grep 'rna_qc' | cut -f1 -d ' '); do
-		Treatment=$(head -n1 rna_qc_fastq-mcf.sh.o$num | cut -f10 -d '/')
-		for FilePath in $(raw_rna/paired/F.oxysporum_fsp_cepae/55_72hrs_rep1); do
-			echo $FilePath
-			FileF=$(ls $FilePath/F/*.gz)
-			FileR=$(ls $FilePath/R/*.gz)
-			IlluminaAdapters=/home/armita/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
-			ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/rna_qc
-			qsub $ProgDir/rna_qc_fastq-mcf.sh $FileF $FileR $IlluminaAdapters RNA
-			sleep 10
-		done
-	done
+  for FilePath in $(ls -d raw_rna/paired/N.*/R0905); do
+    echo $FilePath;
+    FileF=$(ls $FilePath/F/*.gz);
+    FileR=$(ls $FilePath/R/*.gz);
+    IlluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa; ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc;
+    qsub $ProgDir/rna_qc_fastq-mcf.sh $FileF $FileR $IlluminaAdapters RNA;
+  done
 ```
-```
+
+
+
+
 
 Data quality was visualised using fastqc:
 ```bash
-	for RawData in $(ls qc_rna/paired/F.oxysporum_fsp_cepae/*/*/*.fq.gz); do
+	RawData in $(ls qc_rna/paired/Fysporum_fsp_cepae/*/*/*.fq.gz); do
 		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
 		echo $RawData;
 		qsub $ProgDir/run_fastqc.sh $RawData
