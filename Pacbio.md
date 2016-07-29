@@ -301,7 +301,7 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 
 Outputs were summarised using the commands:
 ```bash
-	for File in $(ls gene_pred/cegma/F*/Fus2/*_dna_cegma.completeness_report); do
+	for File in $(ls gene_pred/cegma/N.*/R0905_canu_assembly/*_dna_cegma.completeness_report); do
 		Strain=$(echo $File | rev | cut -f2 -d '/' | rev);
 		Species=$(echo $File | rev | cut -f3 -d '/' | rev);
 		printf "$Species\t$Strain\n";
@@ -330,7 +330,7 @@ First, RNAseq data was aligned to Fusarium genomes.
 * qc of RNA seq data is detailed below:
 
 ```bash
- for Folder in $(ls -d raw_rna/paired/F.oxysporum_fsp_cepae/*); do
+ for Folder in $(ls -d raw_rna/paired/N.ditissima/*); do
 	 FolderName=$(echo $Folder | rev | cut -f1 -d '/' | rev);
 	 echo $FolderName;
 	 ls $Folder/F;
@@ -338,83 +338,14 @@ First, RNAseq data was aligned to Fusarium genomes.
 	done
 ```
 This contained the following data:
+
 ```
-	55_72hrs_rep1
-	sample013_1.combined.fastq.gz
-	sample013_2.combined.fastq.gz
-	55_72hrs_rep2
-	sample014_1.combined.fastq.gz
-	sample014_2.combined.fastq.gz
-	55_72hrs_rep3
-	sample015_1.combined.fastq.gz
-	sample015_2.combined.fastq.gz
-	control_72hrs_rep1
-	sample002_1.combined.fastq.gz
-	sample002_2.combined.fastq.gz
-	control_72hrs_rep2
-	sample004_1.combined.fastq.gz
-	sample004_2.combined.fastq.gz
-	control_72hrs_rep3
-	sample005_1.combined.fastq.gz
-	sample005_2.combined.fastq.gz
-	FO47_72hrs_rep1
-	sample006_1.combined.fastq.gz
-	sample006_2.combined.fastq.gz
-	FO47_72hrs_rep2
-	sample007_1.combined.fastq.gz
-	sample007_2.combined.fastq.gz
-	FO47_72hrs_rep3
-	sample012_1.combined.fastq.gz
-	sample012_2.combined.fastq.gz
-	Fus2_0hrs_prelim
-	1_S1_L001_R1_001.fastq.gz
-	1_S1_L001_R2_001.fastq.gz
-	Fus2_16hrs_prelim
-	3_S2_L001_R1_001.fastq.gz
-	3_S2_L001_R2_001.fastq.gz
-	Fus2_24hrs_prelim_rep1
-	4_S3_L001_R1_001.fastq.gz
-	4_S3_L001_R2_001.fastq.gz
-	Fus2_24hrs_prelim_rep2
-	Fus2_36hrs_prelim
-	36hr-root_S10_L001_R1_001.fastq.gz
-	36hr-root_S10_L001_R2_001.fastq.gz
-	Fus2_48hrs_prelim
-	6_S4_L001_R1_001.fastq.gz
-	6_S4_L001_R2_001.fastq.gz
-	Fus2_4hrs_prelim
-	4hr-root_S7_L001_R1_001.fastq.gz
-	4hr-root_S7_L001_R2_001.fastq.gz
-	Fus2_72hrs_prelim
-	7_S5_L001_R1_001.fastq.gz
-	7_S5_L001_R2_001.fastq.gz
-	Fus2_72hrs_rep1
-	sample016_1.combined.fastq.gz
-	sample016_2.combined.fastq.gz
-	Fus2_72hrs_rep2
-	sample018_1.combined.fastq.gz
-	sample018_2.combined.fastq.gz
-	Fus2_72hrs_rep3
-	sample019_1.combined.fastq.gz
-	sample019_2.combined.fastq.gz
-	Fus2_8hrs_prelim
-	8hr-root_S8_L001_R1_001.fastq.gz
-	8hr-root_S8_L001_R2_001.fastq.gz
-	Fus2_96hrs_prelim
-	8_S6_L001_R1_001.fastq.gz
-	8_S6_L001_R2_001.fastq.gz
-	Fus2_CzapekDox
-	6_S2_L001_R1_001_fastqc  6_S2_L001_R1_001.fastq.gz
-	6_S2_L001_R2_001_fastqc  6_S2_L001_R2_001.fastq.gz
-	Fus2_GlucosePeptone
-	7_S3_L001_R1_001_fastqc  7_S3_L001_R1_001.fastq.gz
-	7_S3_L001_R2_001_fastqc  7_S3_L001_R2_001.fastq.gz
-	Fus2_PDA
-	9_S4_L001_R1_001_fastqc  9_S4_L001_R1_001.fastq.gz
-	9_S4_L001_R2_001_fastqc  9_S4_L001_R2_001.fastq.gz
-	Fus2_PDB
-	4_S1_L001_R1_001_fastqc  4_S1_L001_R1_001.fastq.gz
-	4_S1_L001_R2_001_fastqc  4_S1_L001_R2_001.fastq.gz
+Hg199
+Hg199_S1_L001_R1_001_fastqc  Hg199_S1_L001_R1_001.fastq.gz
+Hg199_S1_L001_R2_001_fastqc  Hg199_S1_L001_R2_001.fastq.gz
+R0905
+R09-05_S2_L001_R1_001_fastqc  R09-05_S2_L001_R1_001.fastq.gz
+R09-05_S2_L001_R2_001_fastqc  R09-05_S2_L001_R2_001.fastq.gz
 ```
 
 Perform qc of RNAseq timecourse data
@@ -432,23 +363,6 @@ Perform qc of RNAseq timecourse data
 		done
 	done
 ```
-```
-raw_rna/paired/F.oxysporum_fsp_cepae/55_72hrs_rep1
-Your job 6436212 ("rna_qc_fastq-mcf.sh") has been submitted
-raw_rna/paired/F.oxysporum_fsp_cepae/55_72hrs_rep2
-Your job 6436213 ("rna_qc_fastq-mcf.sh") has been submitted
-raw_rna/paired/F.oxysporum_fsp_cepae/55_72hrs_rep3
-Your job 6436214 ("rna_qc_fastq-mcf.sh") has been submitted
-raw_rna/paired/F.oxysporum_fsp_cepae/control_72hrs_rep2
-Your job 6436215 ("rna_qc_fastq-mcf.sh") has been submitted
-raw_rna/paired/F.oxysporum_fsp_cepae/control_72hrs_rep3
-Your job 6436216 ("rna_qc_fastq-mcf.sh") has been submitted
-raw_rna/paired/F.oxysporum_fsp_cepae/FO47_72hrs_rep1
-Your job 6436217 ("rna_qc_fastq-mcf.sh") has been submitted
-raw_rna/paired/F.oxysporum_fsp_cepae/FO47_72hrs_rep2
-Your job 6436218 ("rna_qc_fastq-mcf.sh") has been submitted
-raw_rna/paired/F.oxysporum_fsp_cepae/FO47_72hrs_rep3
-Your job 6436219 ("rna_qc_fastq-mcf.sh") has been submitted
 ```
 
 Data quality was visualised using fastqc:
