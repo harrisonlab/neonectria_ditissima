@@ -242,6 +242,19 @@ Fus2 was temporarily renamed for preliminary analysis
   done
 ```
 
+Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
+
+```bash
+for File in $(ls repeat_masked/*/*/filtered_contigs_repmask/*_contigs_softmasked.fa); do
+      OutDir=$(dirname $File)
+      TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+      OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+      bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+      echo "$OutFile"
+      echo "Number of masked bases:"
+      cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+    done
+
 # Preliminary analysis
 
 ## Checking PacBio coverage against Fus2 contigs
@@ -388,7 +401,7 @@ cufflinks was running.
 			FileR=$(ls $RNADir/R/*_trim.fq.gz)
 			OutDir=alignment/$Organism/$Strain/$Timepoint
 			ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-			qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir
+
 		done
 	done
 ```
@@ -396,54 +409,35 @@ Alignments were concatenated prior to running cufflinks:
 Cufflinks was run to produce the fragment length and stdev statistics:
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/Fo47/*/*_contigs_softmasked.fa | grep 'FOP2'); do
-		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-		AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
-		OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
-		echo "$Organism - $Strain"
-		mkdir -p $OutDir
-		samtools merge -f $AcceptedHits \
-		alignment/$Organism/$Strain/55_72hrs_rep1/accepted_hits.bam \
-		alignment/$Organism/$Strain/55_72hrs_rep2/accepted_hits.bam \
-		alignment/$Organism/$Strain/55_72hrs_rep3/accepted_hits.bam \
-		alignment/$Organism/$Strain/FO47_72hrs_rep1/accepted_hits.bam \
-		alignment/$Organism/$Strain/FO47_72hrs_rep2/accepted_hits.bam \
-		alignment/$Organism/$Strain/FO47_72hrs_rep3/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_0hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_16hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_24hrs_prelim_rep1/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_36hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_48hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_4hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_72hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_72hrs_rep1/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_72hrs_rep2/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_72hrs_rep3/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_8hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_96hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_CzapekDox/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_GlucosePeptone/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_PDA/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_PDB/accepted_hits.bam
-		cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
+	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked.fa); do
+	Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+	Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+	# AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
+  AcceptedHits=alignment/$Organism/$Strain/R0905/accepted_hits.bam
+  OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
+	echo "$Organism - $Strain"
+	mkdir -p $OutDir
+	# samtools merge -f $AcceptedHits \
+	# alignment/$Organism/$Strain/R0905/accepted_hits.bam \
+  # alignment/$Organism/$Strain/R0905/accepted_hits.bam
+  cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
 	done
 ```
 
 Output from stdout included:
 ```
-	Processed 22484 loci.                        [*************************] 100%
-	Map Properties:
-	     Normalized Map Mass: 50507412.55
-	     Raw Map Mass: 50507412.55
-	     Fragment Length Distribution: Empirical (learned)
-	                   Estimated Mean: 181.98
-	                Estimated Std Dev: 78.39
-	[13:02:48] Assembling transcripts and estimating abundances.
-	Processed 22506 loci.                        [*************************] 100%
+  Processed 19254 loci.                        [*************************] 100%
+  Map Properties:
+  Normalized Map Mass: 12059221.57
+  Raw Map Mass: 12059221.57
+  Fragment Length Distribution: Empirical (learned)
+                Estimated Mean: 219.68
+	            Estimated Std Dev: 39.56
+[15:04:46] Assembling transcripts and estimating abundances.
+  Processed 19333 loci.                        [*************************] 100%
 ```
 
-The Estimated Mean: 181.98 allowed calculation of of the mean insert gap to be
+The Estimated Mean: 219.68 allowed calculation of of the mean insert gap to be
 -20bp 182-(97*2) where 97 was the mean read length. This was provided to tophat
 on a second run (as the -r option) along with the fragment length stdev to
 increase the accuracy of mapping.
