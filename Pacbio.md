@@ -377,17 +377,17 @@ single genome. The fragment length and stdev were printed to stdout while
 cufflinks was running.
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/*/*/*_contigs_unmasked.fa | grep 'FOP2'); do
+	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_unmasked.fa); do
 		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
-		for RNADir in $(ls -d qc_rna/paired/F.oxysporum_fsp_cepae/*); do
+		for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905); do
 			Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
 			echo "$Timepoint"
 			FileF=$(ls $RNADir/F/*_trim.fq.gz)
 			FileR=$(ls $RNADir/R/*_trim.fq.gz)
 			OutDir=alignment/$Organism/$Strain/$Timepoint
-			ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/RNAseq
+			ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
 			qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir
 		done
 	done
