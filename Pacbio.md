@@ -360,14 +360,10 @@ Perform qc of RNAseq data
   done
 ```
 
-
-
-
-
 Data quality was visualised using fastqc:
 ```bash
-	RawData in $(ls qc_rna/paired/Fysporum_fsp_cepae/*/*/*.fq.gz); do
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+	for RawData in $(ls qc_rna/paired/N.ditissima/R0905/*/*.fq.gz); do
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
 		echo $RawData;
 		qsub $ProgDir/run_fastqc.sh $RawData
 	done
