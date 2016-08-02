@@ -77,13 +77,13 @@ This was done with fastq-mcf
 Data quality was visualised once again following trimming:
 
 ```bash
-	for RawData in $(ls qc_dna/paired/*/*/*/*.fastq.gz); do
-	echo $RawData;
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
-	qsub $ProgDir/run_fastqc.sh $RawData;
+  for RawData in $(ls qc_dna/paired/*/Hg199/*/*.fq.gz); do
+  echo $RawData;
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
+  qsub $ProgDir/run_fastqc.sh $RawData;
   done
 ```
-
+----
 
 kmer counting was performed using kmc.
 This allowed estimation of sequencing depth and total genome size:
