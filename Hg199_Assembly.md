@@ -83,22 +83,30 @@ Data quality was visualised once again following trimming:
   qsub $ProgDir/run_fastqc.sh $RawData;
   done
 ```
-----
 
 kmer counting was performed using kmc.
 This allowed estimation of sequencing depth and total genome size:
 
 ```bash
-	Trim_F=qc_dna/paired/N.ditissima/NG-R0905/F/NG-R0905_qc_F.fastq.gz
-	Trim_R=qc_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_qc_R.fastq.gz
+	Trim_F=qc_dna/paired/N.ditissima/Hg199/F/*.fq.gz
+	Trim_R=qc_dna/paired/N.ditissima/Hg199/R/*.fq.gz
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
 	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
 ```
 
-** Estimated Genome Size is: 48490129
+mode kmer abundance prior to error correction was reported using the following commands:
+```bash
+    for File in $(ls qc_dna/kmc/*/Hg199/*_true_kmer_summary.txt); do
+        basename $File;
+        cat $File | grep -e 'abundance' -e 'size'
+    done
+```
 
-** Esimated Coverage is: 42
+** Estimated Genome Size is: 42917594
 
+** Esimated Coverage is: 74
+
+    
 #Assembly
 Assembly was performed using: Velvet / Abyss / Spades
 
