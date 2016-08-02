@@ -1,4 +1,21 @@
-# neonectria_ditissima
+
+for StrainPath in $(ls -d qc_dna/paired/*/* | grep -v -w -e "036" -e "057" -e "118"); do
+        Jobs=$(qstat | grep 'submit_S' | grep 'qw' | wc -l)
+        while [ $Jobs -gt 1 ]; do
+        sleep 10
+        printf "."
+        Jobs=$(qstat | grep 'submit_S' | grep 'qw' | wc -l)
+        done
+        ProgDir=/home/passet/git_repos/tools/seq_tools/assemblers/spades
+        Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
+        Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
+        F_Read=$(ls $StrainPath/F/*.fq.gz)
+        R_Read=$(ls $StrainPath/R/*.fq.gz)
+        OutDir=assembly/spades/$Organism/$Strain
+        echo $F_Read
+        echo $R_Read
+        qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $OutDir correct 15
+    done# neonectria_ditissima
 Scripts used during analysis of neonectria_ditissima genomes.
 
 neonectria_ditissima
@@ -106,7 +123,7 @@ mode kmer abundance prior to error correction was reported using the following c
 
 ** Esimated Coverage is: 74
 
-    
+
 #Assembly
 Assembly was performed using: Velvet / Abyss / Spades
 
@@ -114,18 +131,21 @@ A range of hash lengths were used and the best assembly selected for subsequent 
 
 
 ```bash
-	F_Read=qc_dna/paired/N.ditissima/NG-R0905/F/NG-R0905_qc_F.fastq.gz
-	R_Read=qc_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_qc_R.fastq.gz
+	F_Read=qc_dna/paired/N.ditissima/Hg199/F/*.fq.gz
+	R_Read=qc_dna/paired/N.ditissima/Hg199/R/*.fq.gz
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
-	Outdir=assembly/spades/N.ditissima/NG-R0905/
-	qsub $ProgDir/sumit_SPAdes2.sh $F_Read $R_Read $Outdir correct
+	Outdir=assembly/spades/N.ditissima/Hg199/
+	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
 ```
+
+OOOOO
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
 	Outdir=assembly/spades/N.ditissima/NG-R0905/
 	qsub $ProgDir/sumit_SPAdes3.sh $F_Read $R_Read $Outdir correct
 ```
+
 
 Assemblies were summarised to allow the best assembly to be determined by eye.
 
