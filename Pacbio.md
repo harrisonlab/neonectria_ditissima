@@ -401,7 +401,7 @@ cufflinks was running.
 			FileR=$(ls $RNADir/R/*_trim.fq.gz)
 			OutDir=alignment/$Organism/$Strain/$Timepoint
 			ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-
+      qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir
 		done
 	done
 ```
@@ -438,7 +438,7 @@ Output from stdout included:
 ```
 
 The Estimated Mean: 219.68 allowed calculation of of the mean insert gap to be
--20bp 182-(97*2) where 97 was the mean read length. This was provided to tophat
+-140bp 182-(180*2) where 180? was the mean read length. This was provided to tophat
 on a second run (as the -r option) along with the fragment length stdev to
 increase the accuracy of mapping.
 
@@ -446,20 +446,18 @@ increase the accuracy of mapping.
 Then Rnaseq data was aligned to each genome assembly:
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/*/*/*_contigs_unmasked.fa | grep -w 'Fus2'); do
-	# for Assembly in $(ls assembly/merged_canu_spades/*/Fus2/filtered_contigs/Fus2_contigs_renamed.fasta); do
-	# for Assembly in $(ls assembly/external_group/F.oxysporum/fo47/broad/fusarium_oxysporum_fo47_1_supercontigs.fasta); do
+	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_unmasked.fa); do
 		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
-		for RNADir in $(ls -d qc_rna/paired/F.oxysporum_fsp_cepae/* | grep -v -e '_rep'); do
+		for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905 | grep -v -e '_rep'); do
 			Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
 			echo "$Timepoint"
 			FileF=$(ls $RNADir/F/*_trim.fq.gz)
 			FileR=$(ls $RNADir/R/*_trim.fq.gz)
 			OutDir=alignment/$Organism/$Strain/$Timepoint
-			InsertGap='-20'
-			InsertStdDev='78'
+			InsertGap='-140'
+			InsertStdDev='40'
 			Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
 			while [ $Jobs -gt 1 ]; do
 				sleep 10
@@ -467,7 +465,7 @@ Then Rnaseq data was aligned to each genome assembly:
 				Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
 			done
 			printf "\n"
-			ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/RNAseq
+			ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
 			qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
 		done
 	done
