@@ -138,41 +138,33 @@ A range of hash lengths were used and the best assembly selected for subsequent 
 	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
 ```
 
-OOOOO
+cat contigs.fasta | grep '>' | wc -l
+1204
+
+cat contigs_min_500bp.fasta | grep '>' | wc -l
+849
+
 
 ```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
-	Outdir=assembly/spades/N.ditissima/NG-R0905/
-	qsub $ProgDir/sumit_SPAdes3.sh $F_Read $R_Read $Outdir correct
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/Hg199/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
 ```
-
 
 Assemblies were summarised to allow the best assembly to be determined by eye.
 
 ** Assembly stats are:
   * Assembly size:
-  * N50:126848
+  * N50:182348
   * N80:
   * N20:
-  * Longest contig:728907
+  * Longest contig:614761
   **
 
-# Filter contigs
-
-The assembled contigs were filtered to remove all contigs shorter than 1kb from
-the assembly. This was done using the following commands:
-
-```bash
-	InDir=assembly/spades/N.ditissima/NG-R0905
-	OutDir=assembly/spades/N.ditissima/NG-R0905_filtered
-	mkdir –p $OutDir
-  	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/abyss
-  	Assembly=$InDir/scaffolds.fasta
-  	AssFiltered=$OutDir/scaffolds_filtered_500.fasta
-  	$ProgDir/filter_abyss_contigs.py $Assembly 500 > $AssFiltered
-  	AssFiltered=$OutDir/scaffolds_filtered_1000.fasta
-  	$ProgDir/filter_abyss_contigs.py $Assembly 1000 > $AssFiltered
-```
 
 # Repeatmasking
 
@@ -182,7 +174,7 @@ The best assembly was used to perform repeatmasking
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-	BestAss=/assembly/spades/N.ditissima/NG-R0905/scaffolds.fasta
+	BestAss=/assembly/spades/N.ditissima/Hg199/filtered_contigs/contigs_min_500bp.fasta
 	qsub $ProgDir/rep_modeling.sh $BestAss
 	qsub $ProgDir/transposonPSI.sh $BestAss
  ```
