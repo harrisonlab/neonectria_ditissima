@@ -470,6 +470,7 @@ Then Rnaseq data was aligned to each genome assembly:
 		done
 	done
 
+  cd alignment/N.ditissima/R0905_pacbio_canu/
   mkdir R0905_accurate
   mv -r R0905/* R0905_accurate/
 ```
