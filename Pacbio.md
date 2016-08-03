@@ -469,9 +469,13 @@ Then Rnaseq data was aligned to each genome assembly:
 			qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
 		done
 	done
+
+  mkdir R0905_accurate
+  mv -r R0905/* R0905_accurate/
 ```
 
-
+mkdir R0905_accurate
+mv -r R0905/* R0905_accurate/
 #### Braker prediction
 
 ```bash
