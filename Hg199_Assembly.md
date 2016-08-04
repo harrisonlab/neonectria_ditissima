@@ -1,21 +1,4 @@
 
-for StrainPath in $(ls -d qc_dna/paired/*/* | grep -v -w -e "036" -e "057" -e "118"); do
-        Jobs=$(qstat | grep 'submit_S' | grep 'qw' | wc -l)
-        while [ $Jobs -gt 1 ]; do
-        sleep 10
-        printf "."
-        Jobs=$(qstat | grep 'submit_S' | grep 'qw' | wc -l)
-        done
-        ProgDir=/home/passet/git_repos/tools/seq_tools/assemblers/spades
-        Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
-        Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
-        F_Read=$(ls $StrainPath/F/*.fq.gz)
-        R_Read=$(ls $StrainPath/R/*.fq.gz)
-        OutDir=assembly/spades/$Organism/$Strain
-        echo $F_Read
-        echo $R_Read
-        qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $OutDir correct 15
-    done# neonectria_ditissima
 Scripts used during analysis of neonectria_ditissima genomes.
 
 neonectria_ditissima
@@ -179,9 +162,26 @@ The best assembly was used to perform repeatmasking
 	qsub $ProgDir/transposonPSI.sh $BestAss
  ```
 
-** % bases masked by repeatmasker: 12.53 %
+** % bases masked by repeatmasker: 10.88% (bases masked:4941726 bp)
 
-** % bases masked by transposon psi: **
+** % bases masked by transposon psi: 9.48% (bases masked:4306052 bp)
+
+Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
+
+```bash
+  for File in $(ls repeat_masked/*/Hg199/filtered_contigs_repmask/*_contigs_softmasked.fa); do
+      OutDir=$(dirname $File)
+      TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+      OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+      bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+      echo "$OutFile"
+      echo "Number of masked bases:"
+      cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+    done
+
+    repeat_masked/N.ditissima/Hg199/filtered_contigs_repmask/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
+    Number of masked bases:  5062507
+```
 
 
 # Gene Prediction
