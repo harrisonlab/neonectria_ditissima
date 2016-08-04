@@ -497,8 +497,6 @@ Then Rnaseq data was aligned to each genome assembly:
   mv -r R0905/* R0905_accurate/
 ```
 
-mkdir R0905_accurate
-mv -r R0905/* R0905_accurate/
 #### Braker prediction
 
 ```bash
