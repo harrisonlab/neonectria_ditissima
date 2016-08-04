@@ -242,6 +242,11 @@ Fus2 was temporarily renamed for preliminary analysis
   done
 ```
 
+** % bases masked by repeatmasker: 11.57% (bases masked:5290972 bp)
+
+** % bases masked by transposon psi: 10.29% (bases masked:4704506 bp)
+
+
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
@@ -254,6 +259,10 @@ for File in $(ls repeat_masked/*/*/filtered_contigs_repmask/*_contigs_softmasked
       echo "Number of masked bases:"
       cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
     done
+```
+repeat_masked/N.ditissima/R0905_pacbio_canu/filtered_contigs_repmask/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:5398957
+
 
 # Preliminary analysis
 
@@ -305,12 +314,25 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
 	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-	for Genome in $(ls repeat_masked/F.*/*/*/*_contigs_unmasked.fa | grep -w -e 'Fus2' -e 'fo47'); do
-	#for Genome in $(ls repeat_masked/F.*/*/*/*_contigs_unmasked.fa | grep -w 'fo47'); do
+	for Genome in $(ls repeat_masked/N.*/R0905_pacbio_canu/*/*_contigs_softmasked.fa); do
 		echo $Genome;
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
 	done
 ```
+** Number of cegma genes present and complete: 94.35
+** Number of cegma genes present and partial: 95.97
+
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
+	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+	for Genome in $(ls repeat_masked/N.*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		echo $Genome;
+		qsub $ProgDir/sub_cegma.sh $Genome dna;
+	done
+```
+** Number of cegma genes present and complete:
+** Number of cegma genes present and partial:
+
 
 Outputs were summarised using the commands:
 ```bash
