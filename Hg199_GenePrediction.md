@@ -15,12 +15,13 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
 	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-	for Genome in $(ls repeat_masked/F.*/*/*/*_contigs_unmasked.fa | grep -w -e 'Fus2' -e 'fo47'); do
-	#for Genome in $(ls repeat_masked/F.*/*/*/*_contigs_unmasked.fa | grep -w 'fo47'); do
+	for Genome in $(ls repeat_masked/N.*/Hg199/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		echo $Genome;
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
 	done
 ```
+** Number of cegma genes present and complete: 95.56
+** Number of cegma genes present and partial: 97.18
 
 Outputs were summarised using the commands:
 ```bash
@@ -33,7 +34,6 @@ Outputs were summarised using the commands:
 
 	less gene_pred/cegma/cegma_results_dna_summary.txt
 ```
-
 
 #Gene prediction
 
