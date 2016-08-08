@@ -319,8 +319,8 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
 	done
 ```
-** Number of cegma genes present and complete: 94.35
-** Number of cegma genes present and partial: 95.97
+** Number of cegma genes present and complete: 94.35%
+** Number of cegma genes present and partial: 95.97%
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
@@ -330,8 +330,8 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
 	done
 ```
-** Number of cegma genes present and complete:
-** Number of cegma genes present and partial:
+** Number of cegma genes present and complete: 94.35%
+** Number of cegma genes present and partial: 95.97%
 
 
 Outputs were summarised using the commands:
@@ -412,7 +412,7 @@ single genome. The fragment length and stdev were printed to stdout while
 cufflinks was running.
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_unmasked.fa); do
+	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
