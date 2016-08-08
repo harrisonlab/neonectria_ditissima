@@ -20,12 +20,12 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
 	done
 ```
-** Number of cegma genes present and complete: 95.56
-** Number of cegma genes present and partial: 97.18
+** Number of cegma genes present and complete: 95.56%
+** Number of cegma genes present and partial: 96.77%
 
 Outputs were summarised using the commands:
 ```bash
-	for File in $(ls gene_pred/cegma/N.*/R0905_canu_assembly/*_dna_cegma.completeness_report); do
+	for File in $(ls gene_pred/cegma/N.*/Hg199/*_dna_cegma.completeness_report); do
 		Strain=$(echo $File | rev | cut -f2 -d '/' | rev);
 		Species=$(echo $File | rev | cut -f3 -d '/' | rev);
 		printf "$Species\t$Strain\n";
@@ -74,7 +74,7 @@ R09-05_S2_L001_R2_001_fastqc  R09-05_S2_L001_R2_001.fastq.gz
 Perform qc of RNAseq data
 
 ```bash
-  for FilePath in $(ls -d raw_rna/paired/N.*/R0905); do
+  for FilePath in $(ls -d raw_rna/paired/N.*/Hg199); do
     echo $FilePath;
     FileF=$(ls $FilePath/F/*.gz);
     FileR=$(ls $FilePath/R/*.gz);
