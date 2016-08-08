@@ -85,7 +85,7 @@ Perform qc of RNAseq data
 
 Data quality was visualised using fastqc:
 ```bash
-	for RawData in $(ls qc_rna/paired/N.ditissima/R0905/*/*.fq.gz); do
+	for RawData in $(ls qc_rna/paired/N.ditissima/Hg199/*/*.fq.gz); do
 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
 		echo $RawData;
 		qsub $ProgDir/run_fastqc.sh $RawData
@@ -100,11 +100,11 @@ single genome. The fragment length and stdev were printed to stdout while
 cufflinks was running.
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_unmasked.fa); do
+	for Assembly in $(ls repeat_masked/*/Hg199/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
-		for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905); do
+		for RNADir in $(ls -d qc_rna/paired/N.ditissima/Hg199); do
 			Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
 			echo "$Timepoint"
 			FileF=$(ls $RNADir/F/*_trim.fq.gz)
@@ -115,6 +115,7 @@ cufflinks was running.
 		done
 	done
 ```
+0000000000
 Alignments were concatenated prior to running cufflinks:
 Cufflinks was run to produce the fragment length and stdev statistics:
 
