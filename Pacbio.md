@@ -427,11 +427,15 @@ cufflinks was running.
 		done
 	done
 ```
+
+76.4% overall read mapping rate.
+66.8% concordant pair alignment rate.
+
 Alignments were concatenated prior to running cufflinks:
 Cufflinks was run to produce the fragment length and stdev statistics:
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked.fa); do
+	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 	Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
 	Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 	# AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
@@ -468,7 +472,7 @@ increase the accuracy of mapping.
 Then Rnaseq data was aligned to each genome assembly:
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_unmasked.fa); do
+	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -478,7 +482,7 @@ Then Rnaseq data was aligned to each genome assembly:
 			FileF=$(ls $RNADir/F/*_trim.fq.gz)
 			FileR=$(ls $RNADir/R/*_trim.fq.gz)
 			OutDir=alignment/$Organism/$Strain/$Timepoint
-			InsertGap='-140'
+			InsertGap='-80'
 			InsertStdDev='40'
 			Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
 			while [ $Jobs -gt 1 ]; do
@@ -491,7 +495,7 @@ Then Rnaseq data was aligned to each genome assembly:
 			qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
 		done
 	done
-
+0000
   cd alignment/N.ditissima/R0905_pacbio_canu/
   mkdir R0905_accurate
   mv -r R0905/* R0905_accurate/
