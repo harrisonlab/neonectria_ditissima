@@ -472,29 +472,29 @@ increase the accuracy of mapping.
 Then Rnaseq data was aligned to each genome assembly:
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-		echo "$Organism - $Strain"
-		for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905 | grep -v -e '_rep'); do
-			Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
-			echo "$Timepoint"
-			FileF=$(ls $RNADir/F/*_trim.fq.gz)
-			FileR=$(ls $RNADir/R/*_trim.fq.gz)
-			OutDir=alignment/$Organism/$Strain/$Timepoint
-			InsertGap='-80'
-			InsertStdDev='40'
-			Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
-			while [ $Jobs -gt 1 ]; do
-				sleep 10
-				printf "."
-				Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
-			done
-			printf "\n"
-			ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-			qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
-		done
-	done
+for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+echo "$Organism - $Strain"
+for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905 | grep -v -e '_rep'); do
+Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
+echo "$Timepoint"
+FileF=$(ls $RNADir/F/*_trim.fq.gz)
+FileR=$(ls $RNADir/R/*_trim.fq.gz)
+OutDir=alignment/$Organism/$Strain/$Timepoint
+InsertGap='-20'
+InsertStdDev='40'
+Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
+while [ $Jobs -gt 1 ]; do
+sleep 10
+printf "."
+Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
+done
+printf "\n"
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
+done
+done
 0000
   cd alignment/N.ditissima/R0905_pacbio_canu/
   mkdir R0905_accurate
