@@ -500,6 +500,8 @@ done
   mkdir R0905_accurate
   mv -r R0905/* R0905_accurate/
 ```
+76.4% overall read mapping rate.
+66.8% concordant pair alignment rate.
 
 #### Braker prediction
 
