@@ -186,3 +186,5 @@ Then Rnaseq data was aligned to each genome assembly:
   mkdir R0905_accurate
   mv -r R0905/* R0905_accurate/
 ```
+79.1% overall read mapping rate.
+70.2% concordant pair alignment rate.
