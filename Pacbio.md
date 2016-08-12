@@ -505,53 +505,38 @@ done
 
 #### Braker prediction
 
+Before braker predictiction was performed, I double checked that I had the genemark key in my user area and copied it over from the genemark install directory:
+
+ls ~/.gm_key
+cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
+
+
 ```bash
-	for Assembly in $(ls repeat_masked/*/*/*/*_contigs_softmasked.fa | grep -w -e 'Fus2'); do
-	Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-	while [ $Jobs -gt 1 ]; do
-	sleep 10
-	printf "."
-	Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-	done
-	printf "\n"
-	Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-	Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-	echo "$Organism - $Strain"
-	mkdir -p alignment/$Organism/$Strain/concatenated
-	samtools merge -f alignment/$Organism/$Strain/concatenated/concatenated.bam \
-	alignment/$Organism/$Strain/55_72hrs_rep1/accepted_hits.bam \
-	alignment/$Organism/$Strain/55_72hrs_rep2/accepted_hits.bam \
-	alignment/$Organism/$Strain/55_72hrs_rep3/accepted_hits.bam \
-	alignment/$Organism/$Strain/FO47_72hrs_rep1/accepted_hits.bam \
-	alignment/$Organism/$Strain/FO47_72hrs_rep2/accepted_hits.bam \
-	alignment/$Organism/$Strain/FO47_72hrs_rep3/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_0hrs_prelim/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_16hrs_prelim/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_24hrs_prelim_rep1/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_36hrs_prelim/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_48hrs_prelim/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_4hrs_prelim/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_72hrs_prelim/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_72hrs_rep1/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_72hrs_rep2/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_72hrs_rep3/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_8hrs_prelim/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_96hrs_prelim/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_CzapekDox/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_GlucosePeptone/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_PDA/accepted_hits.bam \
-	alignment/$Organism/$Strain/Fus2_PDB/accepted_hits.bam
-	OutDir=gene_pred/braker/$Organism/"$Strain"_braker_pacbio
-	AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
-	GeneModelName="$Organism"_"$Strain"_braker_new
-	rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_new
-	ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/braker1
-	qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
-	done
+    for Assembly in $(ls repeat_masked/N.ditissima/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+    while [ $Jobs -gt 1 ]; do
+    sleep 10
+    printf "."
+    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+    done
+    printf "\n"
+    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+    echo "$Organism - $Strain"
+    mkdir -p alignment/$Organism/$Strain/concatenated
+    samtools merge -f alignment/$Organism/$Strain/concatenated/concatenated.bam \
+    alignment/$Organism/R0905_pacbio_canu/R0905/accepted_hits.bam
+    OutDir=gene_pred/braker/$Organism/"$Strain"_braker_first
+    AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
+    GeneModelName="$Organism"_"$Strain"_braker_first
+    rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_first
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
+    qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
+    done
 ```
 
 Fasta and gff files were extracted from Braker1 output.
-
+q
 ```bash
 	for File in $(ls gene_pred/braker/F.*/*_braker_new/*/augustus.gff); do
 		getAnnoFasta.pl $File
