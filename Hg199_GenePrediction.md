@@ -188,3 +188,35 @@ Then Rnaseq data was aligned to each genome assembly:
 ```
 79.1% overall read mapping rate.
 70.2% concordant pair alignment rate.
+
+#### Braker prediction
+
+Before braker predictiction was performed, I double checked that I had the genemark key in my user area and copied it over from the genemark install directory:
+
+ls ~/.gm_key
+cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
+
+
+```bash
+    for Assembly in $(ls repeat_masked/N.ditissima/Hg199/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+    while [ $Jobs -gt 1 ]; do
+    sleep 10
+    printf "."
+    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+    done
+    printf "\n"
+    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+    echo "$Organism - $Strain"
+    mkdir -p alignment/$Organism/$Strain/concatenated
+    samtools merge -f alignment/$Organism/$Strain/concatenated/concatenated.bam \
+    alignment/$Organism/Hg199/Hg199/accepted_hits.bam
+    OutDir=gene_pred/braker/$Organism/"$Strain"_braker_first
+    AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
+    GeneModelName="$Organism"_"$Strain"_braker_first
+    rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_first
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
+    qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
+    done
+```
