@@ -536,6 +536,27 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
     done
 ```
 
+```bash
+    for Assembly in $(ls repeat_masked/N.ditissima/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+    while [ $Jobs -gt 1 ]; do
+    sleep 10
+    printf "."
+    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+    done
+    printf "\n"
+    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+    echo "$Organism - $Strain"
+    OutDir=gene_pred/braker/$Organism/"$Strain"_braker_first
+    AcceptedHits=alignment/$Organism/$Strain/R0905/accepted_hits.bam
+    GeneModelName="$Organism"_"$Strain"_braker_first
+    rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_first
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
+    qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
+    done
+```
+
 Fasta and gff files were extracted from Braker1 output.
 q
 ```bash
