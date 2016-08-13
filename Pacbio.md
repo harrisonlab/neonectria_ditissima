@@ -507,9 +507,10 @@ done
 
 Before braker predictiction was performed, I double checked that I had the genemark key in my user area and copied it over from the genemark install directory:
 
+```bash
 ls ~/.gm_key
 cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
-
+```
 
 ```bash
     for Assembly in $(ls repeat_masked/N.ditissima/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
@@ -538,11 +539,11 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 Fasta and gff files were extracted from Braker1 output.
 q
 ```bash
-	for File in $(ls gene_pred/braker/F.*/*_braker_new/*/augustus.gff); do
-		getAnnoFasta.pl $File
-		OutDir=$(dirname $File)
-		echo "##gff-version 3" > $OutDir/augustus_extracted.gff
-		cat $File | grep -v '#' >> $OutDir/augustus_extracted.gff
+for File in $(ls gene_pred/braker/N.*/*_braker_first/*/augustus.gff); do
+getAnnoFasta.pl $File
+OutDir=$(dirname $File)
+echo "##gff-version 3" > $OutDir/augustus_extracted.gff
+cat $File | grep -v '#' >> $OutDir/augustus_extracted.gff
 	done
 ```
 
@@ -553,19 +554,21 @@ Note - IGV was used to view aligned reads against the Fus2 genome on my local
 machine.
 
 ```bash
-	InBam=alignment/F.oxysporum_fsp_cepae/Fus2_edited_v2/concatenated/concatenated.bam
-	ViewBam=alignment/F.oxysporum_fsp_cepae/Fus2_edited_v2/concatenated/concatenated_view.bam
-	SortBam=alignment/F.oxysporum_fsp_cepae/Fus2_edited_v2/concatenated/concatenated_sorted
-	samtools view -b $InBam > $ViewBam
-	samtools sort $ViewBam $SortBam
-	samtools index $SortBam.bam
+InBam=alignment/N.ditissima/R0905_pacbio_canu/concatenated/concatenated.bam
+ViewBam=alignment/N.ditissima/R0905_pacbio_canu/concatenated/concatenated_view.bam
+SortBam=alignment/N.ditissima/R0905_pacbio_canu/concatenated/concatenated_sorted
+samtools view -b $InBam > $ViewBam
+samtools sort $ViewBam $SortBam
+samtools index $SortBam.bam
 ```
 
+[bam_header_read] EOF marker is absent. The input is probably truncated.
+[main_samview] truncated file.
 
 Cufflinks was run to compare the predicted genes to assembled transcripts:
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/*/*/*_contigs_softmasked.fa | grep -w -e 'Fus2'); do
+	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
 		while [ $Jobs -gt 1 ]; do
 		sleep 10
@@ -579,29 +582,8 @@ Cufflinks was run to compare the predicted genes to assembled transcripts:
 		echo "$Organism - $Strain"
 		mkdir -p $OutDir
 		samtools merge -f $AcceptedHits \
-		alignment/$Organism/$Strain/55_72hrs_rep1/accepted_hits.bam \
-		alignment/$Organism/$Strain/55_72hrs_rep2/accepted_hits.bam \
-		alignment/$Organism/$Strain/55_72hrs_rep3/accepted_hits.bam \
-		alignment/$Organism/$Strain/FO47_72hrs_rep1/accepted_hits.bam \
-		alignment/$Organism/$Strain/FO47_72hrs_rep2/accepted_hits.bam \
-		alignment/$Organism/$Strain/FO47_72hrs_rep3/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_0hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_16hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_24hrs_prelim_rep1/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_36hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_48hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_4hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_72hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_72hrs_rep1/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_72hrs_rep2/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_72hrs_rep3/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_8hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_96hrs_prelim/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_CzapekDox/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_GlucosePeptone/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_PDA/accepted_hits.bam \
-		alignment/$Organism/$Strain/Fus2_PDB/accepted_hits.bam
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/RNAseq
+		alignment/$Organism/R0905_pacbio_canu/R0905/accepted_hits.bam
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
 		qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir/cuflfinks
 	# cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
 	done
