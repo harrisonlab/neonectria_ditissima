@@ -194,27 +194,27 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 ```
 
 ```bash
-for Assembly in $(ls repeat_masked/N.ditissima/Hg199/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-while [ $Jobs -gt 1 ]; do
-sleep 10
-printf "."
-Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-done
-printf "\n"
-Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-echo "$Organism - $Strain"
-mkdir -p alignment/$Organism/$Strain/concatenated
-samtools merge -f alignment/$Organism/$Strain/concatenated/concatenated.bam \
-alignment/$Organism/Hg199/Hg199/accepted_hits.bam
-OutDir=gene_pred/braker/$Organism/"$Strain"_braker_first
-AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
-GeneModelName="$Organism"_"$Strain"_braker_first
-rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_first
-ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
-qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
-done
+#for Assembly in $(ls repeat_masked/N.ditissima/Hg199/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+#Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+#while [ $Jobs -gt 1 ]; do
+#sleep 10
+#printf "."
+#Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+#done
+#printf "\n"
+#Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+#Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+#echo "$Organism - $Strain"
+#mkdir -p alignment/$Organism/$Strain/concatenated
+#samtools merge -f alignment/$Organism/$Strain/concatenated/concatenated.bam \
+#alignment/$Organism/Hg199/Hg199/accepted_hits.bam
+#OutDir=gene_pred/braker/$Organism/"$Strain"_braker_first
+#AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
+#GeneModelName="$Organism"_"$Strain"_braker_first
+#rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_first
+#ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
+#qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
+#done
 ```
 
 
@@ -237,4 +237,44 @@ rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
 qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
 done
+```
+
+Fasta and gff files were extracted from Braker1 output.
+
+```bash
+for File in $(ls gene_pred/braker/N.*/Hg199_braker_first/*/augustus.gff); do
+getAnnoFasta.pl $File
+OutDir=$(dirname $File)
+echo "##gff-version 3" > $OutDir/augustus_extracted.gff
+cat $File | grep -v '#' >> $OutDir/augustus_extracted.gff
+	done
+```
+
+The relationship between gene models and aligned reads was investigated. To do
+this aligned reads needed to be sorted and indexed:
+
+Note - IGV was used to view aligned reads against the Fus2 genome on my local
+machine.
+
+## Supplimenting Braker gene models with CodingQuary genes
+
+Additional genes were added to Braker gene predictions, using CodingQuary in
+pathogen mode to predict additional regions.
+
+Fistly, aligned RNAseq data was assembled into transcripts using Cufflinks.
+
+Note - cufflinks doesn't always predict direction of a transcript and
+therefore features can not be restricted by strand when they are intersected.
+
+```bash
+    for Assembly in $(ls repeat_masked/*/*/*/*_contigs_unmasked.fa); do
+    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+    echo "$Organism - $Strain"
+    OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated
+    mkdir -p $OutDir
+    AcceptedHits=alignment/$Organism/$Strain/*/accepted_hits.bam
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+    qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
+    done
 ```
