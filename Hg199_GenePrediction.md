@@ -278,3 +278,17 @@ therefore features can not be restricted by strand when they are intersected.
     qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
     done
 ```
+
+Secondly, genes were predicted using CodingQuary:
+
+```bash
+		for Assembly in $(ls repeat_masked/*/*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+		echo "$Organism - $Strain"
+		OutDir=gene_pred/codingquary/$Organism/$Strain
+		CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated/transcripts.gtf
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
+		qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
+		done
+```
