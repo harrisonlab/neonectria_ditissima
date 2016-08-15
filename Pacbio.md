@@ -495,7 +495,7 @@ ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
 qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
 done
 done
-0000
+
   cd alignment/N.ditissima/R0905_pacbio_canu/
   mkdir R0905_accurate
   mv -r R0905/* R0905_accurate/
@@ -647,7 +647,7 @@ therefore features can not be restricted by strand when they are intersected.
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-		for Assembly in $(ls repeat_masked/*/*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -664,12 +664,11 @@ models:
 
 ```bash
 	# for BrakerGff in $(ls gene_pred/braker/F.*/*_braker_new/*/augustus.gff3 | grep -w -e 'Fus2'); do
-	for BrakerGff in $(ls gene_pred/braker/F.*/*_braker_pacbio/*/augustus.gff3 | grep -e 'Fus2'); do
-		Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_new//g' | sed 's/_braker_pacbio//g')
+	for BrakerGff in $(ls gene_pred/braker/N.*/*_braker_second/*/augustus.gff3); do
+		Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_second//g')
 		Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
-		# BrakerGff=gene_pred/braker/$Organism/$Strain/F.oxysporum_fsp_cepae_Fus2_braker/augustus_extracted.gff
-		Assembly=$(ls repeat_masked/$Organism/$Strain/*/"$Strain"_contigs_softmasked.fa)
+		Assembly=$(ls repeat_masked/$Organism/$Strain/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
 		CodingQuaryGff=gene_pred/codingquary/$Organism/$Strain/out/PredictedPass.gff3
 		PGNGff=gene_pred/codingquary/$Organism/$Strain/out/PGN_predictedPass.gff3
 		AddDir=gene_pred/codingquary/$Organism/$Strain/additional
@@ -682,12 +681,10 @@ models:
 
 		bedtools intersect -v -a $CodingQuaryGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' > $AddGenesList
 		bedtools intersect -v -a $PGNGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' >> $AddGenesList
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation
 		$ProgDir/gene_list_to_gff.pl $AddGenesList $CodingQuaryGff CodingQuarry_v2.0 ID CodingQuary > $AddGenesGff
-		$ProgDir/gene_list_to_gff.pl $AddGenesList $PGNGff PGNCodingQuarry_v2.0 ID CodingQuary >> $AddGenesGff
-		ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
-		# GffFile=gene_pred/codingquary/F.oxysporum_fsp_cepae/Fus2_edited_v2/additional/additional_genes.gff
-		# GffFile=gene_pred/codingquary/F.oxysporum_fsp_cepae/Fus2_edited_v2/out/PredictedPass.gff3
+	  $ProgDir/gene_list_to_gff.pl $AddGenesList $PGNGff PGNCodingQuarry_v2.0 ID CodingQuary >> $AddGenesGff
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
 
 		$ProgDir/add_CodingQuary_features.pl $AddGenesGff $Assembly > $FinalDir/final_genes_CodingQuary.gff3
 		$ProgDir/gff2fasta.pl $Assembly $FinalDir/final_genes_CodingQuary.gff3 $FinalDir/final_genes_CodingQuary
@@ -709,7 +706,7 @@ models:
 
 The final number of genes per isolate was observed using:
 ```bash
-for DirPath in $(ls -d gene_pred/codingquary/F.*/*/final | grep -w -e'Fus2'); do
+for DirPath in $(ls -d gene_pred/codingquary/N.*/*/final); do
 echo $DirPath;
 cat $DirPath/final_genes_Braker.pep.fasta | grep '>' | wc -l;
 cat $DirPath/final_genes_CodingQuary.pep.fasta | grep '>' | wc -l;
@@ -717,6 +714,17 @@ cat $DirPath/final_genes_combined.pep.fasta | grep '>' | wc -l;
 echo "";
 done
 ```
+
+gene_pred/codingquary/N.ditissima/Hg199/final
+12807
+954
+13761
+
+gene_pred/codingquary/N.ditissima/R0905_pacbio_canu/final
+12946
+53
+12999
+
 <!--
 ## Suplimenting gene models with known genes
 
