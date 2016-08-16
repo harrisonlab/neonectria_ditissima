@@ -435,19 +435,19 @@ Alignments were concatenated prior to running cufflinks:
 Cufflinks was run to produce the fragment length and stdev statistics:
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-	Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-	Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-	# AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
-  AcceptedHits=alignment/$Organism/$Strain/R0905/accepted_hits.bam
-  OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
-	echo "$Organism - $Strain"
-	mkdir -p $OutDir
-	# samtools merge -f $AcceptedHits \
-	# alignment/$Organism/$Strain/R0905/accepted_hits.bam \
-  # alignment/$Organism/$Strain/R0905/accepted_hits.bam
-  cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
-	done
+for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+# AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
+AcceptedHits=alignment/$Organism/$Strain/R0905/accepted_hits.bam
+OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
+echo "$Organism - $Strain"
+mkdir -p $OutDir
+# samtools merge -f $AcceptedHits \
+# alignment/$Organism/$Strain/R0905/accepted_hits.bam \
+# alignment/$Organism/$Strain/R0905/accepted_hits.bam
+cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
+done
 ```
 
 Output from stdout included:
@@ -482,7 +482,7 @@ echo "$Timepoint"
 FileF=$(ls $RNADir/F/*_trim.fq.gz)
 FileR=$(ls $RNADir/R/*_trim.fq.gz)
 OutDir=alignment/$Organism/$Strain/$Timepoint
-InsertGap='-20'
+InsertGap='-140'
 InsertStdDev='40'
 Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
 while [ $Jobs -gt 1 ]; do
@@ -501,7 +501,7 @@ done
   mv -r R0905/* R0905_accurate/
 ```
 76.4% overall read mapping rate.
-66.8% concordant pair alignment rate.
+66.7% concordant pair alignment rate.
 
 #### Braker prediction
 
@@ -549,7 +549,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
     Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
     echo "$Organism - $Strain"
     OutDir=gene_pred/braker/$Organism/"$Strain"_braker_second
-    AcceptedHits=alignment/$Organism/$Strain/R0905/accepted_hits.bam
+    AcceptedHits=alignment/$Organism/R0905_pacbio_canu/R0905/accepted_hits.bam
     GeneModelName="$Organism"_"$Strain"_braker_second
     rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_second
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
