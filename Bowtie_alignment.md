@@ -2,6 +2,7 @@
 
 Sequence data for isolates with a data from a single sequencing run was aligned against the Fus2 genome
 
+```bash
   Reference=$(ls repeat_masked/N.*/*/*/*_contigs_unmasked.fa)
   for StrainPath in $(ls -d qc_dna/paired/N.ditissima/*); do
     Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
@@ -15,8 +16,10 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
     qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
   done
+  ```
 Sequence data for isolates with a data from two sequencing runs was aligned against the Fus2 genome
 
+```bash
   Reference=$(ls repeat_masked/*/*/*/*_contigs_unmasked.fa | grep -w 'Fus2_canu_new')
   for StrainPath in $(ls -d qc_dna/paired/F.*/* | grep -e 'HB6' -e 'Fus2'); do
     echo $StrainPath
@@ -35,3 +38,4 @@ Sequence data for isolates with a data from two sequencing runs was aligned agai
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment
     qsub $ProgDir/bowtie/sub_bowtie_2lib.sh $Reference $F1_Read $R1_Read $F2_Read $R2_Read $OutDir $Strain
   done
+```
