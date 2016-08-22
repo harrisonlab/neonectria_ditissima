@@ -12,11 +12,6 @@ Draft Genome assembly Hg199
   * Data qc
   * Genome assembly
   * Repeatmasking
-  * Gene prediction
-  * Functional annotation
-Genome analysis
-  * Homology between predicted genes & published effectors
-
 
 #Data organisation
 
@@ -182,75 +177,3 @@ Up till now we have been using just the repeatmasker/repeatmodeller fasta file w
     repeat_masked/N.ditissima/Hg199/filtered_contigs_repmask/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
     Number of masked bases:  5062507
 ```
-
-
-# Gene Prediction
-Gene prediction followed two steps:
-Pre-gene prediction - Quality of genome assemblies were assessed using Cegma to see how many core eukaryotic genes can be identified.
-Gene models were used to predict genes in the Neonectria genome. This used results from CEGMA as hints for gene models.
-
-## Pre-gene prediction
-Quality of genome assemblies was assessed by looking for the gene space in the assemblies.
-
-```bash
-  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
-  	Assembly=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
-  	qsub $ProgDir/sub_cegma.sh $Assembly dna
-```
-
-** Number of cegma genes present and complete: 95.56
-** Number of cegma genes present and partial: 97.18
-
-##Gene prediction
-
-Gene prediction was performed for the neonectria genome.
-CEGMA genes were used as Hints for the location of CDS.
-
-```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/augustus
-  	Assembly=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
-  	GeneModel=fusarium_graminearum
-  	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly
-```
-
-** Number of genes predicted: 13589
-
-#Functional annotation
-
-Interproscan was used to give gene models functional annotations.
-
-```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan/
-  	Genes=gene_pred/augustus/spades/N.ditissima/N.ditissima_aug_out.aa
-  	$ProgDir/sub_interproscan.sh $Genes
-```
-
-```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	Genes=gene_pred/augustus/spades/N.ditissima/N.ditissima_aug_out.aa
-	InterProRaw=gene_pred/interproscan/spades/N.ditissima/raw
-	ProgDir/append_interpro.sh $Genes $InterProRaw
-```
-
-#Genomic analysis
-The first analysis was based upon BLAST searches for genes known to be involved in toxin production
-
-
-##Genes with homology to PHIbase
-Predicted gene models were searched against the PHIbase database using tBLASTx.
-
-```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/blast
-	Query=../../phibase/v3.8/PHI_accessions.fa
-	Subject=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
-	qsub $ProgDir/blast_pipe.sh $Query protein $Subject
-```
-
-Top BLAST hits were used to annotate gene models.
-
-```bash
-
-```
-
-** Blast results of note: **
-  * 'Result A'
