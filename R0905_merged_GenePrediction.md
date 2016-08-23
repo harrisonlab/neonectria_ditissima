@@ -20,8 +20,8 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
 	done
 ```
-** Number of cegma genes present and complete: 94.35%
-** Number of cegma genes present and partial: 95.97%
+** Number of cegma genes present and complete: 90.73
+** Number of cegma genes present and partial: 92.74
 
 #Gene prediction
 
@@ -88,7 +88,7 @@ single genome. The fragment length and stdev were printed to stdout while
 cufflinks was running.
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+	for Assembly in $(ls repeat_masked/*/R0905_merged_assembly/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
