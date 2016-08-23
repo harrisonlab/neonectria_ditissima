@@ -231,6 +231,10 @@ Fus2 was temporarily renamed for preliminary analysis
   done
 ```
 
+** % bases masked by repeatmasker: 11.29% (bases masked:5055833 bp)
+
+** % bases masked by transposon psi: 9.95% (bases masked:4452549 bp)
+
 ```bash
   R0905_pacbio_canu=$(ls assembly/canu/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
   # for Assembly in $(ls $Fus2_pacbio_merged $Fus2_pacbio_canu); do
@@ -249,18 +253,18 @@ Fus2 was temporarily renamed for preliminary analysis
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
-for File in $(ls repeat_masked/*/*/filtered_contigs_repmask/*_contigs_softmasked.fa); do
-      OutDir=$(dirname $File)
-      TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
-      OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
-      bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
-      echo "$OutFile"
-      echo "Number of masked bases:"
-      cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
-    done
+for File in $(ls repeat_masked/*/R0905_merged_assembly/filtered_contigs_repmask/*_contigs_softmasked.fa); do
+OutDir=$(dirname $File)
+TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+echo "$OutFile"
+echo "Number of masked bases:"
+cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+done
 ```
-repeat_masked/N.ditissima/R0905_pacbio_canu/filtered_contigs_repmask/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:5398957
+repeat_masked/N.ditissima/R0905_merged_assembly/filtered_contigs_repmask/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:5145223
 
 
 # Preliminary analysis
