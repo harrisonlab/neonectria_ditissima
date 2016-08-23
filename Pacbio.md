@@ -550,13 +550,13 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
     echo "$Organism - $Strain"
     OutDir=gene_pred/braker/$Organism/"$Strain"_braker_fourth
     AcceptedHits=alignment/$Organism/R0905_pacbio_canu/R0905/accepted_hits.bam
-    GeneModelName="$Organism"_"$Strain"_braker_second
+    GeneModelName="$Organism"_"$Strain"_braker_fourth
     rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_fourth
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
     qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
     done
 ```
-
+ddddd
 Fasta and gff files were extracted from Braker1 output.
 
 ```bash
