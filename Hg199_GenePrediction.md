@@ -372,6 +372,39 @@ and were exported to the following locations:
 
 These gene models were then edited with nano to give names and IDs to these genes. -->
 
+## ORF finder
+
+The genome was searched in six reading frames for any start codon and following
+translated identification of a start codon translating sequence until a stop
+codon was found. This is based upon the atg.pl script used in paper describing
+the P. infestans genome. Additional functionality was added to this script by
+also printing ORFs in .gff format.
+
+
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+	for Genome in $(ls repeat_masked/N.*/*/*/*_contigs_unmasked.fa); do
+		qsub $ProgDir/run_ORF_finder.sh $Genome
+	done
+```
+
+The Gff files from the the ORF finder are not in true Gff3 format. These were
+corrected using the following commands:
+
+```bash
+	ProgDir=~/git_repos/emr_repos/tools/seq_tools/feature_annotation
+	for ORF_Gff in $(ls gene_pred/ORF_finder/*/*/*_ORF.gff | grep -v '_F_atg_' | grep -v '_R_atg_'); do
+		ORF_Gff_mod=$(echo $ORF_Gff | sed 's/_ORF.gff/_ORF_corrected.gff3/g')
+		echo ""
+		echo "Correcting the following file:"
+		echo $ORF_Gff
+		echo "Redirecting to:"
+		echo $ORF_Gff_mod
+		$ProgDir/gff_corrector.pl $ORF_Gff > $ORF_Gff_mod
+	done
+```
+
+
 ## Effector genes
 
 Putative pathogenicity and effector related genes were identified within Braker
