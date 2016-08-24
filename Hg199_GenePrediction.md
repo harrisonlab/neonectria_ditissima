@@ -404,6 +404,36 @@ corrected using the following commands:
 	done
 ```
 
+#Functional annotation
+
+## A) Interproscan
+
+Interproscan was used to give gene models functional annotations.
+Annotation was run using the commands below:
+
+Note: This is a long-running script. As such, these commands were run using
+'screen' to allow jobs to be submitted and monitored in the background.
+This allows the session to be disconnected and reconnected over time.
+
+Screen ouput detailing the progress of submission of interporscan jobs
+was redirected to a temporary output file named interproscan_submission.log .
+
+```bash
+	screen -a
+	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
+	for Genes in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	echo $Genes
+	$ProgDir/sub_interproscan.sh $Genes
+	done 2>&1 | tee -a interproscan_submisison.log
+```
+
+
+
+
+
+
+
 
 ## Effector genes
 
@@ -427,8 +457,8 @@ Proteins that were predicted to contain signal peptides were identified using
 the following commands:
 
 ```bash
-	SplitfileDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
-	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+	SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
 	CurPath=$PWD
 	for Proteome in $(ls gene_pred/codingquary/N.*/Hg199/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
