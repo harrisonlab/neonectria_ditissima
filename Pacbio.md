@@ -537,7 +537,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 ```
 
 ```bash
-    for Assembly in $(ls repeat_masked/N.ditissima/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+  for Assembly in $(ls repeat_masked/N.ditissima/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
     while [ $Jobs -gt 1 ]; do
     sleep 10
@@ -554,18 +554,18 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
     rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_fourth
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
     qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
-    done
+  done
 ```
-ddddd
+
 Fasta and gff files were extracted from Braker1 output.
 
 ```bash
-for File in $(ls gene_pred/braker/N.*/R0905_pacbio_canu_braker_third/*/augustus.gff); do
-getAnnoFasta.pl $File
-OutDir=$(dirname $File)
-echo "##gff-version 3" > $OutDir/augustus_extracted.gff
-cat $File | grep -v '#' >> $OutDir/augustus_extracted.gff
-	done
+  for File in $(ls gene_pred/braker/N.*/R0905_pacbio_canu_braker_fourth/*/augustus.gff); do
+    getAnnoFasta.pl $File
+    OutDir=$(dirname $File)
+    echo "##gff-version 3" > $OutDir/augustus_extracted.gff
+    cat $File | grep -v '#' >> $OutDir/augustus_extracted.gff
+  done
 ```
 
 The relationship between gene models and aligned reads was investigated. To do
@@ -636,7 +636,7 @@ therefore features can not be restricted by strand when they are intersected.
     Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
     echo "$Organism - $Strain"
-    OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated
+    OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
     mkdir -p $OutDir
     AcceptedHits=alignment/$Organism/$Strain/*/accepted_hits.bam
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
@@ -647,16 +647,21 @@ therefore features can not be restricted by strand when they are intersected.
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-		for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-		echo "$Organism - $Strain"
-		OutDir=gene_pred/codingquary/$Organism/$Strain
-		CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated/transcripts.gtf
-		ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
-		qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
-		done
+    for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+    echo "$Organism - $Strain"
+    OutDir=gene_pred/codingquary/$Organism/$Strain
+    CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/cufflinks/transcripts.gtf
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
+    qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
+    done
 ```
+
+
+
+
+
 
 Then, additional transcripts were added to Braker gene models, when CodingQuary
 genes were predicted in regions of the genome, not containing Braker gene
@@ -664,8 +669,8 @@ models:
 
 ```bash
 	# for BrakerGff in $(ls gene_pred/braker/F.*/*_braker_new/*/augustus.gff3 | grep -w -e 'Fus2'); do
-for BrakerGff in $(ls gene_pred/braker/N.*/*_braker_third/*/augustus.gff3); do
-Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_third//g')
+for BrakerGff in $(ls gene_pred/braker/N.*/*_braker_fourth/*/augustus.gff3); do
+Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_fourth//g')
 Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
 Assembly=$(ls repeat_masked/$Organism/$Strain/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
