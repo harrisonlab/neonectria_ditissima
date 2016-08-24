@@ -658,11 +658,6 @@ Secondly, genes were predicted using CodingQuary:
     done
 ```
 
-
-
-
-
-
 Then, additional transcripts were added to Braker gene models, when CodingQuary
 genes were predicted in regions of the genome, not containing Braker gene
 models:
@@ -726,9 +721,9 @@ gene_pred/codingquary/N.ditissima/Hg199/final
 13761
 
 gene_pred/codingquary/N.ditissima/R0905_pacbio_canu/final
-12946
-53
-12999
+12917
+879
+13796
 
 <!--
 ## Suplimenting gene models with known genes
@@ -790,13 +785,17 @@ was redirected to a temporary output file named interproscan_submission.log .
 
 ```bash
 	screen -a
-	cd /home/groups/harrisonlab/project_files/fusarium
-	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w -e 'Fus2'); do
+	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
+	for Genes in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
 ```
+
+
+
+
 
 Following interproscan annotation split files were combined using the following
 commands:
