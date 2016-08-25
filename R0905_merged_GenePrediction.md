@@ -328,21 +328,14 @@ Secondly, genes were predicted using CodingQuary:
 	done
 ```
 
-
-
-
-
-
-
-
 Then, additional transcripts were added to Braker gene models, when CodingQuary
 genes were predicted in regions of the genome, not containing Braker gene
 models:
 
 ```bash
 	# for BrakerGff in $(ls gene_pred/braker/F.*/*_braker_new/*/augustus.gff3 | grep -w -e 'Fus2'); do
-for BrakerGff in $(ls gene_pred/braker/N.*/*_braker_third/*/augustus.gff3); do
-Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_third//g')
+for BrakerGff in $(ls gene_pred/braker/N.*/R0905_merged_assembly_braker_first/*/augustus.gff3); do
+Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_first//g')
 Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
 Assembly=$(ls repeat_masked/$Organism/$Strain/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
@@ -397,10 +390,16 @@ gene_pred/codingquary/N.ditissima/Hg199/final
 954
 13761
 
+gene_pred/codingquary/N.ditissima/R0905_merged_assembly/final
+12693
+832
+13525
+
 gene_pred/codingquary/N.ditissima/R0905_pacbio_canu/final
-12946
-53
-12999
+12917
+879
+13796
+
 
 <!--
 ## Suplimenting gene models with known genes
@@ -462,26 +461,49 @@ was redirected to a temporary output file named interproscan_submission.log .
 
 ```bash
 	screen -a
-	cd /home/groups/harrisonlab/project_files/fusarium
-	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w -e 'Fus2'); do
+	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
+	for Genes in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
 ```
 
+
+
+
+
+
+
+
+
+
 Following interproscan annotation split files were combined using the following
 commands:
 
 ```bash
-	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w 'Fus2'); do
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
+	for Proteins in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
 		echo $Strain
 		InterProRaw=gene_pred/interproscan/$Organism/$Strain/raw
 		$ProgDir/append_interpro.sh $Proteins $InterProRaw
+	done
+```
+
+## B) SwissProt
+
+```bash
+	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+		OutDir=gene_pred/swissprot/$Organism/$Strain
+		SwissDbDir=../../uniprot/swissprot
+		SwissDbName=uniprot_sprot
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
+		qsub $ProgDir/sub_swissprot.sh $Proteome $OutDir $SwissDbDir $SwissDbName
 	done
 ```
 
