@@ -793,16 +793,12 @@ was redirected to a temporary output file named interproscan_submission.log .
 	done 2>&1 | tee -a interproscan_submisison.log
 ```
 
-
-
-
-
 Following interproscan annotation split files were combined using the following
 commands:
 
 ```bash
-	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w 'Fus2'); do
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
+	for Proteins in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -838,16 +834,22 @@ commands:
 
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w -e 'Fus2'); do
+	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		OutDir=gene_pred/swissprot/$Organism/$Strain
 		SwissDbDir=../../uniprot/swissprot
 		SwissDbName=uniprot_sprot
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
 		qsub $ProgDir/sub_swissprot.sh $Proteome $OutDir $SwissDbDir $SwissDbName
 	done
 ```
+
+
+
+
+
+
 
 ```bash
 	for SwissTable in $(ls gene_pred/swissprot/*/*/swissprot_v2015_10_hits.tbl | grep -w -e 'Fus2'); do
