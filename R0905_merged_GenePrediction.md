@@ -469,21 +469,12 @@ was redirected to a temporary output file named interproscan_submission.log .
 	done 2>&1 | tee -a interproscan_submisison.log
 ```
 
-
-
-
-
-
-
-
-
-
 Following interproscan annotation split files were combined using the following
 commands:
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteins in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -496,7 +487,7 @@ commands:
 ## B) SwissProt
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteome in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		OutDir=gene_pred/swissprot/$Organism/$Strain
@@ -508,41 +499,13 @@ commands:
 ```
 
 
-## B) SwissProt
-<!--
-```bash
-  screen -a
-  qlogin
-  ProjDir=/home/groups/harrisonlab/project_files/idris
-  cd $ProjDir
-  for Proteome in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta); do
-    Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
-    Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-    OutDir=$ProjDir/gene_pred/swissprot/$Species/$Strain/
-    mkdir -p $OutDir
-    blastp \
-    -db /home/groups/harrisonlab/uniprot/swissprot/uniprot_sprot \
-    -query $ProjDir/$Proteome \
-    -out $OutDir/swissprot_v2015_10_hits.tbl \
-    -evalue 1e-100 \
-    -outfmt 6 \
-    -num_threads 16 \
-    -num_alignments 10
-  done
-``` -->
 
 
-```bash
-	for Proteome in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w -e 'Fus2'); do
-		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
-		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-		OutDir=gene_pred/swissprot/$Organism/$Strain
-		SwissDbDir=../../uniprot/swissprot
-		SwissDbName=uniprot_sprot
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
-		qsub $ProgDir/sub_swissprot.sh $Proteome $OutDir $SwissDbDir $SwissDbName
-	done
-```
+
+
+
+
+
 
 ```bash
 	for SwissTable in $(ls gene_pred/swissprot/*/*/swissprot_v2015_10_hits.tbl | grep -w -e 'Fus2'); do
