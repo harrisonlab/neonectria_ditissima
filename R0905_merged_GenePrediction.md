@@ -291,8 +291,6 @@ The number of Fo47 genes was determined for comparison to number predicted by Br
 ```
  -->
 
-
-
 ## Supplimenting Braker gene models with CodingQuary genes
 
 Additional genes were added to Braker gene predictions, using CodingQuary in
@@ -316,17 +314,10 @@ therefore features can not be restricted by strand when they are intersected.
 	done
 ```
 
-
-
-
-
-
-
-
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-		for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+	for Assembly in $(ls repeat_masked/*/R0905_merged_assembly/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -334,8 +325,15 @@ Secondly, genes were predicted using CodingQuary:
 		CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated/transcripts.gtf
 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
 		qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
-		done
+	done
 ```
+
+
+
+
+
+
+
 
 Then, additional transcripts were added to Braker gene models, when CodingQuary
 genes were predicted in regions of the genome, not containing Braker gene
