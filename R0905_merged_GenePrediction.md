@@ -498,26 +498,22 @@ commands:
 	done
 ```
 
-
-
-
-
-
-
-
-
-
 ```bash
-	for SwissTable in $(ls gene_pred/swissprot/*/*/swissprot_v2015_10_hits.tbl | grep -w -e 'Fus2'); do
+	for SwissTable in $(ls gene_pred/swissprot/*/*/swissprot_v2015_10_hits.tbl); do
 	# SwissTable=gene_pred/swissprot/Fus2/swissprot_v2015_10_hits.tbl
 		Strain=$(echo $SwissTable | rev | cut -f2 -d '/' | rev)
 		Organism=$(echo $SwissTable | rev | cut -f3 -d '/' | rev)
 		echo "$Organism - $Strain"
 		OutTable=gene_pred/swissprot/$Organism/$Strain/swissprot_v2015_tophit_parsed.tbl
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
 		$ProgDir/swissprot_parser.py --blast_tbl $SwissTable --blast_db_fasta ../../uniprot/swissprot/uniprot_sprot.fasta > $OutTable
 	done
 ```
+
+
+
+
+
 
 
 #Genomic analysis
@@ -584,77 +580,81 @@ gene models using a number of approaches:
 
 ### A) From Augustus gene models - Identifying secreted proteins
 
-Required programs:
- * SignalP-4.1
- * TMHMM
+ Required programs:
+  * SignalP-4.1
+  * TMHMM
 
-Proteins that were predicted to contain signal peptides were identified using
-the following commands:
+ Proteins that were predicted to contain signal peptides were identified using
+ the following commands:
 
-```bash
-	SplitfileDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
-	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
-	CurPath=$PWD
-	for Proteome in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w -e 'Fus2'); do
-		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
-		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-		SplitDir=gene_pred/final_genes_split/$Organism/$Strain
-		mkdir -p $SplitDir
-		BaseName="$Organism""_$Strain"_final_preds
-		$SplitfileDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName
-		for File in $(ls $SplitDir/*_final_preds_*); do
-			Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
-			while [ $Jobs -gt 1 ]; do
-				sleep 10
-				printf "."
-				Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
-			done
-			printf "\n"
-			echo $File
-			qsub $ProgDir/pred_sigP.sh $File signalp-4.1
-		done
-	done
-```
+ ```bash
+ 	SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+ 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+ 	CurPath=$PWD
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+ 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+ 		SplitDir=gene_pred/final_genes_split/$Organism/$Strain
+ 		mkdir -p $SplitDir
+ 		BaseName="$Organism""_$Strain"_final_preds
+ 		$SplitfileDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName
+ 		for File in $(ls $SplitDir/*_final_preds_*); do
+ 			Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
+ 			while [ $Jobs -gt 1 ]; do
+ 				sleep 10
+ 				printf "."
+ 				Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
+ 			done
+ 			printf "\n"
+ 			echo $File
+ 			qsub $ProgDir/pred_sigP.sh $File signalp-4.1
+ 		done
+ 	done
+ ```
+
+ The batch files of predicted secreted proteins needed to be combined into a
+ single file for each strain. This was done with the following commands:
+ ```bash
+ 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/*); do
+ 		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
+ 		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
+ 		InStringAA=''
+ 		InStringNeg=''
+ 		InStringTab=''
+ 		InStringTxt=''
+ 		SigpDir=final_genes_signalp-4.1
+ 		for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
+ 			InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
+ 			InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
+ 			InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
+ 			InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
+ 		done
+ 		cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
+ 		cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
+ 		tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
+ 		cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
+ 	done
+ ```
+
+ Some proteins that are incorporated into the cell membrane require secretion.
+ Therefore proteins with a transmembrane domain are not likely to represent
+ cytoplasmic or apoplastic effectors.
+
+ Proteins containing a transmembrane domain were identified:
+
+ ```bash
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+ 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+ 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
+ 		qsub $ProgDir/submit_TMHMM.sh $Proteome
+ 	done
+ ```
 
 
-The batch files of predicted secreted proteins needed to be combined into a
-single file for each strain. This was done with the following commands:
-```bash
-	for SplitDir in $(ls -d gene_pred/final_genes_split/*/Fus2); do
-		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
-		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
-		InStringAA=''
-		InStringNeg=''
-		InStringTab=''
-		InStringTxt=''
-		SigpDir=final_genes_signalp-4.1
-		for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
-			InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
-			InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
-			InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
-			InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
-		done
-		cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
-		cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
-		tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
-		cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
-	done
-```
 
-Some proteins that are incorporated into the cell membrane require secretion.
-Therefore proteins with a transmembrane domain are not likely to represent
-cytoplasmic or apoplastic effectors.
 
-Proteins containing a transmembrane domain were identified:
 
-```bash
-	for Proteome in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w -e 'Fus2'); do
-		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
-		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
-		qsub $ProgDir/submit_TMHMM.sh $Proteome
-	done
-```
 
 
 ### B) From Augustus gene models - Effector identification using EffectorP
