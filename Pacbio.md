@@ -1008,7 +1008,7 @@ Required programs:
  * EffectorP.py
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w -e 'Fus2'); do
+	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		BaseName="$Organism"_"$Strain"_EffectorP
