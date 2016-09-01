@@ -32,6 +32,11 @@ and annotation.
   mkdir -p raw_dna/paired/$Species/$Strain/R
   cp /home/groups/harrisonlab/project_files/neonectria/NG-R0905_S4_L001_R1_001.fastq raw_dna/paired/$Species/$Strain/F/.
   cp /home/groups/harrisonlab/project_files/neonectria/NG-R0905_S4_L001_R2_001.fastq raw_dna/paired/$Species/$Strain/R/.
+  mkdir -p raw_dna/paired/N.ditissima/Hg199/F
+  mkdir -p raw_dna/paired/N.ditissima/Hg199/R
+  RawDat=/home/groups/harrisonlab/raw_data/raw_seq/raw_reads/160725_M04465_0020-AP1N0
+  cp $RawDat/Hg199_S1_L001_R1_001.fastq.gz raw_dna/paired/N.ditissima/Hg199/F/.
+  cp $RawDat/Hg199_S1_L001_R2_001.fastq.gz raw_dna/paired/N.ditissima/Hg199/R/.
 ```
 
 RNA data was also copied into the project area:
@@ -40,8 +45,8 @@ RNA data was also copied into the project area:
   cd /home/groups/harrisonlab/project_files/neonectria_ditissima
   mkdir -p raw_rna/paired/N.ditissima/Hg199/F
   mkdir -p raw_rna/paired/N.ditissima/Hg199/R
-  mkdir -p raw_dna/paired/N.ditissima/R0905/F
-  mkdir -p raw_dna/paired/N.ditissima/R0905/R
+  mkdir -p raw_rna/paired/N.ditissima/R0905/F
+  mkdir -p raw_rna/paired/N.ditissima/R0905/R
   RawDat=/home/groups/harrisonlab/raw_data/raw_seq/raw_reads/160718_M04465_0018_ANU02
   cp $RawDat/Hg199_S1_L001_R1_001.fastq.gz raw_rna/paired/N.ditissima/Hg199/F/.
   cp $RawDat/Hg199_S1_L001_R2_001.fastq.gz raw_rna/paired/N.ditissima/Hg199/R/.
