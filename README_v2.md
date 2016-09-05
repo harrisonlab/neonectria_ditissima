@@ -42,9 +42,9 @@ programs: fastqc fastq-mcf kmc
 Data quality was visualised using fastqc:
 
 ```bash
-  	for RawData in $(ls raw_dna/paired/*/*/*/*.fastq); do 
-	  echo $RawData; 
-	  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc; 
+  	for RawData in $(ls raw_dna/paired/*/*/*/*.fastq); do
+	  echo $RawData;
+	  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	  qsub $ProgDir/run_fastqc.sh $RawData;
   	done
 ```
@@ -64,9 +64,9 @@ This was done with fastq-mcf
 Data quality was visualised once again following trimming:
 
 ```bash
-	for RawData in $(ls qc_dna/paired/*/*/*/*.fastq.gz); do 
-	echo $RawData; 
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc; 
+	for RawData in $(ls qc_dna/paired/*/*/*/*.fastq.gz); do
+	echo $RawData;
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	qsub $ProgDir/run_fastqc.sh $RawData;
   done
 ```
@@ -155,9 +155,27 @@ The best assembly was used to perform repeatmasking
 	qsub $ProgDir/transposonPSI.sh $BestAss
  ```
 
-** % bases masked by repeatmasker: 11.73% 
+** % bases masked by repeatmasker: 11.73%
 
 ** % bases masked by transposon psi: **
+
+Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
+
+```bash
+for File in $(ls repeat_masked/spades/N.*/R0905_v2/filtered_contigs_repmask/*_contigs_softmasked.fa); do
+      OutDir=$(dirname $File)
+      TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+      OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+      bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+      echo "$OutFile"
+      echo "Number of masked bases:"
+      cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+    done
+```
+
+cd repeat_masked/spades/N.ditissima/R0905_v2/filtered_contigs_repmask/R0905_v2_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+5504315
 
 
 # Gene Prediction
@@ -174,7 +192,7 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
   	qsub $ProgDir/sub_cegma.sh $Assembly dna
 ```
 
-** Number of cegma genes present and complete: 95.16 
+** Number of cegma genes present and complete: 95.16
 ** Number of cegma genes present and partial: 97.18
 
 ##Gene prediction
@@ -188,7 +206,7 @@ CEGMA genes were used as Hints for the location of CDS.
   	GeneModel=fusarium
   	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly false
 ```
-	
+
 ** Number of genes predicted: 12711
 
 #Functional annotation
@@ -252,4 +270,3 @@ Top BLAST hits were used to annotate gene models.
 
 ** Blast results of note: **
   * 'Result A'
-  
