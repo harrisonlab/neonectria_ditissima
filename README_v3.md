@@ -31,8 +31,8 @@ This was done with fastq-mcf
 
 
 ```bash
-    Read_F=raw_dna/paired/N.ditissima/Hg199/F/*.fastq.gz
-    Read_R=raw_dna/paired/N.ditissima/Hg199/R/*.fastq.gz
+    Read_F=raw_dna/paired/N.ditissima/NG-R0905/F/*.fastq.gz
+    Read_R=raw_dna/paired/N.ditissima/NG-R0905/R/*.fastq.gz
     IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
     qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
