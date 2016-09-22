@@ -41,7 +41,7 @@ This was done with fastq-mcf
 Data quality was visualised once again following trimming:
 
 ```bash
-  for RawData in $(ls qc_dna/paired/*/Hg199/*/*.fq.gz); do
+  for RawData in $(ls qc_dna/paired/*/NG-R0905/*/*.fq.gz); do
   echo $RawData;
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
   qsub $ProgDir/run_fastqc.sh $RawData;
