@@ -11,6 +11,10 @@ Draft Genome assembly Hg199
   * Data qc
   * Genome assembly
   * Repeatmasking
+  * Pacbio assembly
+  * Merged hybrid assemblies
+  * Rename contigs
+  * Preliminary analysis
 
 #Data qc
 
