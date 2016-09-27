@@ -412,13 +412,14 @@ Canu assembly
   done
 ```
 
+## Alignment of raw reads vs the Neonectria genome
 
-
+Sequence data for isolates with a data from a single sequencing run was aligned against the Neonectria genome
 
 
 ```bash
   Reference=$(ls repeat_masked/N.*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
-  for StrainPath in $(ls -d qc_dna/paired/N.ditissima/NG-R0905); do
+  for StrainPath in $(ls -d qc_dna/paired/N.ditissima/*); do
     Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
     Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
     echo "$Organism - $Strain"
@@ -426,7 +427,7 @@ Canu assembly
     R_Read=$(ls $StrainPath/R/*.fq.gz)
     echo $F_Read
     echo $R_Read
-    OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/vs_NG-R0905_pacbio2
+    OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/vs_R0905_pacbio
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
     qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
   done
