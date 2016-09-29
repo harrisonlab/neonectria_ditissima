@@ -320,7 +320,40 @@ Assembly stats were collected using quast
   done
 ```
 
-#Canu assembly contigs were renamed in accordance with ncbi recomendations.
+# Preliminary analysis
+
+## Checking PacBio coverage against Neonectria contigs
+
+The accuracy of PacBio assembly pipelines is currently unknown. To help identify
+regions that may have been missassembled the pacbio reads were aligned back to
+the assembled genome. Coverage was determined using bedtools genomecov and
+regions with low coverage flagged using a python script flag_low_coverage.py.
+These low coverage regions were visually inspected using IGV.
+
+
+Merged canu spades assembly
+
+```bash
+    Assembly=assembly/merged_canu_spades/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta
+    Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
+    OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/merged_canu_spades/
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
+    qsub $ProgDir/sub_bwa_pacbio.sh $Assembly $Reads $OutDir
+  done
+```
+
+Canu assembly
+
+```bash
+    Assembly=assembly/canu/N.ditissima/R0905/polished/pilon.fasta
+    Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
+    OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/canu/
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
+    qsub $ProgDir/sub_bwa_pacbio.sh $Assembly $Reads $OutDir
+  done
+```
+
+## Canu assembly contigs were renamed in accordance with ncbi recomendations (without repear contings).
 
 
 ```bash
@@ -336,22 +369,40 @@ Assembly stats were collected using quast
   rm tmp.csv
 ```
 
+## Repair merged assemblies and rename.
+
+Using IGV we can identify those missassembled regions and trim them. This will correct our assemblies.
+
+
+```bash
+    ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+    touch tmp.csv
+    # printf "contig_17\tmanual edit\tsplit\t780978\t780978\tcanu:missassembly" > tmp.csv
+    printf \
+    "Trim:
+    Sequence name,\tlength,\tspan(s),\tapparent source
+    contig_2\t3685016\t2630642..2631051\tlow coverage
+    contig_7\t2122932\t14290..15776\tlow coverage
+    contig_15\t1318801\t1303809..1306436\tlow coverage
+    contig_17\t1243348\t1098076..1099539\tlow coverage
+    contig_21\t602725\t120117..121484,162018..164688,289092..289649\tlow coverage
+    " \
+    > tmp.csv
+    for Assembly in $(ls assembly/merged_canu_spades/*/R0905/filtered_contigs/*_contigs_renamed.fasta); do
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    OutDir=assembly/merged_canu_spades/$Organism/$Strain/edited_contigs
+    mkdir -p $OutDir
+    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_canu_contigs_modified.fasta --coord_file tmp.csv
+    done
+    rm tmp.csv
+```
+
 # Repeatmasking assemblies
 
 ```bash
-  R0905_pacbio_merged=$(ls assembly/merged_canu_spades/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
-  # for Assembly in $(ls $Fus2_pacbio_merged $Fus2_pacbio_canu); do
+  R0905_pacbio_merged=$(ls assembly/merged_canu_spades/*/R0905/edited_contigs/*_contigs_modified.fasta)
   for Assembly in $(ls $R0905_pacbio_merged); do
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-    qsub $ProgDir/rep_modeling.sh $Assembly
-    qsub $ProgDir/transposonPSI.sh $Assembly
-  done
-```
-
-```bash
-  R0905_pacbio_canu=$(ls assembly/canu/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
-  # for Assembly in $(ls $Fus2_pacbio_merged $Fus2_pacbio_canu); do
-  for Assembly in $(ls $R0905_pacbio_canu); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
     qsub $ProgDir/rep_modeling.sh $Assembly
     qsub $ProgDir/transposonPSI.sh $Assembly
