@@ -300,7 +300,7 @@ therefore features can not be restricted by strand when they are intersected.
 			echo "$Organism - $Strain"
 			OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
 			mkdir -p $OutDir
-			AcceptedHits=alignment/$Organism/$Strain/*/accepted_hits.bam
+			AcceptedHits=alignment/$Organism/R0905_merged_assembly/*/accepted_hits.bam
 			ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
 			qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
 		done
@@ -309,15 +309,15 @@ therefore features can not be restricted by strand when they are intersected.
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-    for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-    echo "$Organism - $Strain"
-    OutDir=gene_pred/codingquary/$Organism/$Strain
-    CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/cufflinks/transcripts.gtf
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
-    qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
-    done
+		for Assembly in $(ls repeat_masked/*/*/edited_*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+		echo "$Organism - $Strain"
+		OutDir=gene_pred/codingquary/$Organism/$Strain
+		CufflinksGTF=gene_pred/cufflinks/$Organism/R0905_merged_assembly/concatenated_prelim/cufflinks/transcripts.gtf
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
+		qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
+		done
 ```
 
 Then, additional transcripts were added to Braker gene models, when CodingQuary
@@ -326,11 +326,11 @@ models:
 
 ```bash
 	# for BrakerGff in $(ls gene_pred/braker/F.*/*_braker_new/*/augustus.gff3 | grep -w -e 'Fus2'); do
-for BrakerGff in $(ls gene_pred/braker/N.*/*_braker_fourth/*/augustus.gff3); do
-Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_fourth//g')
+for BrakerGff in $(ls gene_pred/braker/N.*/*_braker_new/*/augustus.gff3); do
+Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_new//g')
 Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
-Assembly=$(ls repeat_masked/$Organism/$Strain/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+Assembly=$(ls repeat_masked/*/*/edited_*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
 CodingQuaryGff=gene_pred/codingquary/$Organism/$Strain/out/PredictedPass.gff3
 PGNGff=gene_pred/codingquary/$Organism/$Strain/out/PGN_predictedPass.gff3
 AddDir=gene_pred/codingquary/$Organism/$Strain/additional
