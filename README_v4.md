@@ -377,15 +377,10 @@ echo "";
 done
 ```
 
-gene_pred/codingquary/N.ditissima/Hg199/final
-12807
-954
-13761
-
-gene_pred/codingquary/N.ditissima/R0905_pacbio_canu/final
-12917
-879
-13796
+gene_pred/codingquary/N.ditissima/R0905_merged_assembly/final
+12686
+804
+13490
 
 <!--
 ## Suplimenting gene models with known genes
@@ -409,9 +404,9 @@ also printing ORFs in .gff format.
 
 
 ```bash
-	ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-	for Genome in $(ls repeat_masked/F.*/*/*/*_contigs_unmasked.fa | grep -w -e 'Fus2'); do
-		qsub $ProgDir/run_ORF_finder.sh $Genome
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+	for Genome in $(ls repeat_masked/*/*/edited_*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+	qsub $ProgDir/run_ORF_finder.sh $Genome
 	done
 ```
 
@@ -449,7 +444,7 @@ was redirected to a temporary output file named interproscan_submission.log .
 	screen -a
 	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Genes in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
