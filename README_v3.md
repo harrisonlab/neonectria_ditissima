@@ -498,7 +498,7 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
 
 
 ```bash
-  Reference=$(ls repeat_masked/N.*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+  Reference=$(ls repeat_masked/N.*/R0905_merged_assembly/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
   for StrainPath in $(ls -d qc_dna/paired/N.ditissima/*); do
     Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
     Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
@@ -507,7 +507,7 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
     R_Read=$(ls $StrainPath/R/*.fq.gz)
     echo $F_Read
     echo $R_Read
-    OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/vs_R0905_pacbio
+    OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/vs_R0905_merged_assembly
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
     qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
   done
