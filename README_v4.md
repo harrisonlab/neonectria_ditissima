@@ -455,7 +455,7 @@ commands:
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteins in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -491,7 +491,7 @@ commands:
 
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteome in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		OutDir=gene_pred/swissprot/$Organism/$Strain
@@ -593,7 +593,7 @@ gene models using a number of approaches:
  	SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
  	CurPath=$PWD
- 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
  		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
  		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
  		SplitDir=gene_pred/final_genes_split/$Organism/$Strain
@@ -617,7 +617,7 @@ gene models using a number of approaches:
  The batch files of predicted secreted proteins needed to be combined into a
  single file for each strain. This was done with the following commands:
  ```bash
- 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/*); do
+ 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/R0905_merged_assembly); do
  		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
  		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
  		InStringAA=''
@@ -645,7 +645,7 @@ gene models using a number of approaches:
  Proteins containing a transmembrane domain were identified:
 
  ```bash
- 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
  		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
  		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
  		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
@@ -665,7 +665,7 @@ Required programs:
  * EffectorP.py
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteome in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		BaseName="$Organism"_"$Strain"_EffectorP
@@ -674,6 +674,66 @@ Required programs:
 		qsub $ProgDir/pred_effectorP.sh $Proteome $BaseName $OutDir
 	done
 ```
+
+## C) CAZY proteins
+
+Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
+at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
+
+```bash
+	for Proteome in $(ls gene_pred/codingquary/N.*/R0905_merged_assembly/*/final_genes_combined.pep.fasta); do
+		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+		OutDir=gene_pred/CAZY/$Organism/$Strain
+		mkdir -p $OutDir
+		Prefix="$Strain"_CAZY
+		CazyHmm=../../dbCAN/dbCAN-fam-HMMs.txt
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/HMMER
+		qsub $ProgDir/sub_hmmscan.sh $CazyHmm $Proteome $Prefix $OutDir
+	done
+```
+
+The Hmm parser was used to filter hits by an E-value of E1x10-5 or E 1x10-e3 if they had a hit over a length of X %.
+
+Those proteins with a signal peptide were extracted from the list and gff files
+representing these proteins made.
+
+```bash
+	for File in $(ls gene_pred/CAZY/F.*/*/*CAZY.out.dm); do
+		Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+		Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+		OutDir=$(dirname $File)
+		echo "$Organism - $Strain"
+		ProgDir=/home/groups/harrisonlab/dbCAN
+		$ProgDir/hmmscan-parser.sh $OutDir/Fus2_canu_new_CAZY.out.dm > $OutDir/Fus2_canu_new_CAZY.out.dm.ps
+		SecretedProts=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
+		SecretedHeaders=$(echo $SecretedProts | sed 's/.aa/_headers.txt/g')
+		cat $SecretedProts | grep '>' | tr -d '>' > $SecretedHeaders
+		Gff=$(ls gene_pred/final_genes/$Organism/$Strain/final/final_genes_appended.gff3)
+		CazyGff=$OutDir/Fus2_canu_new_CAZY.gff
+		ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+		$ProgDir/extract_gff_for_sigP_hits.pl $SecretedHeaders $Gff CAZyme ID > $CazyGff
+	done
+```
+
+Note - the CAZY genes identified may need further filtering based on e value and
+cuttoff length - see below:
+
+Cols in yourfile.out.dm.ps:
+1. Family HMM
+2. HMM length
+3. Query ID
+4. Query length
+5. E-value (how similar to the family HMM)
+6. HMM start
+7. HMM end
+8. Query start
+9. Query end
+10. Coverage
+
+* For fungi, use E-value < 1e-17 and coverage > 0.45
+
+* The best threshold varies for different CAZyme classes (please see http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4132414/ for details). Basically to annotate GH proteins, one should use a very relax coverage cutoff or the sensitivity will be low (Supplementary Tables S4 and S9); (ii) to annotate CE families a very stringent E-value cutoff and coverage cutoff should be used; otherwise the precision will be very low due to a very high false positive rate (Supplementary Tables S5 and S10)
 
 ### C) Identification of MIMP-flanking genes
 
