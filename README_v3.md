@@ -1121,6 +1121,7 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
       cat $CazyGffSecreted | grep -w 'mRNA' | cut -f9 | tr -d 'ID=' | cut -f1 -d ';' > $OutDir/"$Strain"_CAZY_secreted_headers.txt
       cat $OutDir/"$Strain"_CAZY_secreted_headers.txt | wc -l
     done
+  ```
 
 N.ditissima - R0905_merged_assembly
 number of CAZY genes identified:
