@@ -46,7 +46,7 @@ NG-R0905 reads
 cat pilon.fasta | grep 'tig' | wc -l
 70
 
-R0905 reads  Running
+R0905 reads
 
 ```bash
   	for Assembly in $(ls assembly/canu_2017/*/R0905/*_canu.contigs.fasta); do
@@ -60,14 +60,15 @@ R0905 reads  Running
     qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
   	done
 ```
+cat pilon.fasta | grep 'tig' | wc -l
+70
 
 ### Spades Assembly
 
-NOT DDONE
 
 For N. ditissima
 
-NG-R0905 reads
+NG-R0905 reads Running
 
 ```bash
   	for PacBioDat in $(ls raw_dna/pacbio/*/*/extracted/concatenated_pacbio.fastq); do
