@@ -68,7 +68,7 @@ cat pilon.fasta | grep 'tig' | wc -l
 
 For N. ditissima
 
-NG-R0905 reads Running
+NG-R0905 reads
 
 ```bash
   	for PacBioDat in $(ls raw_dna/pacbio/*/*/extracted/concatenated_pacbio.fastq); do
@@ -88,9 +88,34 @@ NG-R0905 reads Running
   	done
 ```
 cat contigs.fasta | grep 'NODE' | wc -l
-641
+620
 
-R0905 reads
+Contigs shorter than 500bp were removed from the assembly
+
+```bash
+  for Contigs in $(ls assembly/spades_pacbio_2017/*/*/contigs.fasta); do
+    AssemblyDir=$(dirname $Contigs)
+    mkdir $AssemblyDir/filtered_contigs_min_500bp
+    FilterDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/abyss
+    $FilterDir/filter_abyss_contigs.py $Contigs 500 > $AssemblyDir/filtered_contigs_min_500bp/contigs_min_500bp.fasta
+  done
+```
+cat contigs_min_500bp.fasta | grep 'NODE' | wc -l
+348
+
+Quast RUNNING
+
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades_pacbio_2017/*/NG-R0905/filtered_contigs_min_500bp/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    OutDir=assembly/spades_pacbio_2017/$Organism/NG-R0905/filtered_contigs_min_500bp
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  done
+```
+
+R0905 reads RUNNING
 
 ```bash
   	for PacBioDat in $(ls raw_dna/pacbio/*/*/extracted/concatenated_pacbio.fastq); do
@@ -109,6 +134,9 @@ R0905 reads
     qsub $ProgDir/sub_spades_pacbio.sh $PacBioDat $TrimF1_Read $TrimR1_Read $OutDir 15
   	done
 ```
+--------
+cat contigs.fasta | grep 'NODE' | wc -l
+641
 
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
