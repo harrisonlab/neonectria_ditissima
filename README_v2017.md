@@ -101,28 +101,64 @@ Quast RUNNING
   done
 ```
 
+Change directory name
+```bash
+  cd assembly/spades_pacbio_2017/N.ditissima/
+  mkdir R0905
+  mv NG-R0905/* R0905/
+  rm -r NG-R0905
+```
+
 ## Merging pacbio and hybrid assemblies
 
+
+AnchorLength: controls the length cutoff for anchor contigs. A good rule of thumb is to start with the N50 of the self assembly (HybridAssembly). E.g. if the N50 of your self assembly is 2Mb then use 2000000 as your cutoff. Lowering this value may lead to more merging but may increase the probability of mis-joins.
+
 ```bash
-  for PacBioAssembly in $(ls assembly/canu/*/*/polished/pilon.fasta); do
-  # for PacBioAssembly in $(ls assembly/pacbio_test/F.oxysporum_fsp_cepae/Fus2_pacbio_merged/polished/pilon.fasta); do
+  for PacBioAssembly in $(ls assembly/canu_2017/*/*/polished/pilon.fasta); do
     Organism=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
     Strain=$(echo $PacBioAssembly | rev | cut -f3 -d '/' | rev)
-    HybridAssembly=$(ls assembly/spades_pacbio/$Organism/$Strain/contigs.fasta)
-    # HybridAssembly=$(ls assembly/spades_pacbio/$Organism/Fus2/contigs.fasta)
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain
-    # OutDir=assembly/pacbio_test/$Organism/$Strain
+    HybridAssembly=$(ls assembly/spades_pacbio_2017/$Organism/$Strain/*/contigs_min_500bp.fasta)
+    AnchorLength=500000
+    OutDir=assembly/merged_assembly_2017/$Organism/$Strain
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
-    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir
+    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
   done
 ```
+52 contigs
+
+```bash
+  for PacBioAssembly in $(ls assembly/canu_2017/*/*/polished/pilon.fasta); do
+    Organism=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $PacBioAssembly | rev | cut -f3 -d '/' | rev)
+    HybridAssembly=$(ls assembly/spades_pacbio_2017/$Organism/$Strain/*/contigs_min_500bp.fasta)
+    AnchorLength=200
+    OutDir=assembly/merged_assembly_2017/$Organism/$Strain
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
+  done
+```
+40 contigs
+
+```bash
+  for PacBioAssembly in $(ls assembly/canu_2017/*/*/polished/pilon.fasta); do
+    Organism=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $PacBioAssembly | rev | cut -f3 -d '/' | rev)
+    HybridAssembly=$(ls assembly/spades_pacbio_2017/$Organism/$Strain/*/contigs_min_500bp.fasta)
+    AnchorLength=340273
+    OutDir=assembly/merged_assembly_2017/$Organism/$Strain
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
+  done
+```
+48 contigs
 
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  	for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta); do
+  	for Assembly in $(ls assembly/merged_assembly_2017/*/*/merged.fasta); do
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/quast
+    OutDir=assembly/merged_assembly_2017/$Organism/$Strain/quast
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
   	done
 ```
@@ -130,17 +166,20 @@ Quast RUNNING
 This merged assembly was polished using Pilon
 
 ```bash
-  for Assembly in $(ls assembly/merged_canu_spades/F.oxysporum_fsp_cepae/Fus2/merged.fasta); do
-  # for Assembly in $(ls assembly/pacbio_test/F.oxysporum_fsp_cepae/Fus2_pacbio_merged/merged.fasta); do
+  mkdir R0905
+  mv NG-R0905/* R0905/
+  rm -r R0905
+```
+
+```bash
+  for Assembly in $(ls assembly/merged_assembly_2017/*/*/merged.fasta); do
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     IlluminaDir=$(ls -d qc_dna/paired/$Organism/$Strain)
-    # IlluminaDir=$(ls -d qc_dna/paired/$Organism/Fus2)
-    TrimF1_Read=$(ls $IlluminaDir/F/s_6_1_sequence_trim.fq.gz);
-    TrimR1_Read=$(ls $IlluminaDir/R/s_6_2_sequence_trim.fq.gz);
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/polished
-    # OutDir=assembly/pacbio_test/$Organism/$Strain/polished
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+    TrimF1_Read=$(ls $IlluminaDir/F/*.fq.gz);
+    TrimR1_Read=$(ls $IlluminaDir/R/*.fq.gz);
+    OutDir=assembly/merged_assembly_2017/$Organism/$Strain/polished
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
     qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
   done
 ```
