@@ -184,19 +184,16 @@ This merged assembly was polished using Pilon
   done
 ```
 
-
 #Contigs were renamed in accordance with ncbi recomendations.
 
 
 ```bash
   ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
   touch tmp.csv
-  # for Assembly in $(ls assembly/merged_canu_spades/*/*/polished/pilon.fasta); do
-  for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/R0905/polished/pilon.fasta); do
+  for Assembly in $(ls assembly/merged_assembly_2017/N.ditissima/R0905/polished/pilon.fasta); do
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    # OutDir=assembly/merged_canu_spades/$Organism/$Strain/filtered_contigs
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/filtered_contigs
+    OutDir=assembly/merged_assembly_2017/$Organism/$Strain/filtered_contigs
     mkdir -p $OutDir
     $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_contigs_renamed.fasta --coord_file tmp.csv
   done
@@ -207,14 +204,15 @@ Assembly stats were collected using quast
 
 ```bash
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  # for Assembly in $(ls assembly/merged_canu_spades/*/*/filtered_contigs/R0905_contigs_renamed.fasta); do
-  for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta); do
+  for Assembly in $(ls assembly/merged_assembly_2017/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta); do
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     OutDir=$(dirname $Assembly)
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
   done
 ```
+
+RUNNING
 
 #Canu assembly contigs were renamed in accordance with ncbi recomendations.
 
