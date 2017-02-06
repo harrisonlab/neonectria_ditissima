@@ -220,30 +220,20 @@ RUNNING
 ```bash
   ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
   touch tmp.csv
-  for Assembly in $(ls assembly/canu/N.ditissima/R0905/polished/pilon.fasta); do
+  for Assembly in $(ls assembly/canu_2017/N.ditissima/R0905/polished/pilon.fasta); do
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    OutDir=assembly/canu/$Organism/$Strain/filtered_contigs
+    OutDir=assembly/canu_2017/$Organism/$Strain/filtered_contigs
     mkdir -p $OutDir
     $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_contigs_renamed.fasta --coord_file tmp.csv
   done
   rm tmp.csv
 ```
 
-## Renaming assemblies - temporarily
-Fus2 was temporarily renamed for preliminary analysis
-
-```bash
-  cp -r assembly/canu/F.oxysporum_fsp_cepae/Fus2 assembly/canu/F.oxysporum_fsp_cepae/Fus2_pacbio_test_canu
-  cp -r assembly/merged_canu_spades/F.oxysporum_fsp_cepae/Fus2 assembly/merged_canu_spades/F.oxysporum_fsp_cepae/Fus2_pacbio_test_merged
-  cp -r assembly/pacbio_test/F.oxysporum_fsp_cepae/Fus2_pacbio_merged assembly/pacbio_test/F.oxysporum_fsp_cepae/Fus2_pacbio_merged_richards
-```
-
 # Repeatmasking assemblies
 
 ```bash
   R0905_pacbio_merged=$(ls assembly/merged_canu_spades/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
-  # for Assembly in $(ls $Fus2_pacbio_merged $Fus2_pacbio_canu); do
   for Assembly in $(ls $R0905_pacbio_merged); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
     qsub $ProgDir/rep_modeling.sh $Assembly
