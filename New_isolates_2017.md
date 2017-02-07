@@ -76,20 +76,42 @@ This was done with fastq-mcf
 Data quality was visualised once again following trimming:
 
 ```bash
-	for RawData in $(ls qc_dna/paired/*/*/*/*.fastq.gz); do
+	for RawData in $(ls qc_dna/paired/*/new_isolates_2017/*/*/*.fq.gz); do
 	echo $RawData;
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	qsub $ProgDir/run_fastqc.sh $RawData;
   done
 ```
 
-
 kmer counting was performed using kmc.
 This allowed estimation of sequencing depth and total genome size:
 
 ```bash
-	Trim_F=qc_dna/paired/N.ditissima/NG-R0905/F/NG-R0905_qc_F.fastq.gz
-	Trim_R=qc_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_qc_R.fastq.gz
+	Trim_F=qc_dna/paired/N.ditissima/*/ND8/F/*.fq.gz
+	Trim_R=qc_dna/paired/N.ditissima/*/ND8/R/*.fq.gz
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
+	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
+```
+-----RUNNING
+
+** Estimated Genome Size is: 48490129
+
+** Esimated Coverage is: 42
+
+```bash
+	Trim_F=qc_dna/paired/N.ditissima/*/AgN04/F/*.fq.gz
+	Trim_R=qc_dna/paired/N.ditissima/*/AgN04/R/*.fq.gz
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
+	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
+```
+
+** Estimated Genome Size is: 48490129
+
+** Esimated Coverage is: 42
+
+```bash
+	Trim_F=qc_dna/paired/N.ditissima/*/R45-15/F/*.fq.gz
+	Trim_R=qc_dna/paired/N.ditissima/*/R45-15/R/*.fq.gz
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
 	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
 ```
