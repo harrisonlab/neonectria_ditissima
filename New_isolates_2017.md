@@ -92,11 +92,10 @@ This allowed estimation of sequencing depth and total genome size:
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
 	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
 ```
------RUNNING
 
-** Estimated Genome Size is: 48490129
+** Estimated Genome Size is: 946768573
 
-** Esimated Coverage is: 42
+** Esimated Coverage is: 5
 
 ```bash
 	Trim_F=qc_dna/paired/N.ditissima/*/AgN04/F/*.fq.gz
@@ -105,9 +104,9 @@ This allowed estimation of sequencing depth and total genome size:
 	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
 ```
 
-** Estimated Genome Size is: 48490129
+** Estimated Genome Size is: 48203823
 
-** Esimated Coverage is: 42
+** Esimated Coverage is: 30
 
 ```bash
 	Trim_F=qc_dna/paired/N.ditissima/*/R45-15/F/*.fq.gz
@@ -116,6 +115,50 @@ This allowed estimation of sequencing depth and total genome size:
 	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
 ```
 
-** Estimated Genome Size is: 48490129
+** Estimated Genome Size is: 43409438
 
-** Esimated Coverage is: 42
+** Esimated Coverage is: 86
+
+
+#Assembly
+Assembly was performed using: Spades
+
+A range of hash lengths were used and the best assembly selected for subsequent analysis
+
+```bash
+	F_Read=qc_dna/paired/N.ditissima/*/R45-15/F/*.fq.gz
+	R_Read=qc_dna/paired/N.ditissima/*/R45-15/R/*.fq.gz
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
+	Outdir=assembly/spades/N.ditissima/R45-15/
+	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
+```
+
+cat contigs.fasta | grep '>' | wc -l
+1204
+
+cat contigs_min_500bp.fasta | grep '>' | wc -l
+849
+
+```bash
+	F_Read=qc_dna/paired/N.ditissima/*/AgN04/F/*.fq.gz
+	R_Read=qc_dna/paired/N.ditissima/*/AgN04/R/*.fq.gz
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
+	Outdir=assembly/spades/N.ditissima/AgN04/
+	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
+```
+
+cat contigs.fasta | grep '>' | wc -l
+1204
+
+cat contigs_min_500bp.fasta | grep '>' | wc -l
+849
+
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/Hg199/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
