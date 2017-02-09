@@ -134,10 +134,10 @@ A range of hash lengths were used and the best assembly selected for subsequent 
 ```
 
 cat contigs.fasta | grep '>' | wc -l
-1204
+1427
 
 cat contigs_min_500bp.fasta | grep '>' | wc -l
-849
+969
 
 ```bash
 	F_Read=qc_dna/paired/N.ditissima/*/AgN04/F/*.fq.gz
@@ -148,14 +148,23 @@ cat contigs_min_500bp.fasta | grep '>' | wc -l
 ```
 
 cat contigs.fasta | grep '>' | wc -l
-1204
+1106
 
 cat contigs_min_500bp.fasta | grep '>' | wc -l
-849
+728
 
 ```bash
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  for Assembly in $(ls assembly/spades/N.ditissima/Hg199/filtered_contigs/contigs_min_500bp.fasta); do
+  for Assembly in $(ls assembly/spades/N.ditissima/R45-15/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/AgN04/filtered_contigs/contigs_min_500bp.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
     OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
