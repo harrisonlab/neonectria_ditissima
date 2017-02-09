@@ -89,7 +89,7 @@ Contigs shorter than 500bp were removed from the assembly
 cat contigs_min_500bp.fasta | grep 'NODE' | wc -l
 348
 
-Quast RUNNING
+Quast
 
 ```bash
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
@@ -204,15 +204,13 @@ Assembly stats were collected using quast
 
 ```bash
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  for Assembly in $(ls assembly/merged_assembly_2017/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta); do
+  for Assembly in $(ls assembly/merged_assembly_2017/N.ditissima/R0905/polished/pilon.fasta); do
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     OutDir=$(dirname $Assembly)
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
   done
 ```
-
-RUNNING
 
 #Canu assembly contigs were renamed in accordance with ncbi recomendations.
 
@@ -230,20 +228,36 @@ RUNNING
   rm tmp.csv
 ```
 
+Assembly stats were collected using quast
+
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/canu_2017/N.ditissima/R0905/polished/pilon.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    OutDir=$(dirname $Assembly)
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  done
+```
+
+-----RUNNING
+
 # Repeatmasking assemblies
 
 ```bash
-  R0905_pacbio_merged=$(ls assembly/merged_canu_spades/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
+  R0905_pacbio_merged=$(ls assembly/merged_assembly_2017/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
   for Assembly in $(ls $R0905_pacbio_merged); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
     qsub $ProgDir/rep_modeling.sh $Assembly
     qsub $ProgDir/transposonPSI.sh $Assembly
   done
 ```
+** % bases masked by repeatmasker: 11.57% (bases masked:5290972 bp)
+
+** % bases masked by transposon psi: 10.29% (bases masked:4704506 bp)
 
 ```bash
-  R0905_pacbio_canu=$(ls assembly/canu/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
-  # for Assembly in $(ls $Fus2_pacbio_merged $Fus2_pacbio_canu); do
+  R0905_pacbio_canu=$(ls assembly/canu_2017/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
   for Assembly in $(ls $R0905_pacbio_canu); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
     qsub $ProgDir/rep_modeling.sh $Assembly
