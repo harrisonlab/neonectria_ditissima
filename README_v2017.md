@@ -240,12 +240,10 @@ Assembly stats were collected using quast
   done
 ```
 
------RUNNING
-
 # Repeatmasking assemblies
 
 ```bash
-  R0905_pacbio_merged=$(ls assembly/merged_assembly_2017/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
+  R0905_pacbio_merged=$(ls assembly/merged_assembly_2017/*/R0905/polished/pilon.fasta)
   for Assembly in $(ls $R0905_pacbio_merged); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
     qsub $ProgDir/rep_modeling.sh $Assembly
@@ -257,7 +255,7 @@ Assembly stats were collected using quast
 ** % bases masked by transposon psi: 10.29% (bases masked:4704506 bp)
 
 ```bash
-  R0905_pacbio_canu=$(ls assembly/canu_2017/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
+  R0905_pacbio_canu=$(ls assembly/canu_2017/*/R0905/polished/pilon.fasta)
   for Assembly in $(ls $R0905_pacbio_canu); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
     qsub $ProgDir/rep_modeling.sh $Assembly
