@@ -242,12 +242,14 @@ Assembly stats were collected using quast
 
 # Repeatmasking assemblies
 
+RUNNING ONLY THIS ONE
 ```bash
   R0905_pacbio_merged=$(ls assembly/merged_assembly_2017/*/R0905/polished/pilon.fasta)
   for Assembly in $(ls $R0905_pacbio_merged); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-    qsub $ProgDir/rep_modeling.sh $Assembly
-    qsub $ProgDir/transposonPSI.sh $Assembly
+    OutDir=repeat_masked/N.ditissima/R0905_merged_2017/
+    qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+    qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
   done
 ```
 ** % bases masked by repeatmasker: 11.57% (bases masked:5290972 bp)
