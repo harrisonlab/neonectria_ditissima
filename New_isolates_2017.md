@@ -171,3 +171,54 @@ done
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
+
+# Repeatmasking
+
+Repeat masking was performed and used the following programs: Repeatmasker Repeatmodeler
+
+The best assembly was used to perform repeatmasking
+
+```bash
+  NewSpades=$(ls assembly/spades/*/R45-15/filtered_contigs/contigs_min_500bp.fasta)
+  for Assembly in $(ls $NewSpades); do
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
+    OutDir=repeat_masked/N.ditissima/R45-15/
+    qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+    qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
+  done
+```
+
+** % bases masked by repeatmasker: 10.88% (bases masked:4941726 bp)
+
+** % bases masked by transposon psi: 9.48% (bases masked:4306052 bp)
+
+```bash
+  NewSpades2=$(ls assembly/spades/*/AgN04/filtered_contigs/contigs_min_500bp.fasta)
+  for Assembly in $(ls $NewSpades2); do
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
+    OutDir=repeat_masked/N.ditissima/AgN04/
+    qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+    qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
+  done
+```
+
+** % bases masked by repeatmasker: 10.88% (bases masked:4941726 bp)
+
+** % bases masked by transposon psi: 9.48% (bases masked:4306052 bp)
+
+Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
+
+```bash
+  for File in $(ls repeat_masked/*/Hg199/filtered_contigs_repmask/*_contigs_softmasked.fa); do
+      OutDir=$(dirname $File)
+      TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+      OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+      bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+      echo "$OutFile"
+      echo "Number of masked bases:"
+      cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+    done
+
+    repeat_masked/N.ditissima/Hg199/filtered_contigs_repmask/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
+    Number of masked bases:  5062507
+```
