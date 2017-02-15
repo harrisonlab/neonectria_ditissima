@@ -242,7 +242,6 @@ Assembly stats were collected using quast
 
 # Repeatmasking assemblies
 
-RUNNING ONLY THIS ONE
 ```bash
   R0905_pacbio_merged=$(ls assembly/merged_assembly_2017/*/R0905/polished/pilon.fasta)
   for Assembly in $(ls $R0905_pacbio_merged); do
@@ -252,10 +251,11 @@ RUNNING ONLY THIS ONE
     qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
   done
 ```
-** % bases masked by repeatmasker: 11.57% (bases masked:5290972 bp)
+** % bases masked by repeatmasker: 11.74% (bases masked:5290972 bp)
 
-** % bases masked by transposon psi: 10.29% (bases masked:4704506 bp)
+** % bases masked by transposon psi: 10.40% (bases masked:4704506 bp)
 
+RUNNING
 ```bash
   R0905_pacbio_canu=$(ls assembly/canu_2017/*/R0905/polished/pilon.fasta)
   for Assembly in $(ls $R0905_pacbio_canu); do
@@ -273,7 +273,7 @@ RUNNING ONLY THIS ONE
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
-for File in $(ls repeat_masked/*/*/filtered_contigs_repmask/*_contigs_softmasked.fa); do
+  for File in $(ls repeat_masked/*/*/*_contigs_softmasked.fa); do
       OutDir=$(dirname $File)
       TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
       OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
@@ -283,10 +283,16 @@ for File in $(ls repeat_masked/*/*/filtered_contigs_repmask/*_contigs_softmasked
       cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
     done
 ```
-repeat_masked/N.ditissima/R0905_pacbio_canu/filtered_contigs_repmask/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:5398957
-
-
+    repeat_masked/N.ditissima/AgN04/AgN04_contigs_softmasked_repeatmasker_TPSI_appended.fa
+    Number of masked bases:
+    6076978
+    repeat_masked/N.ditissima/R0905_merged_2017/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
+    Number of masked bases:
+    5395566
+    repeat_masked/N.ditissima/R45-15/R45-15_contigs_softmasked_repeatmasker_TPSI_appended.fa
+    Number of masked bases:
+    4967354
+    
 # Preliminary analysis
 
 ## Checking PacBio coverage against Fus2 contigs
