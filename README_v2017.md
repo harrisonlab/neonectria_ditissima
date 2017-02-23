@@ -305,8 +305,6 @@ the assembled genome. Coverage was determined using bedtools genomecov and
 regions with low coverage flagged using a python script flag_low_coverage.py.
 These low coverage regions were visually inspected using IGV.
 
-RUNNING!!
-
 Merged canu spades assembly
 
 ```bash
@@ -341,25 +339,18 @@ Gene prediction followed three steps:
 # Pre-gene prediction
 
 Quality of genome assemblies was assessed by looking for the gene space in the assemblies.
-```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
-	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-	for Genome in $(ls repeat_masked/N.*/R0905_pacbio_canu/*/*_contigs_softmasked.fa); do
-		echo $Genome;
-		qsub $ProgDir/sub_cegma.sh $Genome dna;
-	done
-```
-** Number of cegma genes present and complete: 94.35%
-** Number of cegma genes present and partial: 95.97%
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
 	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-	for Genome in $(ls repeat_masked/N.*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+	for Genome in $(ls repeat_masked/N.*/R0905_merged_2017/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		echo $Genome;
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
 	done
 ```
+
+------------------
+
 ** Number of cegma genes present and complete: 94.35%
 ** Number of cegma genes present and partial: 95.97%
 
