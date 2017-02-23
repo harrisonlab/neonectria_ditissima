@@ -255,25 +255,27 @@ Assembly stats were collected using quast
 
 ** % bases masked by transposon psi: 10.40% (bases masked:4704506 bp)
 
-RUNNING
+running!!!!
+
 ```bash
   R0905_pacbio_canu=$(ls assembly/canu_2017/*/R0905/polished/pilon.fasta)
   for Assembly in $(ls $R0905_pacbio_canu); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-    qsub $ProgDir/rep_modeling.sh $Assembly
-    qsub $ProgDir/transposonPSI.sh $Assembly
+    OutDir=repeat_masked/N.ditissima/R0905_canu_2017_v2/
+    qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+    qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
   done
 ```
 
-** % bases masked by repeatmasker: 11.57% (bases masked:5290972 bp)
+** % bases masked by repeatmasker: 11.61% (bases masked:5331562 bp)
 
-** % bases masked by transposon psi: 10.29% (bases masked:4704506 bp)
+** % bases masked by transposon psi: 10.29% (bases masked:4722389 bp)
 
 
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
-  for File in $(ls repeat_masked/*/*/*_contigs_softmasked.fa); do
+  for File in $(ls repeat_masked/*/*/*/*_contigs_softmasked.fa); do
       OutDir=$(dirname $File)
       TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
       OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
@@ -292,10 +294,10 @@ Up till now we have been using just the repeatmasker/repeatmodeller fasta file w
     repeat_masked/N.ditissima/R45-15/R45-15_contigs_softmasked_repeatmasker_TPSI_appended.fa
     Number of masked bases:
     4967354
-    
+
 # Preliminary analysis
 
-## Checking PacBio coverage against Fus2 contigs
+## Checking PacBio coverage against Nd contigs
 
 The accuracy of PacBio assembly pipelines is currently unknown. To help identify
 regions that may have been missassembled the pacbio reads were aligned back to
@@ -303,27 +305,26 @@ the assembled genome. Coverage was determined using bedtools genomecov and
 regions with low coverage flagged using a python script flag_low_coverage.py.
 These low coverage regions were visually inspected using IGV.
 
+RUNNING!!
 
 Merged canu spades assembly
 
 ```bash
-    Assembly=assembly/merged_canu_spades/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta
+    Assembly=assembly/merged_assembly_2017/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta
     Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
     OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
     qsub $ProgDir/sub_bwa_pacbio.sh $Assembly $Reads $OutDir
-  done
 ```
 
 Canu assembly
 
 ```bash
-    Assembly=assembly/canu/N.ditissima/R0905/polished/pilon.fasta
+    Assembly=assembly/canu_2017/N.ditissima/R0905/polished/pilon.fasta
     Reads=raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq
     OutDir=analysis/genome_alignment/bwa/N.ditissima/R0905/
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
     qsub $ProgDir/sub_bwa_pacbio.sh $Assembly $Reads $OutDir
-  done
 ```
 
 # Gene Prediction
