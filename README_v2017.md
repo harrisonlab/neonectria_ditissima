@@ -255,7 +255,6 @@ Assembly stats were collected using quast
 
 ** % bases masked by transposon psi: 10.40% (bases masked:4704506 bp)
 
-running!!!!
 
 ```bash
   R0905_pacbio_canu=$(ls assembly/canu_2017/*/R0905/polished/pilon.fasta)
@@ -267,9 +266,9 @@ running!!!!
   done
 ```
 
-** % bases masked by repeatmasker: 11.61% (bases masked:5331562 bp)
+** % bases masked by repeatmasker: 12.43% (bases masked:5706940 bp)
 
-** % bases masked by transposon psi: 10.29% (bases masked:4722389 bp)
+** % bases masked by transposon psi: 11.12% (bases masked:5107601 bp)
 
 
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
@@ -294,6 +293,9 @@ Up till now we have been using just the repeatmasker/repeatmodeller fasta file w
     repeat_masked/N.ditissima/R45-15/R45-15_contigs_softmasked_repeatmasker_TPSI_appended.fa
     Number of masked bases:
     4967354
+    repeat_masked/N.ditissima/R0905_canu_2017_v2/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
+    Number of masked bases:
+    5786417
 
 # Preliminary analysis
 
@@ -341,23 +343,32 @@ Gene prediction followed three steps:
 Quality of genome assemblies was assessed by looking for the gene space in the assemblies.
 
 ```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
 	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-	for Genome in $(ls repeat_masked/N.*/R0905_merged_2017/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-		echo $Genome;
-		qsub $ProgDir/sub_cegma.sh $Genome dna;
-	done
+	for Genome2 in $(ls repeat_masked/$Organism/R0905_merged_2017/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		echo $Genome2;
+		qsub $ProgDir/sub_cegma.sh $Genome2 dna;
+  done
 ```
-
-------------------
 
 ** Number of cegma genes present and complete: 94.35%
 ** Number of cegma genes present and partial: 95.97%
 
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
+	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+	for Genome in $(ls repeat_masked/N.*/R0905_canu_2017_v2/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		echo $Genome;
+		qsub $ProgDir/sub_cegma.sh $Genome dna;
+	done
+```
+** Number of cegma genes present and complete: 95.16%
+** Number of cegma genes present and partial: 96.77%
+
 
 Outputs were summarised using the commands:
 ```bash
-	for File in $(ls gene_pred/cegma/N.*/R0905_canu_assembly/*_dna_cegma.completeness_report); do
+	for File in $(ls gene_pred/cegma/N.*/R0905_merged_2017/*_dna_cegma.completeness_report); do
 		Strain=$(echo $File | rev | cut -f2 -d '/' | rev);
 		Species=$(echo $File | rev | cut -f3 -d '/' | rev);
 		printf "$Species\t$Strain\n";
