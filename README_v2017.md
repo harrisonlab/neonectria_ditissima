@@ -368,7 +368,7 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 
 Outputs were summarised using the commands:
 ```bash
-	for File in $(ls gene_pred/cegma/N.*/R0905_merged_2017/*_dna_cegma.completeness_report); do
+	for File in $(ls gene_pred/cegma/*/*/*_dna_cegma.completeness_report); do
 		Strain=$(echo $File | rev | cut -f2 -d '/' | rev);
 		Species=$(echo $File | rev | cut -f3 -d '/' | rev);
 		printf "$Species\t$Strain\n";
@@ -444,8 +444,8 @@ single genome. The fragment length and stdev were printed to stdout while
 cufflinks was running.
 
 ```bash
-	for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+	for Assembly in $(ls repeat_masked/*/Ref_Genomes/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
 		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
 		for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905); do
