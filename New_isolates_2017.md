@@ -247,8 +247,8 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
 	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
 	for Genome in $(ls repeat_masked/*/R45-15/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Strain=$(echo $Genome | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Genome | rev | cut -f3 -d '/' | rev)
     echo $Genome;
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
 	done
@@ -260,18 +260,18 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
 	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
 	for Genome in $(ls repeat_masked/*/AgN04/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Strain=$(echo $Genome | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Genome | rev | cut -f3 -d '/' | rev)
     echo $Genome;
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
 	done
 ```
-** Number of cegma genes present and complete: %
-** Number of cegma genes present and partial: %
+** Number of cegma genes present and complete: 95.16%
+** Number of cegma genes present and partial: 96.77%
 
 Outputs were summarised using the commands:
 ```bash
-	for File in $(ls gene_pred/cegma/N.*/Hg199/*_dna_cegma.completeness_report); do
+	for File in $(ls gene_pred/cegma/N.*/*/*_dna_cegma.completeness_report); do
 		Strain=$(echo $File | rev | cut -f2 -d '/' | rev);
 		Species=$(echo $File | rev | cut -f3 -d '/' | rev);
 		printf "$Species\t$Strain\n";
