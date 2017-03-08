@@ -588,66 +588,13 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 Fasta and gff files were extracted from Braker1 output.
 
 ```bash
-  for File in $(ls gene_pred/braker/N.*/R0905_pacbio_canu_braker_fourth/*/augustus.gff); do
+  for File in $(ls gene_pred/braker/N.*/*_2017_*/*/augustus.gff); do
     getAnnoFasta.pl $File
     OutDir=$(dirname $File)
     echo "##gff-version 3" > $OutDir/augustus_extracted.gff
     cat $File | grep -v '#' >> $OutDir/augustus_extracted.gff
   done
 ```
-
-The relationship between gene models and aligned reads was investigated. To do
-this aligned reads needed to be sorted and indexed:
-
-Note - IGV was used to view aligned reads against the Fus2 genome on my local
-machine.
-
-```bash
-#InBam=alignment/N.ditissima/R0905_pacbio_canu/concatenated/concatenated.bam
-#ViewBam=alignment/N.ditissima/R0905_pacbio_canu/concatenated/concatenated_view.bam
-#SortBam=alignment/N.ditissima/R0905_pacbio_canu/concatenated/concatenated_sorted
-#samtools view -b $InBam > $ViewBam
-#samtools sort $ViewBam $SortBam
-#samtools index $SortBam.bam
-```
-
-[bam_header_read] EOF marker is absent. The input is probably truncated.
-[main_samview] truncated file.
-
-Cufflinks was run to compare the predicted genes to assembled transcripts:
-
-```bash
-	#for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-		#Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-		#while [ $Jobs -gt 1 ]; do
-		#sleep 10
-		#printf "."
-		#Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-		#done
-		#Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-		#Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-		#AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
-		#OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated
-		#echo "$Organism - $Strain"
-		#mkdir -p $OutDir
-		#samtools merge -f $AcceptedHits \
-		#alignment/$Organism/R0905_pacbio_canu/R0905/accepted_hits.bam
-		#ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-		#qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir/cuflfinks
-	# cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
-	#done
-```
-
-<!--
-The number of Fo47 genes was determined for comparison to number predicted by Braker (16269):
-```bash
-	fo47_transcripts=assembly/external_group/F.oxysporum/fo47/broad/fusarium_oxysporum_fo47_1_transcripts.gtf
-	cat $fo47_transcripts | grep 'gene_id' | cut -f2 -d '"' | sort | uniq | wc -l
-	# 18191
-```
- -->
-
-
 
 ## Supplimenting Braker gene models with CodingQuary genes
 
@@ -660,8 +607,8 @@ Note - cufflinks doesn't always predict direction of a transcript and
 therefore features can not be restricted by strand when they are intersected.
 
 ```bash
-    for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+    for Assembly in $(ls repeat_masked/*/Ref_Genomes/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
     echo "$Organism - $Strain"
     OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
@@ -675,8 +622,8 @@ therefore features can not be restricted by strand when they are intersected.
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-    for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+    for Assembly in $(ls repeat_masked/*/Ref_Genomes/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
     echo "$Organism - $Strain"
     OutDir=gene_pred/codingquary/$Organism/$Strain
@@ -691,12 +638,11 @@ genes were predicted in regions of the genome, not containing Braker gene
 models:
 
 ```bash
-	# for BrakerGff in $(ls gene_pred/braker/F.*/*_braker_new/*/augustus.gff3 | grep -w -e 'Fus2'); do
-for BrakerGff in $(ls gene_pred/braker/N.*/*_braker_fourth/*/augustus.gff3); do
-Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_fourth//g')
+for BrakerGff in $(ls gene_pred/braker/N.*/*_2017_*/*/augustus.gff3); do
+Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_first//g')
 Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
-Assembly=$(ls repeat_masked/$Organism/$Strain/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+Assembly=$(ls repeat_masked/$Organism/Ref_Genomes/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
 CodingQuaryGff=gene_pred/codingquary/$Organism/$Strain/out/PredictedPass.gff3
 PGNGff=gene_pred/codingquary/$Organism/$Strain/out/PGN_predictedPass.gff3
 AddDir=gene_pred/codingquary/$Organism/$Strain/additional
@@ -728,7 +674,6 @@ GffQuary=$FinalDir/final_genes_Braker.gff3
 GffAppended=$FinalDir/final_genes_appended.gff3
 cat $GffBraker $GffQuary > $GffAppended
 
-# cat $BrakerGff $AddDir/additional_gene_parsed.gff3 | bedtools sort > $FinalGff
 done
 ```
 
