@@ -679,7 +679,7 @@ done
 
 The final number of genes per isolate was observed using:
 ```bash
-for DirPath in $(ls -d gene_pred/codingquary/N.*/*/final); do
+for DirPath in $(ls -d gene_pred/codingquary/N.*/*_201*/final); do
 echo $DirPath;
 cat $DirPath/final_genes_Braker.pep.fasta | grep '>' | wc -l;
 cat $DirPath/final_genes_CodingQuary.pep.fasta | grep '>' | wc -l;
@@ -688,27 +688,15 @@ echo "";
 done
 ```
 
-gene_pred/codingquary/N.ditissima/Hg199/final
-12807
-954
-13761
+gene_pred/codingquary/N.ditissima/R0905_canu_2017_v2/final
+12851
+915
+13766
 
-gene_pred/codingquary/N.ditissima/R0905_pacbio_canu/final
-12917
-879
-13796
-
-<!--
-## Suplimenting gene models with known genes
-
-Additional gene models were consrtucted in braker / transfered from other isolates
-and were exported to the following locations:
-
-```bash
-	Fus2Six9=assembly/spades/F.oxysporum_fsp_cepae/Fus2_edited_v2/filtered_contigs/Fus2_edited_v2_contig_1090_six9.gff
-```
-
-These gene models were then edited with nano to give names and IDs to these genes. -->
+gene_pred/codingquary/N.ditissima/R0905_merged_2017/final
+12751
+896
+13647
 
 ## ORF finder
 
@@ -720,10 +708,10 @@ also printing ORFs in .gff format.
 
 
 ```bash
-	ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-	for Genome in $(ls repeat_masked/F.*/*/*/*_contigs_unmasked.fa | grep -w -e 'Fus2'); do
-		qsub $ProgDir/run_ORF_finder.sh $Genome
-	done
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+for Genome in $(ls repeat_masked/*/Ref_Genomes/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+qsub $ProgDir/run_ORF_finder.sh $Genome
+done
 ```
 
 The Gff files from the the ORF finder are not in true Gff3 format. These were
@@ -760,7 +748,7 @@ was redirected to a temporary output file named interproscan_submission.log .
 	screen -a
 	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Genes in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
@@ -771,7 +759,7 @@ commands:
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteins in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -781,33 +769,10 @@ commands:
 	done
 ```
 
-
 ## B) SwissProt
-<!--
-```bash
-  screen -a
-  qlogin
-  ProjDir=/home/groups/harrisonlab/project_files/idris
-  cd $ProjDir
-  for Proteome in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta); do
-    Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
-    Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-    OutDir=$ProjDir/gene_pred/swissprot/$Species/$Strain/
-    mkdir -p $OutDir
-    blastp \
-    -db /home/groups/harrisonlab/uniprot/swissprot/uniprot_sprot \
-    -query $ProjDir/$Proteome \
-    -out $OutDir/swissprot_v2015_10_hits.tbl \
-    -evalue 1e-100 \
-    -outfmt 6 \
-    -num_threads 16 \
-    -num_alignments 10
-  done
-``` -->
-
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteome in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		OutDir=gene_pred/swissprot/$Organism/$Strain
@@ -819,68 +784,13 @@ commands:
 ```
 
 ```bash
-	for SwissTable in $(ls gene_pred/swissprot/*/*/swissprot_v2015_10_hits.tbl); do
-	# SwissTable=gene_pred/swissprot/Fus2/swissprot_v2015_10_hits.tbl
+	for SwissTable in $(ls gene_pred/swissprot/*/*_201*/*_hits.tbl); do
 		Strain=$(echo $SwissTable | rev | cut -f2 -d '/' | rev)
 		Organism=$(echo $SwissTable | rev | cut -f3 -d '/' | rev)
 		echo "$Organism - $Strain"
-		OutTable=gene_pred/swissprot/$Organism/$Strain/swissprot_v2015_tophit_parsed.tbl
+		OutTable=gene_pred/swissprot/$Organism/$Strain/swissprot_v2017_tophit_parsed.tbl
 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
 		$ProgDir/swissprot_parser.py --blast_tbl $SwissTable --blast_db_fasta ../../uniprot/swissprot/uniprot_sprot.fasta > $OutTable
-	done
-```
-
-
-
-
-
-#Genomic analysis
-
-## Comparison to FoL 4287
-
-BLast searches were used to identify which genes had homologs on which
-chromosomes of the Fusarium lycopersici genome.
-
-```bash
-	FoLGenomeFa=assembly/external_group/F.oxysporum_fsp_lycopersici/4287_chromosomal/ensembl/Fusarium_oxysporum_chromosome_and_additional_contigs.fa
-	for Proteome in $(ls gene_pred/codingquary/F.*/*/*/final_genes_combined.pep.fasta | grep -w -e 'Fus2'); do
-	# for Proteome in $(ls assembly/external_group/F.oxysporum/fo47/broad/fusarium_oxysporum_fo47_1_proteins.fasta); do
-	# for Proteome in $(ls gene_pred/external_group/F.oxysporum_fsp_lycopersici/4287/Fusox1/Fusox1_GeneCatalog_proteins_20110522_parsed.fa); do
-		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
-		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-		echo "$Organism - $Strain"
-		OutDir=analysis/blast_homology/$Organism/$Strain
-		ProgDir=/home/armita/git_repos/emr_repos/tools/pathogen/blast
-		qsub $ProgDir/run_blast2csv.sh $Proteome protein $FoLGenomeFa $OutDir
-	done
-```
-
-Convert top blast hits into gff annotations
-
-```bash
-	for BlastHitsCsv in $(ls analysis/blast_homology/F.*/*/4287_chromosomal_final_genes_combined.pep.fasta_hits.csv | grep -w -e 'Fus2'); do
-		Organism=$(echo $BlastHitsCsv | rev | cut -f3 -d '/' | rev)
-		Strain=$(echo $BlastHitsCsv | rev | cut -f2 -d '/' | rev)
-		echo "$Organism - $Strain"
-		HitsGff=$(echo $BlastHitsCsv | sed  's/.csv/.gff/g')
-		Column2="$Strain"_gene_homolog
-		NumHits=1
-		ProgDir=/home/armita/git_repos/emr_repos/tools/pathogen/blast
-		$ProgDir/blast2gff.pl $Column2 $NumHits $BlastHitsCsv > $HitsGff
-	done
-```
-
-#### Intersecting blast hits with genes from FoL
-
-```bash
-	for HitsGff in $(ls analysis/blast_homology/F.*/*/4287_chromosomal_final_genes_combined.pep.fasta_hits.gff | grep -w -e 'Fus2'); do
-		Organism=$(echo $HitsGff | rev | cut -f3 -d '/' | rev)
-		Strain=$(echo $HitsGff| rev | cut -f2 -d '/' | rev)
-		echo "$Organism - $Strain"
-		HitsDir=$(dirname $HitsGff)
-		FoLGenes=assembly/external_group/F.oxysporum_fsp_lycopersici/4287_chromosomal/ensembl/Fusarium_oxysporum.FO2.31.chr.gff3
-		FoLIntersect=$HitsDir/4287_chromosomal_final_genes_combined_intersect.bed
-		bedtools intersect -wo -a $HitsGff -b $FoLGenes > $FoLIntersect
 	done
 ```
 
@@ -906,10 +816,11 @@ gene models using a number of approaches:
  the following commands:
 
  ```bash
+  screen -a
  	SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
  	CurPath=$PWD
- 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
  		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
  		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
  		SplitDir=gene_pred/final_genes_split/$Organism/$Strain
