@@ -880,6 +880,27 @@ gene models using a number of approaches:
  	done
  ```
 
+ Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
+
+ ```bash
+   for File in $(ls gene_pred/trans_mem/*/*_201*/*_TM_genes_neg.txt); do
+     Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+     Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+     echo "$Organism - $Strain"
+     TmHeaders=$(echo "$File" | sed 's/neg.txt/neg_headers.txt/g')
+     cat $File | cut -f1 > $TmHeaders
+     SigP=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
+     OutDir=$(dirname $SigP)
+     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+     $ProgDir/extract_from_fasta.py --fasta $SigP --headers $TmHeaders > $OutDir/"$Strain"_final_sp_no_trans_mem.aa
+     cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
+   done
+ ```
+    N.ditissima - R0905_canu_2017_v2
+    1017
+    N.ditissima - R0905_merged_2017
+    991
+
 ### B) From Augustus gene models - Effector identification using EffectorP
 
 Required programs:
@@ -919,23 +940,43 @@ The Hmm parser was used to filter hits by an E-value of E1x10-5 or E 1x10-e3 if 
 Those proteins with a signal peptide were extracted from the list and gff files
 representing these proteins made.
 
-```bash
-	for File in $(ls gene_pred/CAZY/N.*/*_201*/*CAZY.out.dm); do
-		Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
-		Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
-		OutDir=$(dirname $File)
-		echo "$Organism - $Strain"
-		ProgDir=/home/groups/harrisonlab/dbCAN
-		$ProgDir/hmmscan-parser.sh $OutDir/R0905_new_CAZY.out.dm > $OutDir/R0905_new_CAZY.out.dm.ps
-		SecretedProts=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
-		SecretedHeaders=$(echo $SecretedProts | sed 's/.aa/_headers.txt/g')
-		cat $SecretedProts | grep '>' | tr -d '>' > $SecretedHeaders
-		Gff=$(ls gene_pred/final_genes/$Organism/$Strain/final/final_genes_appended.gff3)
-		CazyGff=$OutDir/Fus2_canu_new_CAZY.gff
-		ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-		$ProgDir/extract_gff_for_sigP_hits.pl $SecretedHeaders $Gff CAZyme ID > $CazyGff
-	done
+  ```bash
+  for File in $(ls gene_pred/CAZY/N.*/*_201*/*CAZY.out.dm); do
+  Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+  OutDir=$(dirname $File)
+  echo "$Organism - $Strain"
+  ProgDir=/home/groups/harrisonlab/dbCAN
+  $ProgDir/hmmscan-parser.sh $OutDir/"$Strain"_CAZY.out.dm > $OutDir/"$Strain"_CAZY.out.dm.ps
+  CazyHeaders=$(echo $File | sed 's/.out.dm/_headers.txt/g')
+  cat $OutDir/"$Strain"_CAZY.out.dm.ps | cut -f3 | sort | uniq > $CazyHeaders
+  echo "number of CAZY genes identified:"
+  cat $CazyHeaders | wc -l
+  Gff=$(ls gene_pred/codingquary/$Organism/$Strain/final/final_genes_appended.gff3)
+  CazyGff=$OutDir/"$Strain"_CAZY.gff
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+  $ProgDir/extract_gff_for_sigP_hits.pl $CazyHeaders $Gff CAZyme ID > $CazyGff
+
+  SecretedProts=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
+  SecretedHeaders=$(echo $SecretedProts | sed 's/.aa/_headers.txt/g')
+  cat $SecretedProts | grep '>' | tr -d '>' > $SecretedHeaders
+  CazyGffSecreted=$OutDir/"$Strain"_CAZY_secreted.gff
+  $ProgDir/extract_gff_for_sigP_hits.pl $SecretedHeaders $CazyGff Secreted_CAZyme ID > $CazyGffSecreted
+  echo "number of Secreted CAZY genes identified:"
+  cat $CazyGffSecreted | grep -w 'gene' | cut -f9 | tr -d 'ID=' | wc -l
+  done
 ```
+
+  N.ditissima - R0905_canu_2017_v2
+  number of CAZY genes identified:
+  721
+  number of Secreted CAZY genes identified:
+  287
+  N.ditissima - R0905_merged_2017
+  number of CAZY genes identified:
+  720
+  number of Secreted CAZY genes identified:
+  283
 
 Note - the CAZY genes identified may need further filtering based on e value and
 cuttoff length - see below:
@@ -955,57 +996,3 @@ Cols in yourfile.out.dm.ps:
 * For fungi, use E-value < 1e-17 and coverage > 0.45
 
 * The best threshold varies for different CAZyme classes (please see http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4132414/ for details). Basically to annotate GH proteins, one should use a very relax coverage cutoff or the sensitivity will be low (Supplementary Tables S4 and S9); (ii) to annotate CE families a very stringent E-value cutoff and coverage cutoff should be used; otherwise the precision will be very low due to a very high false positive rate (Supplementary Tables S5 and S10)
-
-
-```bash
-for File in $(ls gene_pred/CAZY/N.*/*/*CAZY.out.dm); do
-Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
-OutDir=$(dirname $File)
-echo "$Organism - $Strain"
-ProgDir=/home/groups/harrisonlab/dbCAN
-$ProgDir/hmmscan-parser.sh $OutDir/"$Strain"_CAZY.out.dm > $OutDir/"$Strain"_CAZY.out.dm.ps
-CazyHeaders=$(echo $File | sed 's/.out.dm/_headers.txt/g')
-cat $OutDir/"$Strain"_CAZY.out.dm.ps | cut -f3 | sort | uniq > $CazyHeaders
-echo "number of CAZY genes identified:"
-cat $CazyHeaders | wc -l
-Gff=$(ls gene_pred/codingquary/$Organism/$Strain/final/final_genes_appended.gff3)
-CazyGff=$OutDir/"$Strain"_CAZY.gff
-ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-$ProgDir/alias $CazyHeaders $Gff CAZyme ID > $CazyGff
-
-SecretedProts=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
-SecretedHeaders=$(echo $SecretedProts | sed 's/.aa/_headers.txt/g')
-cat $SecretedProts | grep '>' | tr -d '>' > $SecretedHeaders
-CazyGffSecreted=$OutDir/"$Strain"_CAZY_secreted.gff
-$ProgDir/extract_gff_for_sigP_hits.pl $SecretedHeaders $CazyGff Secreted_CAZyme ID > $CazyGffSecreted
-echo "number of Secreted CAZY genes identified:"
-cat $CazyGffSecreted | grep -w 'gene' | cut -f9 | tr -d 'ID=' | wc -l
-done
-
-
-for File in $(ls gene_pred/CAZY/*/*/*CAZY.out.dm); do
-Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
-OutDir=$(dirname $File)
-echo "$Organism - $Strain"
-ProgDir=/home/groups/harrisonlab/dbCAN
-$ProgDir/hmmscan-parser.sh $OutDir/"$Strain"_CAZY.out.dm > $OutDir/"$Strain"_CAZY.out.dm.ps
-CazyHeaders=$(echo $File | sed 's/.out.dm/_headers.txt/g')
-cat $OutDir/"$Strain"_CAZY.out.dm.ps | cut -f3 | sort | uniq > $CazyHeaders
-echo "number of CAZY genes identified:"
-cat $CazyHeaders | wc -l
-Gff=$(ls gene_pred/codingquary/$Organism/$Strain/final/final_genes_appended.gff3)
-# Gff=$(ls gene_pred/final_genes/$Organism/$Strain/final/final_genes_appended.gff3)
-CazyGff=$OutDir/"$Strain"_CAZY.gff
-ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-$ProgDir/extract_gff_for_sigP_hits.pl $CazyHeaders $Gff CAZyme ID > $CazyGff
-
-SecretedProts=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
-SecretedHeaders=$(echo $SecretedProts | sed 's/.aa/_headers.txt/g')
-cat $SecretedProts | grep '>' | tr -d '>' > $SecretedHeaders
-CazyGffSecreted=$OutDir/"$Strain"_CAZY_secreted.gff
-$ProgDir/extract_gff_for_sigP_hits.pl $SecretedHeaders $CazyGff Secreted_CAZyme ID > $CazyGffSecreted
-echo "number of Secreted CAZY genes identified:"
-cat $CazyGffSecreted | grep -w 'gene' | cut -f9 | tr -d 'ID=' | wc -l
-done
