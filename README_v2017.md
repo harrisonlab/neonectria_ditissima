@@ -120,7 +120,7 @@ AnchorLength: controls the length cutoff for anchor contigs. A good rule of thum
     Strain=$(echo $PacBioAssembly | rev | cut -f3 -d '/' | rev)
     HybridAssembly=$(ls assembly/spades_pacbio_2017/$Organism/$Strain/*/contigs_min_500bp.fasta)
     AnchorLength=500000
-    OutDir=assembly/merged_assembly_2017/$Organism/$Strain
+    OutDir=assembly/merged_assembly_2017/$Organism/"$Strain"_500000
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
     qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
   done
@@ -996,40 +996,3 @@ Cols in yourfile.out.dm.ps:
 * For fungi, use E-value < 1e-17 and coverage > 0.45
 
 * The best threshold varies for different CAZyme classes (please see http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4132414/ for details). Basically to annotate GH proteins, one should use a very relax coverage cutoff or the sensitivity will be low (Supplementary Tables S4 and S9); (ii) to annotate CE families a very stringent E-value cutoff and coverage cutoff should be used; otherwise the precision will be very low due to a very high false positive rate (Supplementary Tables S5 and S10)
-
-### Improving the merged assembly
-
-```bash
-  for PacBioAssembly in $(ls assembly/canu_2017/*/*/polished/pilon.fasta); do
-    Organism=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
-    Strain=$(echo $PacBioAssembly | rev | cut -f3 -d '/' | rev)
-    HybridAssembly=$(ls assembly/spades_pacbio_2017/$Organism/$Strain/*/contigs_min_500bp.fasta)
-    AnchorLength=340273
-    OutDir=assembly/merged_assembly_2017/$Organism/"$Strain"_HybridFirst
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
-    qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $PacBioAssembly $OutDir $AnchorLength
-  done
-```
-77 contigs
-
-```bash
-  for PacBioAssembly in $(ls assembly/canu_2017/*/*/polished/pilon.fasta); do
-    Organism=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
-    Strain=$(echo $PacBioAssembly | rev | cut -f3 -d '/' | rev)
-    HybridAssembly=$(ls assembly/spades_pacbio_2017/$Organism/$Strain/*/contigs_min_500bp.fasta)
-    AnchorLength=1241821
-    OutDir=assembly/merged_assembly_2017/$Organism/"$Strain"_HybridFirst2
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
-    qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $PacBioAssembly $OutDir $AnchorLength
-  done
-```
-
-```bash
-  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  	for Assembly in $(ls assembly/merged_assembly_2017/*/*_HybridFirst/merged.fasta); do
-    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    OutDir=assembly/merged_assembly_2017/$Organism/$Strain/quast
-    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-  	done
-```
