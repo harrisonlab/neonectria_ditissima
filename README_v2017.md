@@ -1010,4 +1010,26 @@ Cols in yourfile.out.dm.ps:
     qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $PacBioAssembly $OutDir $AnchorLength
   done
 ```
-48 contigs
+77 contigs
+
+```bash
+  for PacBioAssembly in $(ls assembly/canu_2017/*/*/polished/pilon.fasta); do
+    Organism=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $PacBioAssembly | rev | cut -f3 -d '/' | rev)
+    HybridAssembly=$(ls assembly/spades_pacbio_2017/$Organism/$Strain/*/contigs_min_500bp.fasta)
+    AnchorLength=1241821
+    OutDir=assembly/merged_assembly_2017/$Organism/"$Strain"_HybridFirst2
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+    qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $PacBioAssembly $OutDir $AnchorLength
+  done
+```
+
+```bash
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/merged_assembly_2017/*/*_HybridFirst/merged.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    OutDir=assembly/merged_assembly_2017/$Organism/$Strain/quast
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
