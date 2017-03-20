@@ -996,3 +996,18 @@ Cols in yourfile.out.dm.ps:
 * For fungi, use E-value < 1e-17 and coverage > 0.45
 
 * The best threshold varies for different CAZyme classes (please see http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4132414/ for details). Basically to annotate GH proteins, one should use a very relax coverage cutoff or the sensitivity will be low (Supplementary Tables S4 and S9); (ii) to annotate CE families a very stringent E-value cutoff and coverage cutoff should be used; otherwise the precision will be very low due to a very high false positive rate (Supplementary Tables S5 and S10)
+
+### Improving the merged assembly
+
+```bash
+  for PacBioAssembly in $(ls assembly/canu_2017/*/*/polished/pilon.fasta); do
+    Organism=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $PacBioAssembly | rev | cut -f3 -d '/' | rev)
+    HybridAssembly=$(ls assembly/spades_pacbio_2017/$Organism/$Strain/*/contigs_min_500bp.fasta)
+    AnchorLength=340273
+    OutDir=assembly/merged_assembly_2017/$Organism/"$Strain"_HybridFirst
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+    qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $PacBioAssembly $OutDir $AnchorLength
+  done
+```
+48 contigs
