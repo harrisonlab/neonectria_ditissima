@@ -996,3 +996,23 @@ Cols in yourfile.out.dm.ps:
 * For fungi, use E-value < 1e-17 and coverage > 0.45
 
 * The best threshold varies for different CAZyme classes (please see http://www.ncbi.nlm.nih.gov/pmc/articles/PMC4132414/ for details). Basically to annotate GH proteins, one should use a very relax coverage cutoff or the sensitivity will be low (Supplementary Tables S4 and S9); (ii) to annotate CE families a very stringent E-value cutoff and coverage cutoff should be used; otherwise the precision will be very low due to a very high false positive rate (Supplementary Tables S5 and S10)
+
+### Alignment of raw reads vs the Fus2 genome
+
+Sequence data for isolates with a data from a single sequencing run was aligned against the R0905 genome
+
+```bash
+  Reference=$(ls repeat_masked/N.ditissima/Ref_Genomes/R0905_canu_2017_v2/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+  for StrainPath in $(ls -d qc_dna/paired/N.ditissima/new_isolates_2017/*); do
+    Organism=$(echo $StrainPath | rev | cut -f3 -d '/' | rev)
+    Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
+    echo "$Organism - $Strain"
+    F_Read=$(ls $StrainPath/F/*.fq.gz)
+    R_Read=$(ls $StrainPath/R/*.fq.gz)
+    echo $F_Read
+    echo $R_Read
+    OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/vs_R0905_canu_2017/
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
+    qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
+  done
+  ```
