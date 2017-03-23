@@ -917,6 +917,28 @@ Required programs:
 	done
 ```
 
+```bash
+  for File in $(ls analysis/effectorP/*/R0905_canu_2017_v2/*_EffectorP.txt); do
+    Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    Headers=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_headers.txt/g')
+    cat $File | grep 'Effector' | cut -f1 > $Headers
+    Secretome=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp_no_trans_mem.aa)
+    OutFile=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted.aa/g')
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+    $ProgDir/extract_from_fasta.py --fasta $Secretome --headers $Headers > $OutFile
+    OutFileHeaders=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted_headers.txt/g')
+    cat $OutFile | grep '>' | tr -d '>' > $OutFileHeaders
+    cat $OutFileHeaders | wc -l
+    Gff=$(ls gene_pred/codingquary/$Organism/$Strain/*/final_genes_appended.gff3)
+    EffectorP_Gff=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted.gff/g')
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+    $ProgDir/extract_gff_for_sigP_hits.pl $OutFileHeaders $Gff effectorP ID > $EffectorP_Gff
+    cat $EffectorP_Gff | grep -w 'gene' | wc -l
+  done > tmp.txt
+```
+
 ### C) CAZY proteins
 
 Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
