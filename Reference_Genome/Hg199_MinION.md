@@ -6,71 +6,29 @@ This document details the commands used to assemble and annotate the Hg199 Neone
 Note - all this work was performed in the directory:
 /home/groups/harrisonlab/project_files/N.ditissima
 
-#Building of directory structure
-# Oxford nanopore 18/07/17 and other runs during HortRes conference
-  RawDatDir=/home/miseq_data/minion/2017/*_Neonectria Hg199/fast5/pass
+# 0. Building of directory structure
+
+screen -a
+
+```bash
+  RawDatDir=/home/miseq_data/minion/2017/*_Neonectria_Hg199/fast5/pass
   Organism=N.ditissima
   Strain=Hg199
   Date=17-07-17
   mkdir -p raw_dna/minion/$Organism/$Strain/$Date
   for Fast5Dir in $(ls -d $RawDatDir/*); do
-    poretools fastq $Fast5Dir | gzip -cf
-  done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_pass.fastq.gz
-# 0. Building of directory structure
-
-Note - all this work was performed in the directory:
-/home/groups/harrisonlab/project_files/N.ditissima
+      poretools fastq $Fast5Dir | gzip -cf
+    done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_pass.fastq.gz
+  ```
 
 The following is a summary of the work presented in this Readme.
 
-The following processes were applied to Fusarium genomes prior to analysis:
+The following processes were applied to Neonectria genomes prior to analysis:
 Data qc
 Genome assembly
 Repeatmasking
 Gene prediction
 Functional annotation
-
-# Oxford nanopore 18/07/17 and other runs during HortRes conference
-  RawDatDir=/home/miseq_data/minion/2017/*_FvenenatumWT/fast5/pass
-  Organism=F.venenatum
-  Strain=WT
-  Date=18-07-17
-  mkdir -p raw_dna/minion/$Organism/$Strain/$Date
-  for Fast5Dir in $(ls -d $RawDatDir/*); do
-    poretools fastq $Fast5Dir | gzip -cf
-  done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_pass.fastq.gz
-# 0. Building of directory structure
-
-
-
-## Minion data
-
-```bash
-	RawDatDir=/home/miseq_data/minion/2017/MINION_20170424_FNFAB42727_MN18323_sequencing_run_Fusarium_oxysporum_Stocks4
-	ProjectDir=/home/groups/harrisonlab/project_files/fusarium
-	mkdir -p $ProjectDir/raw_dna/minion/F.oxysporum/Stocks4
-```
-
-Sequence data was moved into the appropriate directories
-
-```bash
-	RawDatDir=/home/miseq_data/minion/2017/MINION_20170424_FNFAB42727_MN18323_sequencing_run_Fusarium_oxysporum_Stocks4/albacore1.1.1
-	ProjectDir=/home/groups/harrisonlab/project_files/fusarium
-	cp $RawDatDir/all_reads_albacore1.1.1.fastq.gz $ProjectDir/raw_dna/minion/F.oxysporum/Stocks4/.
-```
-
-
-### MiSeq data
-
-```bash
-	RawDatDir=/home/miseq_data/2017/RAW/170626_M04465_0043_000000000-B48RG/Data/Intensities/BaseCalls
-	ProjectDir=/home/groups/harrisonlab/project_files/fusarium
-	OutDir=$ProjectDir/raw_dna/paired/F.oxysporum/Stocks4
-	mkdir -p $OutDir/F
-	mkdir -p $OutDir/R
-	cp $RawDatDir/Stocks4_S1_L001_R1_001.fastq.gz $OutDir/F/.
-	cp $RawDatDir/Stocks4_S1_L001_R2_001.fastq.gz $OutDir/R/.
-```
 
 #### QC of MiSeq data
 
@@ -81,22 +39,10 @@ programs:
 
 Data quality was visualised using fastqc:
 ```bash
-	for RawData in $(ls raw_dna/paired/*/*/*/*.fastq.gz | grep 'Stocks4'); do
+	for RawData in $(ls raw_dna/minion/*/*/*.fastq.gz); do
 		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
 		echo $RawData;
 		qsub $ProgDir/run_fastqc.sh $RawData
-	done
-```
-
-```bash
-	for StrainPath in $(ls -d raw_dna/paired/*/* | grep 'Stocks4'); do
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/rna_qc
-		IlluminaAdapters=/home/armita/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
-		ReadsF=$(ls $StrainPath/F/*.fastq*)
-		ReadsR=$(ls $StrainPath/R/*.fastq*)
-		echo $ReadsF
-		echo $ReadsR
-		qsub $ProgDir/rna_qc_fastq-mcf.sh $ReadsF $ReadsR $IlluminaAdapters DNA
 	done
 ```
 
