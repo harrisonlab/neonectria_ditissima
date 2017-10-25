@@ -21,7 +21,7 @@ pip3 install --user ont_albacore-2.0.2-cp34-cp34m-manylinux1_x86_64.whl
 #Building of directory structure
 
 ```bash
-  # Oxford nanopore 07/03/17
+  screen -a
   RawDatDir=/data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199/workspace
   Organism=N.ditissima
   Strain=Hg199
@@ -29,10 +29,8 @@ pip3 install --user ont_albacore-2.0.2-cp34-cp34m-manylinux1_x86_64.whl
   mkdir -p raw_dna/minion/$Organism/$Strain/$Date
   for Fast5Dir in $(ls -d $RawDatDir/*); do
     poretools fastq $Fast5Dir | gzip -cf
-  done > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date"_pass.fastq.gz
-  done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_pass.fastq.gz
+  done > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date"_pass.fastq.gz  
 ```
-
 
 
 ```bash
