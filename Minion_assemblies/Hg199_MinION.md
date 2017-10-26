@@ -95,12 +95,12 @@ done
 Assembly using Canu
 
 ```bash
-for CorrectedReads in $(ls assembly/canu-1.5/F.oxysporum_fsp_mathioli/Stocks4/Stocks4.trimmedReads.fasta.gz); do
+for CorrectedReads in $(ls assembly/canu-1.5/N.ditissima/Hg199/Hg199.trimmedReads.fasta.gz); do
 Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $CorrectedReads | rev | cut -f2 -d '/' | rev)
-OutDir=assembly/canu-1.5/F.oxysporum_fsp_mathioli/"$Strain"
+OutDir=assembly/canu-1.5/N.ditissima/"$Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 60m $Strain $OutDir
+qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 42m $Strain $OutDir
 done
 
 ```
@@ -108,11 +108,11 @@ done
 Assembbly using SMARTdenovo
 
 ```bash
-for CorrectedReads in $(ls assembly/canu-1.5/F.oxysporum_fsp_mathioli/Stocks4/Stocks4.trimmedReads.fasta.gz); do
+for CorrectedReads in $(ls assembly/canu-1.5/N.ditissima/Hg199/Hg199.trimmedReads.fasta.gz); do
 Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $CorrectedReads | rev | cut -f2 -d '/' | rev)
 Prefix=$Strain
-OutDir=assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/"$Strain"
+OutDir=assembly/SMARTdenovo/N.ditissima/"$Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/SMARTdenovo
 qsub $ProgDir/sub_SMARTdenovo.sh $CorrectedReads $Prefix $OutDir
 done
@@ -158,10 +158,25 @@ qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
+Minion data
+
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly
+# OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+done
+```
+
 ```bash
 # printf "Organism\tStrain\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/F*/*/assembly/*/short_summary_*.txt | grep 'Stocks4'); do
+for File in $(ls gene_pred/busco/F*/*/assembly/*/short_summary_*.txt | grep 'Stocks4'); do  
 # echo $File;
 # Strain=$(echo $File| rev | cut -d '/' -f4 | rev)
 # Organism=$(echo $File | rev | cut -d '/' -f5 | rev)
