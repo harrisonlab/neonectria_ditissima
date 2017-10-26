@@ -122,7 +122,15 @@ Quast for the SMARTdenovo assembly:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg); do
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199.dmo.lay.utg); do
+  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/canu-1.5/N.ditissima/Hg199/Hg199.contigs.fasta); do
   Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $Assembly)
@@ -132,36 +140,10 @@ done
 
 Busco has replaced CEGMA and was run to check gene space in assemblies
 
-Previous isolates
-
-```bash
-for Assembly in $(ls repeat_masked/N.ditissima/*/*unmasked.fa); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-echo "$Organism - $Strain"
-ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly
-# OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
-
-for Assembly in $(ls repeat_masked/N.ditissima/*/*/*unmasked.fa); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-echo "$Organism - $Strain"
-ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly
-# OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
-```
-
 Minion data
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg); do
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199.dmo.lay.utg); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -169,14 +151,15 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
 # OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
+NOT Done
 ```bash
 # printf "Organism\tStrain\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/F*/*/assembly/*/short_summary_*.txt | grep 'Stocks4'); do  
+for File in $(ls gene_pred/busco/N*/*/assembly/*/short_summary_*.txt); do  
 # echo $File;
 # Strain=$(echo $File| rev | cut -d '/' -f4 | rev)
 # Organism=$(echo $File | rev | cut -d '/' -f5 | rev)
@@ -191,21 +174,20 @@ printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
 
-
 Error correction using racon:
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg)
+Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199.dmo.lay.utg)
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
-ReadsFq=qc_dna/minion/F.oxysporum/Stocks4/all_reads_trim.fastq.gz
-OutDir=assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon2
+ReadsFq=qc_dna/minion/N.ditissima/Hg199/*_trim.fastq.gz
+OutDir=assembly/SMARTdenovo/N.ditissima/Hg199/racon
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 Iterations=10
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
 ```
-
+----------
 Quast and busco were run to assess the effects of racon on assembly quality:
 
 ```bash
@@ -228,7 +210,7 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
 # OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
