@@ -17,171 +17,54 @@ pip3 install --user ont_albacore-2.0.2-cp34-cp34m-manylinux1_x86_64.whl
 ```bash
 ~/.local/bin/read_fast5_basecaller.py --flowcell FLO-MIN106 --kit SQK-LSK108 --input /data/seq_data/minion/2017/20170717_1504_Neonectria_Hg199 --recursive --worker_threads 12 --save_path /home/nanopore/Neonectria_Hg199_2_0_2 --output_format fastq,fast5 --reads_per_fastq_batch 4000
 ```
+```bash
+cat  *.fastq | gzip > fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz
+cat  *.fastq | gzip > fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_fail.fastq.gz
+tar -czf fast5_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.tar.gz [0-9]*
+tar -czf fast5_runid_5832f037a56936787d17e66d1e3b8ac05572199f_fail.tar.gz [0-9]*
+```
 
 #Building of directory structure
 
 ```bash
   screen -a
+  RawDatDir=/data/seq_data/minion/2017/20171025_Neonectria_Hg199_2_0_2/workspace
+  Organism=N.ditissima
+  Strain=Hg199
+  Date=25-10-17
+  mkdir -p raw_dna/minion/$Organism/$Strain/$Date
+  cat /data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199/workspace/*fastq | gzip -cf > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date".fastq.gz
+```
+
+```bash
   RawDatDir=/data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199/workspace
   Organism=N.ditissima
   Strain=Hg199
   Date=23-10-17
-  mkdir -p raw_dna/minion/$Organism/$Strain/$Date
   for Fast5Dir in $(ls -d $RawDatDir/*); do
     poretools fastq $Fast5Dir | gzip -cf
-  done > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date"_pass.fastq.gz  
+  done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_fast5.fastq.gz
 ```
 
-
-```bash
-  # poretools stats $RawDatDir/ > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_fail.stats.txt
-  # poretools hist $RawDatDir/ > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_fail.hist
-  # cat raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date".fastq.gz raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_fail.fastq.gz > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_pass-fail.fastq.gz
-
-  # Oxford nanopore 18/07/17 and other runs during HortRes conference
-  RawDatDir=/home/miseq_data/minion/2017/*_FvenenatumWT/fast5/pass
-  Organism=F.venenatum
-  Strain=WT
-  Date=18-07-17
-  mkdir -p raw_dna/minion/$Organism/$Strain/$Date
-  for Fast5Dir in $(ls -d $RawDatDir/*); do
-    poretools fastq $Fast5Dir | gzip -cf
-  done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_pass.fastq.gz
-```
-
-
-
-# Stocks_Assembly
-==========
-
-This document details the commands used to assemble and annotate the Nd genome.
-
-Note - all this work was performed in the directory:
-/home/groups/harrisonlab/project_files/neonectria_ditissima
-
-The following is a summary of the work presented in this Readme.
-
-The following processes were applied to Fusarium genomes prior to analysis:
-Data qc
-Genome assembly
-Repeatmasking
-Gene prediction
-Functional annotation
-
-
-# 0. Building of directory structure
-
-## Minion data
-
-```bash
-	RawDatDir=/home/miseq_data/minion/2017/MINION_20170424_FNFAB42727_MN18323_sequencing_run_Fusarium_oxysporum_Stocks4
-	ProjectDir=/home/groups/harrisonlab/project_files/fusarium
-	mkdir -p $ProjectDir/raw_dna/minion/F.oxysporum/Stocks4
-```
-
-Sequence data was moved into the appropriate directories
-
-```bash
-	RawDatDir=/home/miseq_data/minion/2017/MINION_20170424_FNFAB42727_MN18323_sequencing_run_Fusarium_oxysporum_Stocks4/albacore1.1.1
-	ProjectDir=/home/groups/harrisonlab/project_files/fusarium
-	cp $RawDatDir/all_reads_albacore1.1.1.fastq.gz $ProjectDir/raw_dna/minion/F.oxysporum/Stocks4/.
-```
-
-
-### MiSeq data
-
-```bash
-	RawDatDir=/home/miseq_data/2017/RAW/170626_M04465_0043_000000000-B48RG/Data/Intensities/BaseCalls
-	ProjectDir=/home/groups/harrisonlab/project_files/fusarium
-	OutDir=$ProjectDir/raw_dna/paired/F.oxysporum/Stocks4
-	mkdir -p $OutDir/F
-	mkdir -p $OutDir/R
-	cp $RawDatDir/Stocks4_S1_L001_R1_001.fastq.gz $OutDir/F/.
-	cp $RawDatDir/Stocks4_S1_L001_R2_001.fastq.gz $OutDir/R/.
-```
-
-#### QC of MiSeq data
-
-programs:
-  fastqc
-  fastq-mcf
-  kmc
-
-Data quality was visualised using fastqc:
-```bash
-	for RawData in $(ls raw_dna/paired/*/*/*/*.fastq.gz | grep 'Stocks4'); do
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-		echo $RawData;
-		qsub $ProgDir/run_fastqc.sh $RawData
-	done
-```
-
-```bash
-	for StrainPath in $(ls -d raw_dna/paired/*/* | grep 'Stocks4'); do
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/rna_qc
-		IlluminaAdapters=/home/armita/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
-		ReadsF=$(ls $StrainPath/F/*.fastq*)
-		ReadsR=$(ls $StrainPath/R/*.fastq*)
-		echo $ReadsF
-		echo $ReadsR
-		qsub $ProgDir/rna_qc_fastq-mcf.sh $ReadsF $ReadsR $IlluminaAdapters DNA
-	done
-```
+Rob command to transfer the date from nanopore node to head node. Permission needed
+scp -r ./Neonectria_Hg199_2_0_2 miseq_data@192.168.1.200:/data/seq_data/minion/2017/20171025_Neonectria_Hg199_2_0_2
 
 # Identify sequencing coverage
 
 For Minion data:
 ```bash
-	for RawData in $(ls qc_dna/minion/*/*/*q.gz | grep 'Stocks4'); do
+	for RawData in $(ls raw_dna/minion/*/*/25-10-17/*q.gz); do
 		echo $RawData;
 		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
-		GenomeSz=60
+		GenomeSz=42
 		OutDir=$(dirname $RawData)
 		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
 	done
 ```
 
-```bash
-  for StrainDir in $(ls -d qc_dna/minion/*/* | grep 'Stocks4'); do
-    Strain=$(basename $StrainDir)
-    printf "$Strain\t"
-    for File in $(ls $StrainDir/*.txt); do
-      echo $(basename $File);
-      cat $File | tail -n1 | rev | cut -f2 -d ' ' | rev;
-    done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
-  done
-```
 MinION coverage was:
 ```
-Stocks4	65.05
-```
 
-For Miseq data:
-```bash
-	for RawData in $(ls qc_dna/paired/*/*/*/*q.gz | grep 'Stocks4'); do
-		echo $RawData;
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
-		qsub $ProgDir/run_fastqc.sh $RawData;
-		GenomeSz=60
-		OutDir=$(dirname $RawData)
-		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
-	done
-```
-
-```bash
-	for StrainDir in $(ls -d qc_dna/paired/*/* | grep 'Stocks4'); do
-		Strain=$(basename $StrainDir)
-		printf "$Strain\t"
-		for File in $(ls $StrainDir/*/*.txt); do
-			echo $(basename $File);
-			cat $File | tail -n1 | rev | cut -f2 -d ' ' | rev;
-		done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
-	done
-```
-
-Miseq coverage was:
-```
-Stocks4	58.66
 ```
 
 ## Assembly
@@ -191,8 +74,8 @@ Stocks4	58.66
 
 Splitting reads and trimming adapters using porechop
 ```bash
-	RawReads=raw_dna/minion/F.oxysporum/Stocks4/all_reads.fastq.gz
-	OutDir=qc_dna/minion/F.oxysporum/Stocks4
+	RawReads=raw_dna/minion/N.ditissima/Hg199/25-10-17/*.fastq.gz
+	OutDir=qc_dna/minion/N.ditissima/Hg199
 	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
 	qsub $ProgDir/sub_porechop.sh $RawReads $OutDir
 ```
@@ -200,12 +83,12 @@ Splitting reads and trimming adapters using porechop
 Read correction using Canu
 
 ```bash
-for TrimReads in $(ls qc_dna/minion/F.oxysporum/Stocks4/*_trim.fastq.gz); do
+for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*_trim.fastq.gz); do
 Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
-OutDir=assembly/canu-1.5/F.oxysporum_fsp_mathioli/"$Strain"
+OutDir=assembly/canu-1.5/"$Organism"/"$Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-qsub $ProgDir/sub_canu_correction.sh $TrimReads 60m $Strain $OutDir
+qsub $ProgDir/sub_canu_correction.sh $TrimReads 42m $Strain $OutDir
 done
 ```
 
@@ -249,8 +132,10 @@ done
 
 Busco has replaced CEGMA and was run to check gene space in assemblies
 
+Previous isolates
+
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg); do
+for Assembly in $(ls repeat_masked/N.ditissima/*/*unmasked.fa); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -258,7 +143,18 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
 # OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+
+for Assembly in $(ls repeat_masked/N.ditissima/*/*/*unmasked.fa); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly
+# OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
