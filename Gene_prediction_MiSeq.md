@@ -109,6 +109,18 @@ Warning: Could not connect to update server to verify current version. Please ch
 >	           Estimated Std Dev: 43.68
 [10:51:11] Assembling transcripts and estimating abundances.
 > Processed 16537 loci.                        [*************************] 100%
+N.ditissima - R0905_canu_2017_v2
+Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
+[14:23:01] Inspecting reads and determining fragment length distribution.
+> Processed 18535 loci.                        [*************************] 100%
+> Map Properties:
+>	Normalized Map Mass: 12759384.33
+>	Raw Map Mass: 12759384.33
+>	Fragment Length Distribution: Empirical (learned)
+>	              Estimated Mean: 217.05
+>	           Estimated Std Dev: 43.58
+[14:25:44] Assembling transcripts and estimating abundances.
+> Processed 18606 loci.                        [*************************] 100%
 ```
 
 The Estimated Mean: 219.68 allowed calculation of of the mean insert gap to be
@@ -120,9 +132,9 @@ increase the accuracy of mapping.
 Then Rnaseq data was aligned to each genome assembly:
 
 ```bash
-for Assembly in $(ls repeat_masked/*/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+for Assembly in $(ls repeat_masked/N*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
+Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
 echo "$Organism - $Strain"
 for RNADir in $(ls -d qc_rna/paired/N.ditissima/Hg199 | grep -v -e '_rep'); do
 Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
@@ -131,7 +143,7 @@ FileF=$(ls $RNADir/F/*_trim.fq.gz)
 FileR=$(ls $RNADir/R/*_trim.fq.gz)
 OutDir=alignment/$Organism/$Strain/$Timepoint
 InsertGap='-140'
-InsertStdDev='40'
+InsertStdDev='43'
 Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
 while [ $Jobs -gt 1 ]; do
 sleep 10
@@ -143,11 +155,8 @@ ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
 qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
 done
 done
-
-  cd alignment/N.ditissima/R0905_pacbio_canu/
-  mkdir R0905_accurate
-  mv -r R0905/* R0905_accurate/
 ```
+
 76.4% overall read mapping rate.
 66.7% concordant pair alignment rate.
 
@@ -161,31 +170,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 ```
 
 ```bash
-    #for Assembly in $(ls repeat_masked/N.ditissima/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    #Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-    #while [ $Jobs -gt 1 ]; do
-    #sleep 10
-    #printf "."
-    #Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-    #done
-    #printf "\n"
-    #Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-    #Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-    #echo "$Organism - $Strain"
-    #mkdir -p alignment/$Organism/$Strain/concatenated
-    #samtools merge -f alignment/$Organism/$Strain/concatenated/concatenated.bam \
-    #alignment/$Organism/R0905_pacbio_canu/R0905/accepted_hits.bam
-    #OutDir=gene_pred/braker/$Organism/"$Strain"_braker_first
-    #AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
-    #GeneModelName="$Organism"_"$Strain"_braker_first
-    #rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_first
-    #ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
-    #qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
-    #done
-```
-
-```bash
-  for Assembly in $(ls repeat_masked/N.ditissima/R0905_pacbio_canu/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+  for Assembly in $(ls repeat_masked/N.ditissima/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
     while [ $Jobs -gt 1 ]; do
     sleep 10
@@ -193,13 +178,13 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
     Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
     done
     printf "\n"
-    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
     echo "$Organism - $Strain"
-    OutDir=gene_pred/braker/$Organism/"$Strain"_braker_fourth
-    AcceptedHits=alignment/$Organism/R0905_pacbio_canu/R0905/accepted_hits.bam
-    GeneModelName="$Organism"_"$Strain"_braker_fourth
-    rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_fourth
+    OutDir=gene_pred/braker/$Organism/"$Strain"_braker_Nov2017
+    AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
+    GeneModelName="$Organism"_"$Strain"_braker_Nov2017
+    rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_Nov2017
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
     qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
   done
