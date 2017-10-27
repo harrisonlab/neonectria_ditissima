@@ -498,7 +498,7 @@ Note - the anchor length is the starting point for contigs to be merged - only c
 larger than these will be extended.
 
 ```bash
-for MinIONAssembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/pilon/*.fasta | grep 'pilon_min_500bp_renamed.fasta'); do
+for MinIONAssembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon/*10.fasta); do
 Organism=$(echo $MinIONAssembly | rev | cut -f4 -d '/' | rev)
 Strain=$(echo $MinIONAssembly | rev | cut -f3 -d '/' | rev)
 HybridAssembly=$(ls assembly/spades_minion/$Organism/$Strain/filtered_contigs/contigs_min_500bp.fasta)
