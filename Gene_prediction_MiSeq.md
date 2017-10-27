@@ -27,6 +27,11 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+short_summary_AgN04_contigs_unmasked.txt	3663	17	23	39	3725
+short_summary_R0905_contigs_unmasked.txt	3651	16	20	54	3725
+short_summary_R45-15_contigs_unmasked.txt	3674	15	22	29	3725
+short_summary_R0905_contigs_unmasked.txt	3668	16	21	36	3725 canu_2017
+
 Gene prediction
 
 ```bash
