@@ -172,11 +172,11 @@ Total=$(cat $File | grep "Total" | cut -f2)
 printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
-short_summary_AgN04_contigs_unmasked.txt	3663	17	23	39	3725
-short_summary_R0905_contigs_unmasked.txt	3651	16	20	54	3725
-short_summary_R45-15_contigs_unmasked.txt	3674	15	22	29	3725
-short_summary_R0905_contigs_unmasked.txt	3668	16	21	36	3725 canu_2017
+short_summary_Hg199.dmo.lay.txt	408	0	438	2879	3725
 
+I had really bad gene prediction.
+
+<!--
 Error correction using racon:
 
 ```bash
@@ -190,12 +190,12 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 Iterations=10
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
 ```
-----------
+
 Quast and busco were run to assess the effects of racon on assembly quality:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon/*.fasta | grep 'round_4'); do
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon/*.fasta); do
   Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
   OutDir=$(dirname $Assembly)
@@ -205,7 +205,7 @@ done
 
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon2/*.fasta | grep "round_.*.fasta"); do
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon/*.fasta | grep "round_.*.fasta"); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -430,8 +430,8 @@ short_summary_pilon_4.txt	3684	34	15	26	3725
 short_summary_pilon_5.txt	3684	34	15	26	3725
 short_summary_pilon_min_500bp_renamed.txt	3684	34	15	26	3725
 ```
+-->
 
-<!--
 # Hybrid Assembly
 
 Hybrid assembly was performed on the FoM genome, but did not significantly
@@ -440,22 +440,21 @@ improve the assembly
 ## Spades Assembly
 
 ```bash
-for TrimReads in $(ls qc_dna/minion/*/*/*_trim.fastq.gz | grep 'Stocks4'); do
-# Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
-Organism="F.oxysporum_fsp_mathioli"
+for TrimReads in $(ls qc_dna/minion/*/Hg199/*_trim.fastq.gz); do
+Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
 IlluminaDir=$(ls -d qc_dna/paired/*/$Strain)
 TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
 TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
 OutDir=assembly/spades_minion/$Organism/"$Strain"
-echo $TrimR1_Read
+echo $TrimF1_Read
 echo $TrimR1_Read
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/spades
 qsub $ProgDir/sub_spades_minion.sh $TrimReads $TrimF1_Read $TrimR1_Read $OutDir
 done
 ```
 
-Contigs shorter thaan 500bp were removed from the assembly
+Contigs shorter than 500bp were removed from the assembly
 
 ```bash
   for Contigs in $(ls assembly/spades_minion/*/*/contigs.fasta); do
