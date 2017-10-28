@@ -527,7 +527,7 @@ Quast and busco were run to assess the quality of hybrid assemblies:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta | grep 'Stocks4'); do
+for Assembly in $(ls assembly/merged_canu_spades/*/Hg199*/merged.fasta); do
   Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $Assembly)
@@ -537,7 +537,7 @@ done
 
 
 ```bash
-for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta | grep 'Stocks4'); do
+for Assembly in $(ls assembly/merged_canu_spades/*/Hg199*/merged.fasta); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -545,7 +545,7 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 # OutDir=gene_pred/busco/$Organism/$Strain/assembly
 OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 -->
