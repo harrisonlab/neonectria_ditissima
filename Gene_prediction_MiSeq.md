@@ -242,11 +242,11 @@ therefore features can not be restricted by strand when they are intersected.
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-    for Assembly in $(ls repeat_masked/N*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    for Assembly in $(ls repeat_masked/N*/Hg199/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
     echo "$Organism - $Strain"
-    OutDir=gene_pred/codingquary/$Organism/$Strain
+    OutDir=gene_pred/codingquary/$Organism/$Strain/NewHg199
     CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
     qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
@@ -268,11 +268,11 @@ genes were predicted in regions of the genome, not containing Braker gene
 models:
 
 ```bash
-for BrakerGff in $(ls gene_pred/braker/N.ditissima/Hg199_braker_Nov2017/*/augustus.gff3); do
+for BrakerGff in $(ls gene_pred/braker/$Organism/Hg199/*/augustus.gff3); do
 Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
 Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
-Assembly=$(ls repeat_masked/$Organism/Hg199/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+Assembly=$(ls repeat_masked/$Organism/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
 CodingQuaryGff=gene_pred/codingquary/$Organism/$Strain/out/PredictedPass.gff3
 PGNGff=gene_pred/codingquary/$Organism/$Strain/out/PGN_predictedPass.gff3
 AddDir=gene_pred/codingquary/$Organism/$Strain/additional
@@ -309,7 +309,7 @@ done
 
 The final number of genes per isolate was observed using:
 ```bash
-for DirPath in $(ls -d gene_pred/codingquary/N.*/*_201*/final); do
+for DirPath in $(ls -d gene_pred/codingquary/N.*/*/final); do
 echo $DirPath;
 cat $DirPath/final_genes_Braker.pep.fasta | grep '>' | wc -l;
 cat $DirPath/final_genes_CodingQuary.pep.fasta | grep '>' | wc -l;
@@ -318,15 +318,27 @@ echo "";
 done
 ```
 
-gene_pred/codingquary/N.ditissima/R0905_canu_2017_v2/final
-12851
-915
-13766
 
-gene_pred/codingquary/N.ditissima/R0905_merged_2017/final
-12751
-896
-13647
+gene_pred/codingquary/N.ditissima/Ag04/final
+12805
+854
+13659
+
+gene_pred/codingquary/N.ditissima/Hg199/final
+12818
+905
+13723
+
+gene_pred/codingquary/N.ditissima/R0905_canu_2017_v2/final
+12848
+898
+13746
+
+gene_pred/codingquary/N.ditissima/R45-15/final
+12635
+989
+13624
+
 
 
 ## ORF finder
@@ -340,7 +352,7 @@ also printing ORFs in .gff format.
 
 ```bash
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-for Genome in $(ls repeat_masked/*/Ref_Genomes/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+for Genome in $(ls repeat_masked/*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 qsub $ProgDir/run_ORF_finder.sh $Genome
 done
 ```
@@ -379,7 +391,7 @@ was redirected to a temporary output file named interproscan_submission.log .
 	screen -a
 	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
+	for Genes in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
@@ -390,7 +402,7 @@ commands:
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
+	for Proteins in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -403,7 +415,7 @@ commands:
 ## B) SwissProt
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
+	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		OutDir=gene_pred/swissprot/$Organism/$Strain
@@ -415,7 +427,7 @@ commands:
 ```
 
 ```bash
-	for SwissTable in $(ls gene_pred/swissprot/*/*_201*/*_hits.tbl); do
+	for SwissTable in $(ls gene_pred/swissprot/*/*/*_hits.tbl); do
 		Strain=$(echo $SwissTable | rev | cut -f2 -d '/' | rev)
 		Organism=$(echo $SwissTable | rev | cut -f3 -d '/' | rev)
 		echo "$Organism - $Strain"
@@ -451,7 +463,7 @@ gene models using a number of approaches:
  	SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
  	CurPath=$PWD
- 	for Proteome in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
  		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
  		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
  		SplitDir=gene_pred/final_genes_split/$Organism/$Strain
@@ -538,7 +550,7 @@ Required programs:
  * EffectorP.py
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
+	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		BaseName="$Organism"_"$Strain"_EffectorP
@@ -576,7 +588,7 @@ Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
 at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
 
 ```bash
-  for Proteome in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
+  for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
     Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
     OutDir=gene_pred/CAZY/$Organism/$Strain
