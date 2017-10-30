@@ -27,6 +27,10 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+short_summary_Hg199_contigs_unmasked.txt
+3673    Complete BUSCOs (C) 3658    Complete and single-copy BUSCOs (S)
+15 Complete and duplicated BUSCOs (D) 24      Fragmented BUSCOs (F)
+28 Missing BUSCOs (M) 3725    Total BUSCO groups searched
 short_summary_AgN04_contigs_unmasked.txt	3663	17	23	39	3725
 short_summary_R0905_contigs_unmasked.txt	3651	16	20	54	3725
 short_summary_R45-15_contigs_unmasked.txt	3674	15	22	29	3725
@@ -218,7 +222,7 @@ therefore features can not be restricted by strand when they are intersected.
     echo "$Organism - $Strain"
     OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
     mkdir -p $OutDir
-    AcceptedHits=alignment/$Organism/$Strain/*/accepted_hits.bam
+    AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
     qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
     done
@@ -229,7 +233,7 @@ therefore features can not be restricted by strand when they are intersected.
     echo "$Organism - $Strain"
     OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
     mkdir -p $OutDir
-    AcceptedHits=alignment/$Organism/$Strain/*/accepted_hits.bam
+    AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
     qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
     done
@@ -243,8 +247,8 @@ Secondly, genes were predicted using CodingQuary:
     Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
     echo "$Organism - $Strain"
     OutDir=gene_pred/codingquary/$Organism/$Strain
-    CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/cufflinks/transcripts.gtf
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
+    CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
     qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
     done
 
@@ -253,7 +257,7 @@ Secondly, genes were predicted using CodingQuary:
     Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
     echo "$Organism - $Strain"
     OutDir=gene_pred/codingquary/$Organism/$Strain
-    CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/cufflinks/transcripts.gtf
+    CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
     qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
     done
@@ -264,11 +268,11 @@ genes were predicted in regions of the genome, not containing Braker gene
 models:
 
 ```bash
-for BrakerGff in $(ls gene_pred/braker/N.*/*_2017_*/*/augustus.gff3); do
-Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev | sed 's/_braker_first//g')
+for BrakerGff in $(ls gene_pred/braker/N.ditissima/Hg199_braker_Nov2017/*/augustus.gff3); do
+Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
 Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
-Assembly=$(ls repeat_masked/$Organism/Ref_Genomes/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+Assembly=$(ls repeat_masked/$Organism/Hg199/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
 CodingQuaryGff=gene_pred/codingquary/$Organism/$Strain/out/PredictedPass.gff3
 PGNGff=gene_pred/codingquary/$Organism/$Strain/out/PGN_predictedPass.gff3
 AddDir=gene_pred/codingquary/$Organism/$Strain/additional
@@ -323,6 +327,7 @@ gene_pred/codingquary/N.ditissima/R0905_merged_2017/final
 12751
 896
 13647
+
 
 ## ORF finder
 
