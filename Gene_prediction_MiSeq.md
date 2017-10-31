@@ -487,7 +487,7 @@ gene models using a number of approaches:
  The batch files of predicted secreted proteins needed to be combined into a
  single file for each strain. This was done with the following commands:
  ```bash
- 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/*_201*); do
+ 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/*); do
  		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
  		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
  		InStringAA=''
@@ -515,7 +515,7 @@ gene models using a number of approaches:
  Proteins containing a transmembrane domain were identified:
 
  ```bash
- 	for Proteome in $(ls gene_pred/codingquary/N.*/*_201*/*/final_genes_combined.pep.fasta); do
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
  		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
  		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
  		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
@@ -526,7 +526,7 @@ gene models using a number of approaches:
  Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
 
  ```bash
-   for File in $(ls gene_pred/trans_mem/*/*_201*/*_TM_genes_neg.txt); do
+   for File in $(ls gene_pred/trans_mem/*/*/*_TM_genes_neg.txt); do
      Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
      Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
      echo "$Organism - $Strain"
@@ -539,10 +539,17 @@ gene models using a number of approaches:
      cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
    done
  ```
+
+
+    N.ditissima - Ag04
+    1006
+    N.ditissima - Hg199
+    1009
     N.ditissima - R0905_canu_2017_v2
-    1017
-    N.ditissima - R0905_merged_2017
-    991
+    1022
+    N.ditissima - R45-15
+    1005
+
 
 ### B) From Augustus gene models - Effector identification using EffectorP
 
@@ -561,7 +568,7 @@ Required programs:
 ```
 
 ```bash
-  for File in $(ls analysis/effectorP/*/R0905_canu_2017_v2/*_EffectorP.txt); do
+  for File in $(ls analysis/effectorP/*/*/*_EffectorP.txt); do
     Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
     echo "$Organism - $Strain"
@@ -606,7 +613,7 @@ Those proteins with a signal peptide were extracted from the list and gff files
 representing these proteins made.
 
   ```bash
-  for File in $(ls gene_pred/CAZY/N.*/*_201*/*CAZY.out.dm); do
+  for File in $(ls gene_pred/CAZY/N.*/R0905_canu_2017_v2/*CAZY.out.dm); do
   Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $File)
@@ -631,17 +638,27 @@ representing these proteins made.
   cat $CazyGffSecreted | grep -w 'gene' | cut -f9 | tr -d 'ID=' | wc -l
   done
 ```
-
-  N.ditissima - R0905_canu_2017_v2
+  N.ditissima - Ag04
+  number of CAZY genes identified:
+  726
+  number of Secreted CAZY genes identified:
+  283
+  N.ditissima - R45-15
+  number of CAZY genes identified:
+  722
+  number of Secreted CAZY genes identified:
+  287
+  N.ditissima - Hg199
   number of CAZY genes identified:
   721
   number of Secreted CAZY genes identified:
-  287
-  N.ditissima - R0905_merged_2017
+  285
+  N.ditissima - R0905_canu_2017_v2
   number of CAZY genes identified:
-  720
+  719
   number of Secreted CAZY genes identified:
-  283
+  286
+
 
 Note - the CAZY genes identified may need further filtering based on e value and
 cuttoff length - see below:
@@ -681,3 +698,134 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
     qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
   done
   ```
+
+  ## D) Secondary metabolites (Antismash and SMURF)
+
+Antismash was run to identify clusters of secondary metabolite genes within
+the genome. Antismash was run using the weserver at:
+http://antismash.secondarymetabolites.org
+
+
+Results of web-annotation of gene clusters within the assembly were downloaded to
+the following directories:
+
+```bash
+  for Assembly in $(ls repeat_masked/*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    OutDir=analysis/secondary_metabolites/antismash/$Organism/$Strain
+    mkdir -p $OutDir
+  done
+```
+
+```bash
+  for Zip in $(ls analysis/secondary_metabolites/antismash/*/*/*.zip); do
+    OutDir=$(dirname $Zip)
+    unzip -d $OutDir $Zip
+  done
+```
+
+```bash
+  for AntiSmash in $(ls analysis/secondary_metabolites/antismash/*/*/*/*.final.gbk); do
+    Organism=$(echo $AntiSmash | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $AntiSmash | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    OutDir=analysis/secondary_metabolites/antismash/$Organism/$Strain
+    Prefix=$OutDir/WT_antismash
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/secondary_metabolites
+    $ProgDir/antismash2gff.py --inp_antismash $AntiSmash --out_prefix $Prefix
+
+    # Identify secondary metabolites within predicted clusters
+    printf "Number of secondary metabolite detected:\t"
+    cat "$Prefix"_secmet_clusters.gff | wc -l
+    GeneGff=gene_pred/final/$Organism/$Strain/final/final_genes_appended_renamed.gff3
+    bedtools intersect -u -a $GeneGff -b "$Prefix"_secmet_clusters.gff > "$Prefix"_secmet_genes.gff
+    cat "$Prefix"_secmet_genes.gff | grep -w 'mRNA' | cut -f9 | cut -f2 -d '=' | cut -f1 -d ';' > "$Prefix"_antismash_secmet_genes.txt
+    bedtools intersect -wo -a $GeneGff -b "$Prefix"_secmet_clusters.gff | grep 'mRNA' | cut -f9,10,12,18 | sed "s/ID=//g" | perl -p -i -e "s/;Parent=g\w+//g" | perl -p -i -e "s/;Notes=.*//g" > "$Prefix"_secmet_genes.tsv
+    printf "Number of predicted proteins in secondary metabolite clusters:\t"
+    cat "$Prefix"_secmet_genes.txt | wc -l
+    printf "Number of predicted genes in secondary metabolite clusters:\t"
+    cat "$Prefix"_secmet_genes.gff | grep -w 'gene' | wc -l
+
+      # Identify cluster finder additional non-secondary metabolite clusters
+      printf "Number of cluster finder non-SecMet clusters detected:\t"
+      cat "$Prefix"_clusterfinder_clusters.gff | wc -l
+      GeneGff=gene_pred/final/$Organism/$Strain/final/final_genes_appended_renamed.gff3
+      bedtools intersect -u -a $GeneGff -b "$Prefix"_clusterfinder_clusters.gff > "$Prefix"_clusterfinder_genes.gff
+      cat "$Prefix"_clusterfinder_genes.gff | grep -w 'mRNA' | cut -f9 | cut -f2 -d '=' | cut -f1 -d ';' > "$Prefix"_clusterfinder_genes.txt
+
+      printf "Number of predicted proteins in cluster finder non-SecMet clusters:\t"
+      cat "$Prefix"_clusterfinder_genes.txt | wc -l
+      printf "Number of predicted genes in cluster finder non-SecMet clusters:\t"
+      cat "$Prefix"_clusterfinder_genes.gff | grep -w 'gene' | wc -l
+  done
+```
+
+These clusters represented the following genes. Note that these numbers just
+show the number of intersected genes with gff clusters and are not confirmed by
+function
+
+```
+F.venenatum - WT
+Number of secondary metabolite detected:	35
+Number of predicted proteins in secondary metabolite clusters:	986
+Number of predicted genes in secondary metabolite clusters:	977
+Number of cluster finder non-SecMet clusters detected:	86
+Number of predicted proteins in cluster finder non-SecMet clusters:	2829
+Number of predicted genes in cluster finder non-SecMet clusters:	2813
+```
+
+SMURF was also run to identify secondary metabolite gene clusters.
+
+Genes needed to be parsed into a specific tsv format prior to submission on the
+SMURF webserver.
+
+```bash
+  Gff=$(ls gene_pred/final/F.venenatum/WT/final/final_genes_appended_renamed.gff3)
+  OutDir=analysis/secondary_metabolites/smurf/F.venenatum/WT
+  mkdir -p $OutDir
+  ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/secondary_metabolites
+  $ProgDir/gff2smurf.py --gff $Gff > $OutDir/WT_genes_smurf.tsv
+```
+
+SMURF output was received by email and downloaded to the cluster in the output
+directory above.
+
+Output files were parsed into gff format:
+
+```bash
+  OutDir=analysis/secondary_metabolites/smurf/F.venenatum/WT
+  Prefix="WT"
+  GeneGff=gene_pred/final/F.venenatum/WT/final/final_genes_appended_renamed.gff3
+  SmurfClusters=$OutDir/Secondary-Metabolite-Clusters.txt
+  SmurfBackbone=$OutDir/Backbone-genes.txt
+  ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/secondary_metabolites
+  $ProgDir/smurf2gff.py --smurf_clusters $SmurfClusters --smurf_backbone $SmurfBackbone > $OutDir/Smurf_clusters.gff
+  bedtools intersect -wo -a $GeneGff -b $OutDir/Smurf_clusters.gff | grep 'mRNA' | cut -f9,10,12,18 | sed "s/ID=//g" | perl -p -i -e "s/;Parent=g\w+//g" | perl -p -i -e "s/;Notes=.*//g" > $OutDir/"$Prefix"_smurf_secmet_genes.tsv
+```
+
+Total number of secondary metabolite clusters:
+
+```bash
+for Assembly in $(ls repeat_masked/*/*/illumina_assembly_ncbi/*_contigs_softmasked_repeatmasker_TPSI_appended.fa | grep -w 'WT'); do
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+OutDir=analysis/secondary_metabolites/antismash/$Organism/$Strain
+mkdir -p $OutDir
+GeneGff=$(ls gene_pred/final/$Organism/$Strain/final/final_genes_appended_renamed.gff3)
+AntismashClusters=$(ls analysis/secondary_metabolites/antismash/$Organism/$Strain/*_secmet_clusters.gff)
+SmurfClusters=$(ls analysis/secondary_metabolites/smurf/$Organism/$Strain/Smurf_clusters.gff)
+echo "Total number of Antismash clusters"
+cat $AntismashClusters | wc -l
+echo "Total number of SMURF clusters"
+cat $SmurfClusters | wc -l
+echo "number of Antismash clusters intersecting Smurf clusters"
+bedtools intersect -a $AntismashClusters -b $SmurfClusters | wc -l
+echo "number of Antismash clusters not intersecting Smurf clusters"
+bedtools intersect -v -a $AntismashClusters -b $SmurfClusters | wc -l
+echo "number of smurf clusters intersecting antismash clusters"
+bedtools intersect -a $SmurfClusters -b $AntismashClusters | wc -l
+echo "number of smurf clusters not intersecting antismash clusters"
+bedtools intersect -v -a $SmurfClusters -b $AntismashClusters | wc -l
+done
+```
