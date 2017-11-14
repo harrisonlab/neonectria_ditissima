@@ -1,7 +1,7 @@
 Sets up correct formatting for SNP calling analysis
 
 ```bash
-input=/home/groups/harrisonlab/project_files/neonectria_ditissima/analysis/genome_alignment/bowtie
+input=/home/groups/harrisonlab/project_files/neonectria_ditissima/
 scripts=/home/gomeza/git_repos/scripts/popgen/snp
 ```
 
@@ -9,29 +9,18 @@ scripts=/home/gomeza/git_repos/scripts/popgen/snp
 
 ```bash
 
-for filename in $(ls -d analysis/genome_alignment/bowtie/*/$Strain/vs_R0905_canu_2017); do
-Organism=$(echo $StrainPath | rev | cut -f3 -d '/' | rev)
-Strain=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
+for filename in $(ls -d analysis/genome_alignment/bowtie/*/*/vs_R0905_canu_2017); do
+Organism=$(echo $filename | rev | cut -f3 -d '/' | rev)
+Strain=$(echo $filename | rev | cut -f2 -d '/' | rev)
 echo "$Organism - $Strain"
-    cp "$filename/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam" "$filename/$Strain_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam"
+    cp "$filename/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam" "$filename/"$Strain"_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam"
 done
 
-cd $input/*/Hg199/vs_R0905_canu_2017
-for filename in R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam
-do
-    mv "$filename" "Hg199_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam"
-done
-
-cd $input/*/AgN04/vs_R0905_canu_2017
-for filename in R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam
-do
-    mv "$filename" "AgN04_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam"
-done
-
-cd $input/*/R0905/vs_NG-R0905_pacbio
-for filename in polished_contigs_unmasked.fa_aligned.sam
-do
-    mv "$filename" "R0905_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam"
+for filename in $(ls -d analysis/genome_alignment/bowtie/*/*/vs_R0905_canu_2017); do
+Organism=$(echo $filename | rev | cut -f3 -d '/' | rev)
+Strain=$(echo $filename | rev | cut -f2 -d '/' | rev)
+echo "$Organism - $Strain"
+    cp "$filename/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam" "$filename/"$Strain"_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam"
 done
 
 
