@@ -1,6 +1,58 @@
+## Gene Prediction
+
+
+Gene prediction followed three steps:
+	Pre-gene prediction
+		- Quality of genome assemblies were assessed using Cegma to see how many core eukaryotic genes can be identified.
+	Gene model training
+		- Gene models were trained using assembled RNAseq data as part of the Braker1 pipeline
+	Gene prediction
+		- Gene models were used to predict genes in genomes as part of the the Braker1 pipeline. This used RNAseq data as hints for gene models.
+
+# Pre-gene prediction
+
+Quality of genome assemblies was assessed by looking for the gene space in the assemblies.
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
+	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+	for Genome in $(ls repeat_masked/*/R45-15/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    Strain=$(echo $Genome | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Genome | rev | cut -f3 -d '/' | rev)
+    echo $Genome;
+		qsub $ProgDir/sub_cegma.sh $Genome dna;
+	done
+```
+** Number of cegma genes present and complete: 95.56%
+** Number of cegma genes present and partial: 96.77%
+
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
+	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+	for Genome in $(ls repeat_masked/*/AgN04/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    Strain=$(echo $Genome | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Genome | rev | cut -f3 -d '/' | rev)
+    echo $Genome;
+		qsub $ProgDir/sub_cegma.sh $Genome dna;
+	done
+```
+** Number of cegma genes present and complete: 95.16%
+** Number of cegma genes present and partial: 96.77%
+
+Outputs were summarised using the commands:
+```bash
+	for File in $(ls gene_pred/cegma/N.*/*/*_dna_cegma.completeness_report); do
+		Strain=$(echo $File | rev | cut -f2 -d '/' | rev);
+		Species=$(echo $File | rev | cut -f3 -d '/' | rev);
+		printf "$Species\t$Strain\n";
+		cat $File | head -n18 | tail -n+4;printf "\n";
+	done > gene_pred/cegma/cegma_results_dna_summary.txt
+
+	less gene_pred/cegma/cegma_results_dna_summary.txt
+```
 
 
 Busco has replaced CEGMA and was run to check gene space in assemblies
+
 
 Previous isolates
 
@@ -27,6 +79,7 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
 short_summary_Hg199_contigs_unmasked.txt
 3673    Complete BUSCOs (C) 3658    Complete and single-copy BUSCOs (S)
 15 Complete and duplicated BUSCOs (D) 24      Fragmented BUSCOs (F)
@@ -36,7 +89,8 @@ short_summary_R0905_contigs_unmasked.txt	3651	16	20	54	3725
 short_summary_R45-15_contigs_unmasked.txt	3674	15	22	29	3725
 short_summary_R0905_contigs_unmasked.txt	3668	16	21	36	3725 canu_2017
 
-Gene prediction
+
+# Gene model training
 
 ```bash
 for Assembly in $(ls repeat_masked/*/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
