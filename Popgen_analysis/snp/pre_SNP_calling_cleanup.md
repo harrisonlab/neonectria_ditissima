@@ -15,7 +15,7 @@ scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_ana
   echo "$Organism - $Strain"
       cp "$filename/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam" "$filename/"$Strain"_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam"
   done
-
+```
 
 ## Remove multimapping reads, discordant reads. PCR and optical duplicates, and add read group and sample name to each mapped read (preferably, the shortest ID possible)
 Convention used:
@@ -35,19 +35,7 @@ do
 done
 ```
 
-```bash
-for Strain in AgN04
-do
-    Jobs=$(qstat | grep 'sub_pre_sn' | wc -l)
-    while [ $Jobs -gt 5 ]
-    do
-        sleep 1
-        printf "."
-        Jobs=$(qstat | grep 'sub_pre_sn' | wc -l)
-    done
-    qsub $scripts/sub_pre_snp_calling.sh $input/AgN04/vs_R0905_canu_2017/AgN04_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam AgN04Z
-done
-```
+
 ##Copy outputs from cleanup to alignment folder
 
 ```bash
