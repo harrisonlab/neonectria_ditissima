@@ -78,6 +78,16 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly
 # OutDir=$(dirname $Assembly)
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
+
+for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/*/*/*unmasked.fa); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
 ```
 
 short_summary_Hg199_contigs_unmasked.txt
