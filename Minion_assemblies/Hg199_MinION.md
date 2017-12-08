@@ -1,70 +1,116 @@
-# Neonectria ditissima
+# Neonectria_Reference_Genome_Assembly
 ==========
 
-Scripts used for the analysis of Neonectria ditissima genomes
+This document details the commands used to assemble and annotate the Hg199 Neonectria genome.
+
 Note - all this work was performed in the directory:
-/home/groups/harrisonlab/project_files/neonectria_ditissima
+/home/groups/harrisonlab/project_files/N.ditissima
 
-#Running Albacore
-
-Installing Albacore
+# 0. Building of directory structure
 
 ```bash
-wget https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-2.0.2-cp34-cp34m-manylinux1_x86_64.whl
-pip3 install --user ont_albacore-2.0.2-cp34-cp34m-manylinux1_x86_64.whl
-```
+screen -a
 
-```bash
-~/.local/bin/read_fast5_basecaller.py --flowcell FLO-MIN106 --kit SQK-LSK108 --input /data/seq_data/minion/2017/20170717_1504_Neonectria_Hg199 --recursive --worker_threads 12 --save_path /home/nanopore/Neonectria_Hg199_2_0_2 --output_format fastq,fast5 --reads_per_fastq_batch 4000
-```
-```bash
-cat  *.fastq | gzip > fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz
-cat  *.fastq | gzip > fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_fail.fastq.gz
-tar -czf fast5_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.tar.gz [0-9]*
-tar -czf fast5_runid_5832f037a56936787d17e66d1e3b8ac05572199f_fail.tar.gz [0-9]*
-```
-
-#Building of directory structure
-
-```bash
-  screen -a
-  RawDatDir=/data/seq_data/minion/2017/20171025_Neonectria_Hg199_2_0_2/workspace
+  RawDatDir=/data/seq_data/minion/transfers/20171203_Hg199/Hg199/GA50000/reads/
   Organism=N.ditissima
   Strain=Hg199
-  Date=25-10-17
+  Date=03-12-17
   mkdir -p raw_dna/minion/$Organism/$Strain/$Date
-  cat /data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199/workspace/*fastq | gzip -cf > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date".fastq.gz
-```
+  for Fast5Dir in $(ls -d $RawDatDir/*); do
+      poretools fastq $Fast5Dir | gzip -cf
+    done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date".fastq.gz
+  ```
 
 ```bash
-  RawDatDir=/data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199/workspace
+  RawDatDir=/home/miseq_data/minion/2017/*_Neonectria_Hg199/fast5/pass
   Organism=N.ditissima
   Strain=Hg199
-  Date=23-10-17
+  Date=17-07-17
+  mkdir -p raw_dna/minion/$Organism/$Strain/$Date
   for Fast5Dir in $(ls -d $RawDatDir/*); do
-    poretools fastq $Fast5Dir | gzip -cf
-  done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_fast5.fastq.gz
-```
+      poretools fastq $Fast5Dir | gzip -cf
+    done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_pass.fastq.gz
+  ```
 
-Rob command to transfer the date from nanopore node to head node. Permission needed
-scp -r ./Neonectria_Hg199_2_0_2 miseq_data@192.168.1.200:/data/seq_data/minion/2017/20171025_Neonectria_Hg199_2_0_2
+The following is a summary of the work presented in this Readme.
+
+The following processes were applied to Neonectria genomes prior to analysis:
+Data qc
+Genome assembly
+Repeatmasking
+Gene prediction
+Functional annotation
+
+#### QC of MiSeq data
+
+programs:
+  fastqc
+  fastq-mcf
+  kmc
+
+Data quality was visualised using fastqc:
+```bash
+	for RawData in $(ls raw_dna/minion/*/*/*.fastq.gz); do
+		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+		echo $RawData;
+		qsub $ProgDir/run_fastqc.sh $RawData
+	done
+```
 
 # Identify sequencing coverage
 
 For Minion data:
 ```bash
-	for RawData in $(ls raw_dna/minion/*/*/25-10-17/*q.gz); do
+	for RawData in $(ls qc_dna/minion/*/*/*q.gz | grep 'Stocks4'); do
 		echo $RawData;
 		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
-		GenomeSz=42
+		GenomeSz=60
 		OutDir=$(dirname $RawData)
 		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
 	done
 ```
 
+```bash
+  for StrainDir in $(ls -d qc_dna/minion/*/* | grep 'Stocks4'); do
+    Strain=$(basename $StrainDir)
+    printf "$Strain\t"
+    for File in $(ls $StrainDir/*.txt); do
+      echo $(basename $File);
+      cat $File | tail -n1 | rev | cut -f2 -d ' ' | rev;
+    done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
+  done
+```
 MinION coverage was:
 ```
+Stocks4	65.05
+```
 
+For Miseq data:
+```bash
+	for RawData in $(ls qc_dna/paired/*/*/*/*q.gz | grep 'Stocks4'); do
+		echo $RawData;
+		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
+		qsub $ProgDir/run_fastqc.sh $RawData;
+		GenomeSz=60
+		OutDir=$(dirname $RawData)
+		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
+	done
+```
+
+```bash
+	for StrainDir in $(ls -d qc_dna/paired/*/* | grep 'Stocks4'); do
+		Strain=$(basename $StrainDir)
+		printf "$Strain\t"
+		for File in $(ls $StrainDir/*/*.txt); do
+			echo $(basename $File);
+			cat $File | tail -n1 | rev | cut -f2 -d ' ' | rev;
+		done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
+	done
+```
+
+Miseq coverage was:
+```
+Stocks4	58.66
 ```
 
 ## Assembly
@@ -74,8 +120,8 @@ MinION coverage was:
 
 Splitting reads and trimming adapters using porechop
 ```bash
-	RawReads=raw_dna/minion/N.ditissima/Hg199/25-10-17/*.fastq.gz
-	OutDir=qc_dna/minion/N.ditissima/Hg199
+	RawReads=raw_dna/minion/F.oxysporum/Stocks4/all_reads.fastq.gz
+	OutDir=qc_dna/minion/F.oxysporum/Stocks4
 	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
 	qsub $ProgDir/sub_porechop.sh $RawReads $OutDir
 ```
@@ -83,24 +129,24 @@ Splitting reads and trimming adapters using porechop
 Read correction using Canu
 
 ```bash
-for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*_trim.fastq.gz); do
+for TrimReads in $(ls qc_dna/minion/F.oxysporum/Stocks4/*_trim.fastq.gz); do
 Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
-OutDir=assembly/canu-1.5/"$Organism"/"$Strain"
+OutDir=assembly/canu-1.5/F.oxysporum_fsp_mathioli/"$Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-qsub $ProgDir/sub_canu_correction.sh $TrimReads 42m $Strain $OutDir
+qsub $ProgDir/sub_canu_correction.sh $TrimReads 60m $Strain $OutDir
 done
 ```
 
 Assembly using Canu
 
 ```bash
-for CorrectedReads in $(ls assembly/canu-1.5/N.ditissima/Hg199/Hg199.trimmedReads.fasta.gz); do
+for CorrectedReads in $(ls assembly/canu-1.5/F.oxysporum_fsp_mathioli/Stocks4/Stocks4.trimmedReads.fasta.gz); do
 Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $CorrectedReads | rev | cut -f2 -d '/' | rev)
-OutDir=assembly/canu-1.5/N.ditissima/"$Strain"
+OutDir=assembly/canu-1.5/F.oxysporum_fsp_mathioli/"$Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 42m $Strain $OutDir
+qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 60m $Strain $OutDir
 done
 
 ```
@@ -108,11 +154,11 @@ done
 Assembbly using SMARTdenovo
 
 ```bash
-for CorrectedReads in $(ls assembly/canu-1.5/N.ditissima/Hg199/Hg199.trimmedReads.fasta.gz); do
+for CorrectedReads in $(ls assembly/canu-1.5/F.oxysporum_fsp_mathioli/Stocks4/Stocks4.trimmedReads.fasta.gz); do
 Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $CorrectedReads | rev | cut -f2 -d '/' | rev)
 Prefix=$Strain
-OutDir=assembly/SMARTdenovo/N.ditissima/"$Strain"
+OutDir=assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/"$Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/SMARTdenovo
 qsub $ProgDir/sub_SMARTdenovo.sh $CorrectedReads $Prefix $OutDir
 done
@@ -122,15 +168,7 @@ Quast for the SMARTdenovo assembly:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199.dmo.lay.utg); do
-  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-  OutDir=$(dirname $Assembly)
-  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-done
-
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/canu-1.5/N.ditissima/Hg199/Hg199.contigs.fasta); do
+for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg); do
   Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $Assembly)
@@ -140,10 +178,8 @@ done
 
 Busco has replaced CEGMA and was run to check gene space in assemblies
 
-Minion data
-
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199.dmo.lay.utg); do
+for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -151,14 +187,14 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
 # OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
 ```bash
 # printf "Organism\tStrain\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/*/*/assembly/*/short_summary_*.txt); do  
+for File in $(ls gene_pred/busco/F*/*/assembly/*/short_summary_*.txt | grep 'Stocks4'); do
 # echo $File;
 # Strain=$(echo $File| rev | cut -d '/' -f4 | rev)
 # Organism=$(echo $File | rev | cut -d '/' -f5 | rev)
@@ -172,20 +208,17 @@ Total=$(cat $File | grep "Total" | cut -f2)
 printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
-short_summary_Hg199.dmo.lay.txt	408	0	438	2879	3725
 
-I had really bad gene prediction.
 
-<!--
 Error correction using racon:
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199.dmo.lay.utg)
+Assembly=$(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg)
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
-ReadsFq=qc_dna/minion/N.ditissima/Hg199/*_trim.fastq.gz
-OutDir=assembly/SMARTdenovo/N.ditissima/Hg199/racon
+ReadsFq=qc_dna/minion/F.oxysporum/Stocks4/all_reads_trim.fastq.gz
+OutDir=assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon2
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 Iterations=10
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
@@ -195,7 +228,7 @@ Quast and busco were run to assess the effects of racon on assembly quality:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon/*.fasta); do
+for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon/*.fasta | grep 'round_4'); do
   Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
   OutDir=$(dirname $Assembly)
@@ -205,7 +238,7 @@ done
 
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon/*.fasta | grep "round_.*.fasta"); do
+for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon2/*.fasta | grep "round_.*.fasta"); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -213,7 +246,7 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
 # OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
@@ -430,8 +463,8 @@ short_summary_pilon_4.txt	3684	34	15	26	3725
 short_summary_pilon_5.txt	3684	34	15	26	3725
 short_summary_pilon_min_500bp_renamed.txt	3684	34	15	26	3725
 ```
--->
 
+<!--
 # Hybrid Assembly
 
 Hybrid assembly was performed on the FoM genome, but did not significantly
@@ -440,21 +473,22 @@ improve the assembly
 ## Spades Assembly
 
 ```bash
-for TrimReads in $(ls qc_dna/minion/*/Hg199/*_trim.fastq.gz); do
-Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+for TrimReads in $(ls qc_dna/minion/*/*/*_trim.fastq.gz | grep 'Stocks4'); do
+# Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+Organism="F.oxysporum_fsp_mathioli"
 Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
 IlluminaDir=$(ls -d qc_dna/paired/*/$Strain)
 TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
 TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
 OutDir=assembly/spades_minion/$Organism/"$Strain"
-echo $TrimF1_Read
+echo $TrimR1_Read
 echo $TrimR1_Read
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/spades
 qsub $ProgDir/sub_spades_minion.sh $TrimReads $TrimF1_Read $TrimR1_Read $OutDir
 done
 ```
 
-Contigs shorter than 500bp were removed from the assembly
+Contigs shorter thaan 500bp were removed from the assembly
 
 ```bash
   for Contigs in $(ls assembly/spades_minion/*/*/contigs.fasta); do
@@ -488,7 +522,7 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
 # OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
@@ -498,7 +532,7 @@ Note - the anchor length is the starting point for contigs to be merged - only c
 larger than these will be extended.
 
 ```bash
-for MinIONAssembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon/*10.fasta); do
+for MinIONAssembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/pilon/*.fasta | grep 'pilon_min_500bp_renamed.fasta'); do
 Organism=$(echo $MinIONAssembly | rev | cut -f4 -d '/' | rev)
 Strain=$(echo $MinIONAssembly | rev | cut -f3 -d '/' | rev)
 HybridAssembly=$(ls assembly/spades_minion/$Organism/$Strain/filtered_contigs/contigs_min_500bp.fasta)
@@ -527,7 +561,7 @@ Quast and busco were run to assess the quality of hybrid assemblies:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/merged_canu_spades/*/Hg199*/merged.fasta); do
+for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta | grep 'Stocks4'); do
   Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $Assembly)
@@ -537,7 +571,7 @@ done
 
 
 ```bash
-for Assembly in $(ls assembly/merged_canu_spades/*/Hg199*/merged.fasta); do
+for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta | grep 'Stocks4'); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -545,19 +579,18 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 # OutDir=gene_pred/busco/$Organism/$Strain/assembly
 OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
 done
 ```
 -->
-
 # Repeat Masking
 
 Repeat masking was performed on the non-hybrid assembly.
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/*/*/pilon/pilon_min_500bp_renamed.fasta | grep 'Stocks4'); do
-Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+for Assembly in $(ls assembly/spades_minion/*/*/filtered_contigs/contigs_min_500bp.fasta | grep 'Stocks4'); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
 OutDir=repeat_masked/$Organism/"$Strain"/filtered_contigs
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/repeat_masking
@@ -565,6 +598,7 @@ qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
 qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
 done
 ```
+
 
 The TransposonPSI masked bases were used to mask additional bases from the
 repeatmasker / repeatmodeller softmasked and hardmasked files.
@@ -589,8 +623,7 @@ echo "$OutFile"
 bedtools maskfasta -fi $File -bed $TPSI -fo $OutFile
 done
 ```
-
 ```
 Number of masked bases:
-9928878
+8321901
 ```
