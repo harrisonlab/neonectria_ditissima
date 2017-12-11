@@ -26,6 +26,38 @@ cp /home/miseq_data/2017/RAW/170203_M04465_0032_000000000-ATMUR/Data/Intensities
 cp /home/miseq_data/2017/RAW/170203_M04465_0032_000000000-ATMUR/Data/Intensities/BaseCalls/NdAgO4_S1_L001_R2_001.fastq.gz raw_dna/paired/$Species/AgN04/R/
 cp /home/miseq_data/2017/RAW/170203_M04465_0032_000000000-ATMUR/Data/Intensities/BaseCalls/R45-15_S2_L001_R1_001.fastq.gz raw_dna/paired/$Species/R45-15/F/  
 cp /home/miseq_data/2017/RAW/170203_M04465_0032_000000000-ATMUR/Data/Intensities/BaseCalls/R45-15_S2_L001_R2_001.fastq.gz raw_dna/paired/$Species/R45-15/R/
+
+mkdir -p raw_dna/paired/$Species/Ag02/F
+mkdir -p raw_dna/paired/$Species/Ag02/R
+mkdir -p raw_dna/paired/$Species/Ag05/F
+mkdir -p raw_dna/paired/$Species/Ag05/R
+mkdir -p raw_dna/paired/$Species/R37-15/F
+mkdir -p raw_dna/paired/$Species/R37-15/R
+
+
+data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls
+
+cd /data/seq_data/miseq/2017/RAW
+
+cat /171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AG02_S1_L001_R1_001.fastq.gz /171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG02_S1_L001_R1_001.fastq.gz /171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls /AG02_S1_L001_R1_001.fastq.gz > raw_dna/paired/$Species/AG02/F/test/
+
+
+cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AG02_S1_L001_R2_001.fastq.gz raw_dna/paired/$Species/AG02/R/171115/
+cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AGO5_S2_L001_R1_001.fastq.gz raw_dna/paired/$Species/AG05/F/171115/
+cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AGO5_S2_L001_R2_001.fastq.gz raw_dna/paired/$Species/AG05/R/171115/
+cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/ND8_S3_L001_R1_001.fastq.gz raw_dna/paired/$Species/ND8/F/171115/  
+cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/ND8_S3_L001_R2_001.fastq.gz raw_dna/paired/$Species/ND8/R/171115/
+
+cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG02_S1_L001_R1_001.fastq.gz raw_dna/paired/$Species/AG02/F/171205/
+cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG02_S1_L001_R2_001.fastq.gz raw_dna/paired/$Species/AG02/R/171205/
+cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AGO5_S2_L001_R1_001.fastq.gz raw_dna/paired/$Species/AG05/F/171205/
+cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AGO5_S2_L001_R2_001.fastq.gz raw_dna/paired/$Species/AG05/R/171205/
+cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/ND8_S3_L001_R1_001.fastq.gz raw_dna/paired/$Species/ND8/F/171205/
+cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/ND8_S3_L001_R2_001.fastq.gz raw_dna/paired/$Species/ND8/R/171205/
+cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/R3715_S4_L001_R1_001.fastq.gz raw_dna/paired/$Species/R37-15/F/171205/
+cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/R3715_S4_L001_R2_001.fastq.gz raw_dna/paired/$Species/R35-15/R/171205/
+
+
 ```
 
 #Data qc
