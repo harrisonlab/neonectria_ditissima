@@ -11,12 +11,12 @@ Note - all this work was performed in the directory:
 ```bash
 screen -a
 
-  RawDatDir=/data/seq_data/minion/2017/20171203_Hg199/Hg199/GA50000/reads/
+  RawDatDir=/data/seq_data/minion/2017/20171203_Hg199/Hg199/GA50000
   Organism=N.ditissima
   Strain=Hg199
   Date=03-12-17
   mkdir -p raw_dna/minion/$Organism/$Strain/$Date
-  for Fast5Dir in $(ls -d $RawDatDir/*); do
+  for Fast5Dir in $(ls -d $RawDatDir/*.fastq); do
       poretools fastq $Fast5Dir | gzip -cf
     done > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date".fastq.gz
   ```
@@ -30,7 +30,13 @@ screen -a
   for Fast5Dir in $(ls -d $RawDatDir/*); do
       poretools fastq $Fast5Dir | gzip -cf
     done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_pass.fastq.gz
+
+
+cat /data/seq_data/minion/2017/20171203_Hg199/Hg199/GA50000/reads/*/*.fast5 | gzip > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date".fastq.gz
   ```
+
+
+
 
 The following is a summary of the work presented in this Readme.
 
