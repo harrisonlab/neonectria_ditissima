@@ -35,28 +35,24 @@ mkdir -p raw_dna/paired/$Species/R37-15/F
 mkdir -p raw_dna/paired/$Species/R37-15/R
 
 
-data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls
-
 cd /data/seq_data/miseq/2017/RAW
+Species=N.ditissima
 
-cat /171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AG02_S1_L001_R1_001.fastq.gz /171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG02_S1_L001_R1_001.fastq.gz /171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls /AG02_S1_L001_R1_001.fastq.gz > raw_dna/paired/$Species/AG02/F/test/
+cat /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AG02_S1_L001_R1_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG02_S1_L001_R1_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls/AG02_S1_L001_R1_001.fastq.gz > raw_dna/paired/$Species/Ag02/F/AG02_S1_L001_R1_001_allfiles.fastq.gz
 
+cat /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AG02_S1_L001_R2_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG02_S1_L001_R2_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls/AG02_S1_L001_R2_001.fastq.gz > raw_dna/paired/$Species/Ag02/R/AG02_S1_L001_R2_001_allfiles.fastq.gz
 
-cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AG02_S1_L001_R2_001.fastq.gz raw_dna/paired/$Species/AG02/R/171115/
-cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AGO5_S2_L001_R1_001.fastq.gz raw_dna/paired/$Species/AG05/F/171115/
-cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AGO5_S2_L001_R2_001.fastq.gz raw_dna/paired/$Species/AG05/R/171115/
-cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/ND8_S3_L001_R1_001.fastq.gz raw_dna/paired/$Species/ND8/F/171115/  
-cp /data/seq_data/miseq/2017/RAW/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/ND8_S3_L001_R2_001.fastq.gz raw_dna/paired/$Species/ND8/R/171115/
+cat /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AG05_S2_L001_R1_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG05_S2_L001_R1_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls/AG05_S2_L001_R1_001.fastq.gz > raw_dna/paired/$Species/Ag05/F/AG05_S2_L001_R1_001_allfiles.fastq.gz
 
-cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG02_S1_L001_R1_001.fastq.gz raw_dna/paired/$Species/AG02/F/171205/
-cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG02_S1_L001_R2_001.fastq.gz raw_dna/paired/$Species/AG02/R/171205/
-cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AGO5_S2_L001_R1_001.fastq.gz raw_dna/paired/$Species/AG05/F/171205/
-cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AGO5_S2_L001_R2_001.fastq.gz raw_dna/paired/$Species/AG05/R/171205/
-cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/ND8_S3_L001_R1_001.fastq.gz raw_dna/paired/$Species/ND8/F/171205/
-cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/ND8_S3_L001_R2_001.fastq.gz raw_dna/paired/$Species/ND8/R/171205/
-cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/R3715_S4_L001_R1_001.fastq.gz raw_dna/paired/$Species/R37-15/F/171205/
-cp /data/seq_data/miseq/2017/RAW/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/R3715_S4_L001_R2_001.fastq.gz raw_dna/paired/$Species/R35-15/R/171205/
+cat /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/AG05_S2_L001_R2_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/AG05_S2_L001_R2_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls/AG05_S2_L001_R2_001.fastq.gz > raw_dna/paired/$Species/Ag05/R/AG05_S2_L001_R2_001_allfiles.fastq.gz
 
+cat /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/ND8_S3_L001_R1_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/ND8_S3_L001_R1_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls/ND8_S3_L001_R1_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/170203_M04465_0032_000000000-ATMUR/Data/Intensities/BaseCalls/ND8_S3_L001_R1_001.fastq.gz > raw_dna/paired/$Species/ND8/F/ND8_S3_L001_R1_001_allfiles.fastq.gz
+
+cat /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/ND8_S3_L001_R2_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/ND8_S3_L001_R2_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls/ND8_S3_L001_R2_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/170203_M04465_0032_000000000-ATMUR/Data/Intensities/BaseCalls/ND8_S3_L001_R2_001.fastq.gz > raw_dna/paired/$Species/ND8/R/ND8_S3_L001_R2_001_allfiles.fastq.gz
+
+cat /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/R3715_S4_L001_R1_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/R3715_S4_L001_R1_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls/R3715_S4_L001_R1_001.fastq.gz > raw_dna/paired/$Species/R37-15/F/R3715_S4_L001_R1_001_allfiles.fastq.gz
+
+cat /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls/R3715_S4_L001_R2_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171205_M04465_0058_000000000-BJ49V/Data/Intensities/BaseCalls/R3715_S4_L001_R2_001.fastq.gz /data/seq_data/miseq/2017/ANALYSIS/171026_M04465_0052_000000000-BFR28/Data/Intensities/BaseCalls/R3715_S4_L001_R2_001.fastq.gz > raw_dna/paired/$Species/R37-15/R/R3715_S4_L001_R2_001_allfiles.fastq.gz
 
 ```
 
@@ -77,32 +73,41 @@ Data quality was visualised using fastqc:
 	  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	  qsub $ProgDir/run_fastqc.sh $RawData;
   done
+
+  for RawData in $(ls raw_dna/paired/*/R37-15/*/*.fastq.gz); do
+    echo $RawData;
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
+    qsub $ProgDir/run_fastqc.sh $RawData;
+  done
 ```
 
 Trimming was performed on data to trim adapters from sequences and remove poor quality data.
 This was done with fastq-mcf
 
+```bash
+  Read_F=raw_dna/paired/N.ditissima/Ag02/F/*allfiles.fastq.gz
+  Read_R=raw_dna/paired/N.ditissima/Ag02/R/*allfiles.fastq.gz
+  IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+  qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
 
-```bash
-	Read_F=raw_dna/paired/N.ditissima/*/ND8/F/*.fastq.gz
-	Read_R=raw_dna/paired/N.ditissima/*/ND8/R/*.fastq.gz
+  Read_F=raw_dna/paired/N.ditissima/Ag05/F/*allfiles.fastq.gz
+  Read_R=raw_dna/paired/N.ditissima/Ag05/R/*allfiles.fastq.gz
+  IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+  qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
+
+	Read_F=raw_dna/paired/N.ditissima/R37-15/F/*allfiles.fastq.gz
+	Read_R=raw_dna/paired/N.ditissima/R37-15/R/*allfiles.fastq.gz
 	IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
 	qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
-```
-```bash
-	Read_F=raw_dna/paired/N.ditissima/*/AgN04/F/*.fastq.gz
-	Read_R=raw_dna/paired/N.ditissima/*/AgN04/R/*.fastq.gz
-	IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
-	qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
-```
-```bash
-	Read_F=raw_dna/paired/N.ditissima/*/R45-15/F/*.fastq.gz
-	Read_R=raw_dna/paired/N.ditissima/*/R45-15/R/*.fastq.gz
-	IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
-	qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
+
+  Read_F=raw_dna/paired/N.ditissima/ND8/F/*allfiles.fastq.gz
+  Read_R=raw_dna/paired/N.ditissima/ND8/R/*allfiles.fastq.gz
+  IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+  qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
 ```
 
 Data quality was visualised once again following trimming:
