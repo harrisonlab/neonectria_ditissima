@@ -121,8 +121,6 @@ Data quality was visualised once again following trimming:
 ```
 
 
-
-
 kmer counting was performed using kmc.
 This allowed estimation of sequencing depth and total genome size:
 
@@ -159,8 +157,6 @@ This allowed estimation of sequencing depth and total genome size:
 
 ** Esimated Coverage is: 86
 
-Last run of MiSeq
-
 
 ```bash
   # for Strain in 415 416 A4 SCRP245_v2 Bc23 Nov5 Nov77; do
@@ -168,7 +164,7 @@ Last run of MiSeq
     echo $Strain
     Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
     Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
-    Outdir=qc_dna/kmc/N.ditissima/paired/
+    Outdir=qc_dna/kmc/N.ditissima/Ag02/
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
     qsub $ProgDir/kmc_kmer_counting.sh 21 $Outdir $Trim_F $Trim_R
   done
@@ -189,58 +185,11 @@ for Strain in Ag05 ND8 R37-15; do
   echo $Strain
   Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
   Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
-  Outdir=qc_dna/kmc/N.ditissima/test/$Strain
+  Outdir=qc_dna/kmc/N.ditissima/$Strain
   ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
   qsub $ProgDir/kmc_kmer_counting.sh 21 $Outdir $Trim_F $Trim_R
 done
 ```
-
-
-
-```bash
-	Trim_F=qc_dna/paired/N.ditissima/*/ND8/F/*allfiles_trim.fq.gz
-	Trim_R=qc_dna/paired/N.ditissima/*/ND8/R/*allfiles_trim.fq.gz
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
-	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
-```
-
-** Estimated Genome Size is: 946768573
-
-** Esimated Coverage is: 5
-
-```bash
-	Trim_F=qc_dna/paired/N.ditissima/*/ND8/F/*.fq.gz
-	Trim_R=qc_dna/paired/N.ditissima/*/ND8/R/*.fq.gz
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
-	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
-```
-
-** Estimated Genome Size is: 946768573
-
-** Esimated Coverage is: 5
-
-```bash
-	Trim_F=qc_dna/paired/N.ditissima/*/ND8/F/*.fq.gz
-	Trim_R=qc_dna/paired/N.ditissima/*/ND8/R/*.fq.gz
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
-	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
-```
-
-** Estimated Genome Size is: 946768573
-
-** Esimated Coverage is: 5
-
-```bash
-	Trim_F=qc_dna/paired/N.ditissima/*/ND8/F/*.fq.gz
-	Trim_R=qc_dna/paired/N.ditissima/*/ND8/R/*.fq.gz
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
-	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
-```
-
-** Estimated Genome Size is: 946768573
-
-** Esimated Coverage is: 5
-
 
 #Assembly
 Assembly was performed using: Spades
@@ -291,6 +240,17 @@ done
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
     OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+```bash
+  for Strain in Ag02 Ag05 ND8 R37-15; do
+  echo $Strain
+  F_Read=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
+  R_Read=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
+	Outdir=assembly/spades/N.ditissima/$Strain/
+	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
 done
 ```
 
