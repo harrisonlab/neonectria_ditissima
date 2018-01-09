@@ -3,45 +3,96 @@
 
 This document details the commands used to assemble and annotate the Hg199 Neonectria genome.
 
-Note - all this work was performed in the directory:
-/home/groups/harrisonlab/project_files/N.ditissima
+#Data management
 
-# 0. Building of directory structure
+###First MinION run date is 20170717. Data stored in 20170717_1504_Neonectria_Hg199 and 20170717_1452_Neonectria_Hg199
+
+Albacore 1.1.1. was used to rerun basecalling. Data stored in data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199
+
+New version of Albacore available. v.2.0.2.
+
+```bash
+wget https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-2.0.2-cp34-cp34m-manylinux1_x86_64.whl
+pip3 install --user ont_albacore-2.0.2-cp34-cp34m-manylinux1_x86_64.whl
+```
+
+Running albacore 2.0.2.
+
+```bash
+screen -S gomeza
+
+~/.local/bin/read_fast5_basecaller.py --flowcell FLO-MIN106 --kit SQK-LSK108 --input /data/seq_data/minion/2017/20170717_1504_Neonectria_Hg199 --recursive --worker_threads 12 --save_path /home/nanopore/Neonectria_Hg199_2_0_2 --output_format fastq,fast5 --reads_per_fastq_batch 4000
+```
+
+```bash
+cat  *.fastq | gzip > fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz
+cat  *.fastq | gzip > fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_fail.fastq.gz
+tar -czf fast5_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.tar.gz [0-9]*
+tar -czf fast5_runid_5832f037a56936787d17e66d1e3b8ac05572199f_fail.tar.gz [0-9]*
+
+rm -rf *.fastq [0-9]*
+```
+Rob command to transfer the date from nanopore node to head node. Permission needed
+scp -r ./Neonectria_Hg199_2_0_2 miseq_data@192.168.1.200:/data/seq_data/minion/2017/20171025_Neonectria_Hg199_2_0_2
+
+###Second MinION run date 20171203. Data stored in 20171203_Hg199.
+
+Running albacore 2.0.2.
+
+```bash
+screen -S gomeza
+
+~/.local/bin/read_fast5_basecaller.py \
+--flowcell FLO-MIN106 \
+--kit SQK-LSK108 \
+--input /data/seq_data/minion/2017/20171203_Hg199/Hg199/GA50000/reads/ \
+--recursive \
+--worker_threads 12 \
+--save_path /home/nanopore/20171203_Hg199_2_0_2 \
+--output_format fastq,fast5 \
+--reads_per_fastq_batch 4000
+```
+Data stored in /data/seq_data/minion/2017/20171203_Hg199
+
+#Building of directory structure
+
+```bash
+  screen -a
+  RawDatDir=/data/seq_data/minion/2017/20171025_Neonectria_Hg199_2_0_2/workspace
+  Organism=N.ditissima
+  Strain=Hg199
+  Date=25-10-17
+  mkdir -p raw_dna/minion/$Organism/$Strain/$Date
+  cat /data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199/workspace/*fastq | gzip -cf > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date".fastq.gz
+```
+
+```bash
+  RawDatDir=/data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199/workspace
+  Organism=N.ditissima
+  Strain=Hg199
+  Date=23-10-17
+  for Fast5Dir in $(ls -d $RawDatDir/*); do
+    poretools fastq $Fast5Dir | gzip -cf
+  done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_fast5.fastq.gz
+```
 
 ```bash
 screen -a
-
   RawDatDir=/data/seq_data/minion/2017/20171203_Hg199/Hg199/GA50000
   Organism=N.ditissima
   Strain=Hg199
   Date=03-12-17
-  mkdir -p raw_dna/minion/$Organism/$Strain/$Date
+  mkdir -p raw_dna/minion/$Organism/$Strain/$Date/
   for Fast5Dir in $(ls -d $RawDatDir/*.fastq); do
       poretools fastq $Fast5Dir | gzip -cf
     done > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date".fastq.gz
   ```
 
-```bash
-  RawDatDir=/home/miseq_data/minion/2017/*_Neonectria_Hg199/fast5/pass
-  Organism=N.ditissima
-  Strain=Hg199
-  Date=17-07-17
-  mkdir -p raw_dna/minion/$Organism/$Strain/$Date
-  for Fast5Dir in $(ls -d $RawDatDir/*); do
-      poretools fastq $Fast5Dir | gzip -cf
-    done > raw_dna/minion/$Organism/$Strain/"$Strain"_"$Date"_pass.fastq.gz
-
-
-cat /data/seq_data/minion/2017/20171203_Hg199/Hg199/GA50000/reads/*/*.fast5 | gzip > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date".fastq.gz
-  ```
-
+Both recalled runs were merged together
 
 ```bash
 cat raw_dna/minion/N.ditissima/Hg199/25-10-17/rebasecalled/pass/fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/fastq_runid_298a8dbc00c3db453901232f1ad01b11fd094980_pass.fastq.gz > Hg199_fastq_allfiles.fastq.gz
 ```
-
-
-The following is a summary of the work presented in this Readme.
 
 The following processes were applied to Neonectria genomes prior to analysis:
 Data qc
@@ -49,6 +100,9 @@ Genome assembly
 Repeatmasking
 Gene prediction
 Functional annotation
+
+Note - all this work was performed in the directory:
+/home/groups/harrisonlab/project_files/N.ditissima
 
 #### QC of MiSeq data
 
