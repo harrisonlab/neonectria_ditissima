@@ -88,7 +88,7 @@ screen -a
     done > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date".fastq.gz
   ```
 
-Both recalled runs were merged together
+Both, 2.0.2 version recalled runs were merged together
 
 ```bash
 cat raw_dna/minion/N.ditissima/Hg199/25-10-17/rebasecalled/pass/fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/fastq_runid_298a8dbc00c3db453901232f1ad01b11fd094980_pass.fastq.gz > Hg199_fastq_allfiles.fastq.gz
