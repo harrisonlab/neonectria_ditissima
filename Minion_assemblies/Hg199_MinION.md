@@ -36,6 +36,9 @@ cat /data/seq_data/minion/2017/20171203_Hg199/Hg199/GA50000/reads/*/*.fast5 | gz
   ```
 
 
+```bash
+cat raw_dna/minion/N.ditissima/Hg199/25-10-17/rebasecalled/pass/fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/fastq_runid_298a8dbc00c3db453901232f1ad01b11fd094980_pass.fastq.gz > Hg199_fastq_allfiles.fastq.gz
+```
 
 
 The following is a summary of the work presented in this Readme.
@@ -55,12 +58,19 @@ programs:
   kmc
 
 Data quality was visualised using fastqc:
+
 ```bash
-	for RawData in $(ls raw_dna/minion/*/*/*.fastq.gz); do
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-		echo $RawData;
-		qsub $ProgDir/run_fastqc.sh $RawData
+	for RawData in $(ls raw_dna/minion/*/*/Hg199_fastq_allfiles.fastq.gz); do
+  	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+  	echo $RawData;
+  	qsub $ProgDir/run_fastqc.sh $RawData
 	done
+
+  for RawData in $(ls raw_dna/minion/*/*/03-12-17/rebasecalled/pass/*.fastq.gz); do
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+    echo $RawData;
+    qsub $ProgDir/run_fastqc.sh $RawData
+    done
 ```
 
 # Identify sequencing coverage
