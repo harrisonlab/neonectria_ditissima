@@ -188,12 +188,12 @@ Splitting reads and trimming adapters using porechop
 Read correction using Canu
 
 ```bash
-for TrimReads in $(ls qc_dna/minion/F.oxysporum/Stocks4/*_trim.fastq.gz); do
+for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
 Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
-OutDir=assembly/canu-1.5/F.oxysporum_fsp_mathioli/"$Strain"
+OutDir=assembly/canu_minion/N.ditissima/"$Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-qsub $ProgDir/sub_canu_correction.sh $TrimReads 60m $Strain $OutDir
+qsub $ProgDir/sub_canu_correction.sh $TrimReads 45m $Strain $OutDir
 done
 ```
 
@@ -203,9 +203,9 @@ Assembly using Canu
 for CorrectedReads in $(ls assembly/canu-1.5/F.oxysporum_fsp_mathioli/Stocks4/Stocks4.trimmedReads.fasta.gz); do
 Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $CorrectedReads | rev | cut -f2 -d '/' | rev)
-OutDir=assembly/canu-1.5/F.oxysporum_fsp_mathioli/"$Strain"
+OutDir=assembly/canu_minion/N.ditissima/"$Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 60m $Strain $OutDir
+qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 45m $Strain $OutDir
 done
 
 ```
