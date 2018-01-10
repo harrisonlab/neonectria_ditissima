@@ -254,6 +254,43 @@ done
 done
 ```
 
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/Ag02/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/Ag05/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/ND8/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/R37-15/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
 # Repeatmasking
 
 Repeat masking was performed and used the following programs: Repeatmasker Repeatmodeler
@@ -288,6 +325,17 @@ The best assembly was used to perform repeatmasking
 
 ** % bases masked by transposon psi: 11.49% (bases masked:4306052 bp)
 
+```bash
+  for Strain in Ag02 Ag05 ND8 R37-15; do
+  echo $Strain
+  Assembly=$(ls assembly/spades/*/$Strain/filtered_contigs/contigs_min_500bp.fasta)
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
+  OutDir=repeat_masked/N.ditissima/$Strain/
+  qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+  qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
+done
+```
+
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
@@ -310,3 +358,5 @@ Up till now we have been using just the repeatmasker/repeatmodeller fasta file w
     repeat_masked/N.ditissima/R45-15/R45-15_contigs_softmasked_repeatmasker_TPSI_appended.fa
     Number of masked bases:
     4967354
+
+  
