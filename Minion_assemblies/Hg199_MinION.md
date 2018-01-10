@@ -104,44 +104,32 @@ Functional annotation
 Note - all this work was performed in the directory:
 /home/groups/harrisonlab/project_files/N.ditissima
 
-#### QC of MiSeq data
-
-programs:
-  fastqc
-  fastq-mcf
-  kmc
-
-Data quality was visualised using fastqc:
-
-```bash
-	for RawData in $(ls raw_dna/minion/*/*/Hg199_fastq_allfiles.fastq.gz); do
-  	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-  	echo $RawData;
-  	qsub $ProgDir/run_fastqc.sh $RawData
-	done
-
-  for RawData in $(ls raw_dna/minion/*/*/03-12-17/rebasecalled/pass/*.fastq.gz); do
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-    echo $RawData;
-    qsub $ProgDir/run_fastqc.sh $RawData
-    done
-```
 
 # Identify sequencing coverage
 
 For Minion data:
 ```bash
-	for RawData in $(ls qc_dna/minion/*/*/*q.gz | grep 'Stocks4'); do
+	for RawData in $(ls raw_dna/minion/*/*/*q.gz); do
 		echo $RawData;
 		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
-		GenomeSz=60
+		GenomeSz=45
 		OutDir=$(dirname $RawData)
 		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
 	done
 ```
 
 ```bash
-  for StrainDir in $(ls -d qc_dna/minion/*/* | grep 'Stocks4'); do
+	for RawData in $(ls raw_dna/minion/*/*/03-12-17/*/*/*q.gz); do
+		echo $RawData;
+		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
+		GenomeSz=45
+		OutDir=$(dirname $RawData)
+		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
+	done
+```
+
+```bash
+  for StrainDir in $(ls -d raw_dna/minion/*/*); do
     Strain=$(basename $StrainDir)
     printf "$Strain\t"
     for File in $(ls $StrainDir/*.txt); do
@@ -149,26 +137,28 @@ For Minion data:
       cat $File | tail -n1 | rev | cut -f2 -d ' ' | rev;
     done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
   done
+
 ```
-MinION coverage was:
-```
-Stocks4	65.05
-```
+Allfiles MinION coverage was:
+94.46
+
+03-12-17 MinION coverage was:
+71.39
 
 For Miseq data:
 ```bash
-	for RawData in $(ls qc_dna/paired/*/*/*/*q.gz | grep 'Stocks4'); do
+	for RawData in $(ls qc_dna/paired/*/Hg199/*/*q.gz); do
 		echo $RawData;
 		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
 		qsub $ProgDir/run_fastqc.sh $RawData;
-		GenomeSz=60
+		GenomeSz=45
 		OutDir=$(dirname $RawData)
 		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
 	done
 ```
 
 ```bash
-	for StrainDir in $(ls -d qc_dna/paired/*/* | grep 'Stocks4'); do
+	for StrainDir in $(ls -d qc_dna/paired/*/Hg199); do
 		Strain=$(basename $StrainDir)
 		printf "$Strain\t"
 		for File in $(ls $StrainDir/*/*.txt); do
@@ -179,9 +169,8 @@ For Miseq data:
 ```
 
 Miseq coverage was:
-```
-Stocks4	58.66
-```
+89.92
+
 
 ## Assembly
 
@@ -190,8 +179,8 @@ Stocks4	58.66
 
 Splitting reads and trimming adapters using porechop
 ```bash
-	RawReads=raw_dna/minion/F.oxysporum/Stocks4/all_reads.fastq.gz
-	OutDir=qc_dna/minion/F.oxysporum/Stocks4
+	RawReads=raw_dna/minion/N.ditissima/Hg199/*allfiles.fastq.gz
+	OutDir=qc_dna/minion/N.ditissima/Hg199
 	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
 	qsub $ProgDir/sub_porechop.sh $RawReads $OutDir
 ```
