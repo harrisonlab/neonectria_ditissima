@@ -57,7 +57,8 @@ Busco has replaced CEGMA and was run to check gene space in assemblies
 Previous isolates
 
 ```bash
-for Assembly in $(ls repeat_masked/N.ditissima/*/*unmasked.fa); do
+for Strain in Ag02 Ag05 ND8 R37-15; do
+for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*unmasked.fa); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -66,6 +67,7 @@ BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
 # OutDir=$(dirname $Assembly)
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
 done
 
 for Assembly in $(ls repeat_masked/N.ditissima/*/*/*unmasked.fa); do
@@ -90,17 +92,83 @@ qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
-short_summary_Hg199_contigs_unmasked.txt
-3673    Complete BUSCOs (C) 3658    Complete and single-copy BUSCOs (S)
-15 Complete and duplicated BUSCOs (D) 24      Fragmented BUSCOs (F)
-28 Missing BUSCOs (M) 3725    Total BUSCO groups searched
-short_summary_AgN04_contigs_unmasked.txt	3663	17	23	39	3725
-short_summary_R0905_contigs_unmasked.txt	3651	16	20	54	3725
+
+short_summary_AgN04_contigs_unmasked.txt
+				3663    Complete BUSCOs (C)
+        3646    Complete and single-copy BUSCOs (S)
+        17      Complete and duplicated BUSCOs (D)
+        23      Fragmented BUSCOs (F)
+        39      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+
 short_summary_R45-15_contigs_unmasked.txt	3674	15	22	29	3725
-short_summary_R0905_contigs_unmasked.txt	3668	16	21	36	3725 canu_2017
+				3674    Complete BUSCOs (C)
+        3659    Complete and single-copy BUSCOs (S)
+        15      Complete and duplicated BUSCOs (D)
+        22      Fragmented BUSCOs (F)
+        29      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+
+
+short_summary_Hg199_contigs_unmasked.txt
+				3670    Complete BUSCOs (C)
+        3655    Complete and single-copy BUSCOs (S)
+        15      Complete and duplicated BUSCOs (D)
+        25      Fragmented BUSCOs (F)
+        30      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+short_summary_contigs_min_500bp.txt Hg199
+				3673    Complete BUSCOs (C)
+        3658    Complete and single-copy BUSCOs (S)
+        15      Complete and duplicated BUSCOs (D)
+        24      Fragmented BUSCOs (F)
+        28      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+
+short_summary_R0905_contigs_unmasked.txt R0905_merged_assembly
+				3510    Complete BUSCOs (C)
+        3417    Complete and single-copy BUSCOs (S)
+        93      Complete and duplicated BUSCOs (D)
+        26      Fragmented BUSCOs (F)
+        189     Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+short_summary_R0905_contigs_unmasked.txt R0905 R0905_merged_2017
+				3651    Complete BUSCOs (C)
+        3635    Complete and single-copy BUSCOs (S)
+        16      Complete and duplicated BUSCOs (D)
+        20      Fragmented BUSCOs (F)
+        54      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+short_summary_R0905_contigs_unmasked.txt R0905_canu_2017_v2
+				3668    Complete BUSCOs (C)
+        3652    Complete and single-copy BUSCOs (S)
+        16      Complete and duplicated BUSCOs (D)
+        21      Fragmented BUSCOs (F)
+        36      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+
 
 
 # Gene model training
+
+```bash
+for Strain in Ag02 Ag05 ND8 R37-15; do
+	for Assembly in $(ls repeat_masked/*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+	  Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
+	  Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
+	  echo "$Organism - $Strain"
+	  for RNADir in $(ls -d qc_rna/paired/N.ditissima/Hg199); do
+	    Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
+	    echo "$Timepoint"
+	    FileF=$(ls $RNADir/F/*_trim.fq.gz)
+	    FileR=$(ls $RNADir/R/*_trim.fq.gz)
+	    OutDir=alignment/$Organism/$Strain/$Timepoint
+	    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+	    qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir
+		done
+	done
+done
+```
 
 ```bash
 for Assembly in $(ls repeat_masked/*/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
@@ -118,6 +186,7 @@ for Assembly in $(ls repeat_masked/*/*/R0905_canu*/*_contigs_softmasked_repeatma
   done
 done
 ```
+
 Alignments were concatenated prior to running cufflinks:
 Cufflinks was run to produce the fragment length and stdev statistics:
 
