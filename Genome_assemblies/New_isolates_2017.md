@@ -317,9 +317,15 @@ Number of masked bases:
 repeat_masked/N.ditissima/Ag04/AgN04_contigs_softmasked_repeatmasker_TPSI_appended.fa
 Number of masked bases:
 6076978
+repeat_masked/N.ditissima/Ag05/Ag05_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+4812553
 repeat_masked/N.ditissima/Hg199/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
 Number of masked bases:
 5062507
+repeat_masked/N.ditissima/ND8/ND8_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+5608134
 repeat_masked/N.ditissima/R0905_canu_2017_v2/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
 Number of masked bases:
 5786417
