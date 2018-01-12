@@ -227,7 +227,7 @@ Quast for the SMARTdenovo assembly:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg); do
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199.dmo.lay.utg); do
   Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $Assembly)
@@ -272,12 +272,12 @@ done
 Error correction using racon:
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg)
+Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/wtasm.dmo.lay.utg)
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
-ReadsFq=qc_dna/minion/F.oxysporum/Stocks4/all_reads_trim.fastq.gz
-OutDir=assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon2
+ReadsFq=qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz
+OutDir=assembly/SMARTdenovo/N.ditissima/Hg199/racon2
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 Iterations=10
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
@@ -523,24 +523,20 @@ short_summary_pilon_5.txt	3684	34	15	26	3725
 short_summary_pilon_min_500bp_renamed.txt	3684	34	15	26	3725
 ```
 
-<!--
-# Hybrid Assembly
 
-Hybrid assembly was performed on the FoM genome, but did not significantly
-improve the assembly
+# Hybrid Assembly
 
 ## Spades Assembly
 
 ```bash
-for TrimReads in $(ls qc_dna/minion/*/*/*_trim.fastq.gz | grep 'Stocks4'); do
-# Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
-Organism="F.oxysporum_fsp_mathioli"
+for TrimReads in $(ls qc_dna/minion/*/Hg199/*allfiles_trim.fastq.gz); do
+Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
 IlluminaDir=$(ls -d qc_dna/paired/*/$Strain)
 TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
 TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
 OutDir=assembly/spades_minion/$Organism/"$Strain"
-echo $TrimR1_Read
+echo $TrimF1_Read
 echo $TrimR1_Read
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/spades
 qsub $ProgDir/sub_spades_minion.sh $TrimReads $TrimF1_Read $TrimR1_Read $OutDir
