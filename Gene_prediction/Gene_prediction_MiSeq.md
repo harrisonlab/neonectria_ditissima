@@ -147,6 +147,34 @@ short_summary_R0905_contigs_unmasked.txt R0905_canu_2017_v2
         36      Missing BUSCOs (M)
         3725    Total BUSCO groups searched
 
+short_summary_Ag02_contigs_unmasked.txt
+				3669    Complete BUSCOs (C)
+				3655    Complete and single-copy BUSCOs (S)
+        14      Complete and duplicated BUSCOs (D)
+        26      Fragmented BUSCOs (F)
+        30      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+short_summary_Ag05_contigs_unmasked.txt
+				3669    Complete BUSCOs (C)
+        3653    Complete and single-copy BUSCOs (S)
+        16      Complete and duplicated BUSCOs (D)
+        25      Fragmented BUSCOs (F)
+        31      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+short_summary_ND8_contigs_unmasked.txt
+				3669    Complete BUSCOs (C)
+        3654    Complete and single-copy BUSCOs (S)
+        15      Complete and duplicated BUSCOs (D)
+        25      Fragmented BUSCOs (F)
+        31      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
+short_summary_R37-15_contigs_unmasked.txt
+				3673    Complete BUSCOs (C)
+        3656    Complete and single-copy BUSCOs (S)
+        17      Complete and duplicated BUSCOs (D)
+        24      Fragmented BUSCOs (F)
+        28      Missing BUSCOs (M)
+        3725    Total BUSCO groups searched
 
 
 # Gene model training
@@ -192,9 +220,10 @@ Cufflinks was run to produce the fragment length and stdev statistics:
 
 ```bash
 screen -a
-for Assembly in $(ls repeat_masked/*/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+for Strain in Ag02 Ag05 ND8 R37-15; do
+for Assembly in $(ls repeat_masked/*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
 # AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
 AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
 OutDir=gene_pred/cufflinks/$Organism/$Strain/vs_Hg199reads/concatenated_prelim
@@ -202,8 +231,9 @@ echo "$Organism - $Strain"
 mkdir -p $OutDir
 cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
 done
+done
 ```
-I have aligned every isolate (Ag04, R45/15, Hg199 and R0905_canu_2017_v2) with the Hg199 RNA reads.
+I have aligned every isolate with the Hg199 RNA reads.
 
 Output from stdout included:
 ```
@@ -258,6 +288,59 @@ Warning: Could not connect to update server to verify current version. Please ch
 >	           Estimated Std Dev: 43.58
 [14:25:44] Assembling transcripts and estimating abundances.
 > Processed 18606 loci.                        [*************************] 100%
+
+N.ditissima - Ag02
+Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
+[14:23:01] Inspecting reads and determining fragment length distribution.
+> Processed 18535 loci.                        [*************************] 100%
+> Map Properties:
+tee: gene_pred/cufflinks/N.ditissima/Ag02/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
+>       Normalized Map Mass: 12798695.86
+>       Raw Map Mass: 12798695.86
+>       Fragment Length Distribution: Empirical (learned)
+>                     Estimated Mean: 216.93
+>                  Estimated Std Dev: 43.61
+[08:51:51] Assembling transcripts and estimating abundances.
+> Processed 18668 loci.                        [*************************] 100%
+N.ditissima - Ag05
+tee: gene_pred/cufflinks/N.ditissima/Ag05/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
+Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
+[08:58:47] Inspecting reads and determining fragment length distribution.
+> Processed 18519 loci.                        [*************************] 100%
+> Map Properties:
+>       Normalized Map Mass: 12749756.54
+>       Raw Map Mass: 12749756.54
+>       Fragment Length Distribution: Empirical (learned)
+>                     Estimated Mean: 217.18
+>                  Estimated Std Dev: 43.59
+[09:01:01] Assembling transcripts and estimating abundances.
+> Processed 18590 loci.                        [*************************] 100%
+N.ditissima - ND8
+tee: gene_pred/cufflinks/N.ditissima/ND8/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
+Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
+[09:07:59] Inspecting reads and determining fragment length distribution.
+> Processed 18483 loci.                        [*************************] 100%
+> Map Properties:
+>       Normalized Map Mass: 12795885.50
+>       Raw Map Mass: 12795885.50
+>       Fragment Length Distribution: Empirical (learned)
+>                     Estimated Mean: 217.04
+>                  Estimated Std Dev: 43.61
+[09:10:15] Assembling transcripts and estimating abundances.
+> Processed 18561 loci.                        [*************************] 100%
+N.ditissima - R37-15
+tee: gene_pred/cufflinks/N.ditissima/R37-15/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
+Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
+[09:16:51] Inspecting reads and determining fragment length distribution.
+> Processed 18491 loci.                        [*************************] 100%
+> Map Properties:
+>       Normalized Map Mass: 12803072.33
+>       Raw Map Mass: 12803072.33
+>       Fragment Length Distribution: Empirical (learned)
+>                     Estimated Mean: 217.03
+>                  Estimated Std Dev: 43.65
+[09:19:09] Assembling transcripts and estimating abundances.
+> Processed 18554 loci.                        [*************************] 100%
 ```
 
 The Estimated Mean: 219.68 allowed calculation of of the mean insert gap to be
@@ -269,7 +352,8 @@ increase the accuracy of mapping.
 Then Rnaseq data was aligned to each genome assembly:
 
 ```bash
-for Assembly in $(ls repeat_masked/N*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+for Strain in Ag02 Ag05 ND8 R37-15; do
+for Assembly in $(ls repeat_masked/N*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
 Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
 echo "$Organism - $Strain"
@@ -290,6 +374,7 @@ done
 printf "\n"
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
 qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
+done
 done
 done
 ```
