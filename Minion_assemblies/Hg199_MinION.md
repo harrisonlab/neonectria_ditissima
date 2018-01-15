@@ -272,15 +272,16 @@ done
 Error correction using racon:
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/wtasm.dmo.lay.utg)
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199.dmo.lay.utg); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
-ReadsFq=qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz
-OutDir=assembly/SMARTdenovo/N.ditissima/Hg199/racon2
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/racon
+ReadsFq=$(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz)
 Iterations=10
+OutDir=$(dirname $Assembly)"/racon_$Iteractions"
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
+done
 ```
 
 Quast and busco were run to assess the effects of racon on assembly quality:
