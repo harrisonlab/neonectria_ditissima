@@ -238,7 +238,7 @@ done
 Busco has replaced CEGMA and was run to check gene space in assemblies
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/wtasm.dmo.lay.utg); do
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199.dmo.lay.utg); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -246,7 +246,7 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly
 # OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
@@ -278,7 +278,7 @@ Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
 ReadsFq=$(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz)
 Iterations=10
-OutDir=$(dirname $Assembly)"/racon_$Iteractions"
+OutDir=$(dirname $Assembly)"/racon_$Iterations"
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
 done
@@ -288,25 +288,25 @@ Quast and busco were run to assess the effects of racon on assembly quality:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon/*.fasta | grep 'round_4'); do
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/*.fasta); do
   Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-  OutDir=$(dirname $Assembly)
+  OutDir=$(dirname $Assembly/grep4)
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
 
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon2/*.fasta | grep "round_.*.fasta"); do
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/*.fasta); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly
+OutDir=gene_pred/busco/$Organism/$Strain/assembly/racon_10
 # OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
@@ -314,12 +314,12 @@ done
 
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon2/wtasm_racon_round_10.fasta)
+Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_racon_round_10.fasta)
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
 # Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
-Fast5Dir=$(ls -d /home/miseq_data/minion/2017/MINION_20170424_FNFAB42727_MN18323_sequencing_run_Fusarium_oxysporum_Stocks4/albacore1.1.1)
+Fast5Dir=$(ls -d /data/seq_data/minion/2017/20171203_Hg199/Hg199/GA50000/reads)
 ReadDir=raw_dna/nanopolish/$Organism/$Strain
 if [ -d $ReadDir ]; then
 	echo "reads already extracted"
@@ -344,7 +344,7 @@ qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $RawReads $OutDir/nanopolish
  nanopolish correction
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon2/wtasm_racon_round_10.fasta)
+Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_racon_round_10.fasta)
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -373,14 +373,14 @@ done
 ```
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/racon2/wtasm_racon_round_10.fasta)
+Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_racon_round_10.fasta)
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 OutDir=assembly/SMARTdenovo/$Organism/$Strain/nanopolish
 mkdir -p $OutDir
 # cat "" > $OutDir/"$Strain"_nanoplish.fa
 NanoPolishDir=/home/armita/prog/nanopolish/nanopolish/scripts
-python $NanoPolishDir/nanopolish_merge.py assembly/SMARTdenovo/$Organism/$Strain/racon2/*/*.fa > $OutDir/"$Strain"_nanoplish.fa
+python $NanoPolishDir/nanopolish_merge.py assembly/SMARTdenovo/$Organism/$Strain/racon_10/*/*.fa > $OutDir/"$Strain"_nanoplish.fa
 
 # for File in $(ls assembly/SMARTdenovo/F.*/*/racon2/*/*.fa | grep ":*-"); do
 # 	# echo $File
@@ -544,7 +544,7 @@ qsub $ProgDir/sub_spades_minion.sh $TrimReads $TrimF1_Read $TrimR1_Read $OutDir
 done
 ```
 
-Contigs shorter thaan 500bp were removed from the assembly
+Contigs shorter than 500bp were removed from the assembly
 
 ```bash
   for Contigs in $(ls assembly/spades_minion/*/*/contigs.fasta); do
@@ -554,7 +554,6 @@ Contigs shorter thaan 500bp were removed from the assembly
     $FilterDir/filter_abyss_contigs.py $Contigs 500 > $AssemblyDir/filtered_contigs/contigs_min_500bp.fasta
   done
 ```
-
 
 Quast and busco were run to assess the quality of hybrid assemblies:
 
@@ -568,7 +567,6 @@ for Assembly in $(ls assembly/spades_minion/*/*/filtered_contigs/contigs_min_500
 done
 ```
 
-
 ```bash
 for Assembly in $(ls assembly/spades_minion/*/*/filtered_contigs/contigs_min_500bp.fasta); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
@@ -576,9 +574,9 @@ Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly
+OutDir=gene_pred/busco/$Organism/$Strain/hybrid_assembly
 # OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
