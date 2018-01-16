@@ -379,9 +379,6 @@ done
 done
 ```
 
-76.4% overall read mapping rate.
-66.7% concordant pair alignment rate.
-
 #### Braker prediction
 
 Before braker predictiction was performed, I double checked that I had the genemark key in my user area and copied it over from the genemark install directory:
@@ -392,7 +389,9 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 ```
 
 ```bash
-  for Assembly in $(ls repeat_masked/N.ditissima/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+for Strain in Ag02 Ag05 ND8 R37-15; do
+  for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		#for Assembly in $(ls repeat_masked/N.ditissima/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
     while [ $Jobs -gt 1 ]; do
     sleep 10
@@ -401,15 +400,18 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
     done
     printf "\n"
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+    Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
     echo "$Organism - $Strain"
-    OutDir=gene_pred/braker/$Organism/"$Strain"_braker_Nov2017
+    OutDir=gene_pred/braker/$Organism/"$Strain"_braker_Jan2018
+		#OutDir=gene_pred/braker/$Organism/"$Strain"_braker_Nov2017
     AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
-    GeneModelName="$Organism"_"$Strain"_braker_Nov2017
-    rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_Nov2017
+    GeneModelName="$Organism"_"$Strain"_braker_Jan2018
+		#GeneModelName="$Organism"_"$Strain"_braker_Nov2017
+    #rm -r /home/gomeza/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_Jan2018
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
     qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
   done
+done
 ```
 
 Fasta and gff files were extracted from Braker1 output.
