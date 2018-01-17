@@ -1,13 +1,14 @@
 # Neonectria_Reference_Genome_Assembly
+
 ==========
 
 This document details the commands used to assemble and annotate the Hg199 Neonectria genome.
 
-#Data management
+# Data management
 
-###First MinION run date is 20170717. Data stored in 20170717_1504_Neonectria_Hg199 and 20170717_1452_Neonectria_Hg199
+## First MinION run date is 20170717. Data stored in 20170717_1504_Neonectria_Hg199 and 20170717_1452_Neonectria_Hg199
 
-Albacore 1.1.1. was used to rerun basecalling. Data stored in data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199
+Albacore 1.1.1\. was used to rerun basecalling. Data stored in data/seq_data/minion/2017/20170717_recalled_Neonectria_Hg199
 
 New version of Albacore available. v.2.0.2.
 
@@ -32,10 +33,10 @@ tar -czf fast5_runid_5832f037a56936787d17e66d1e3b8ac05572199f_fail.tar.gz [0-9]*
 
 rm -rf *.fastq [0-9]*
 ```
-Rob command to transfer the date from nanopore node to head node. Permission needed
-scp -r ./Neonectria_Hg199_2_0_2 miseq_data@192.168.1.200:/data/seq_data/minion/2017/20171025_Neonectria_Hg199_2_0_2
 
-###Second MinION run date 20171203. Data stored in 20171203_Hg199.
+Rob command to transfer the date from nanopore node to head node. Permission needed scp -r ./Neonectria_Hg199_2_0_2 miseq_data@192.168.1.200:/data/seq_data/minion/2017/20171025_Neonectria_Hg199_2_0_2
+
+## Second MinION run date 20171203. Data stored in 20171203_Hg199.
 
 Running albacore 2.0.2.
 
@@ -52,9 +53,10 @@ screen -S gomeza
 --output_format fastq,fast5 \
 --reads_per_fastq_batch 4000
 ```
+
 Data stored in /data/seq_data/minion/2017/20171203_Hg199
 
-#Building of directory structure
+# Building of directory structure
 
 ```bash
   screen -a
@@ -86,7 +88,7 @@ screen -a
   for Fast5Dir in $(ls -d $RawDatDir/*.fastq); do
       poretools fastq $Fast5Dir | gzip -cf
     done > raw_dna/minion/$Organism/$Strain/$Date/"$Strain"_"$Date".fastq.gz
-  ```
+```
 
 Both, 2.0.2 version recalled runs were merged together
 
@@ -94,38 +96,32 @@ Both, 2.0.2 version recalled runs were merged together
 cat raw_dna/minion/N.ditissima/Hg199/25-10-17/rebasecalled/pass/fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/fastq_runid_298a8dbc00c3db453901232f1ad01b11fd094980_pass.fastq.gz > Hg199_fastq_allfiles.fastq.gz
 ```
 
-The following processes were applied to Neonectria genomes prior to analysis:
-Data qc
-Genome assembly
-Repeatmasking
-Gene prediction
-Functional annotation
+The following processes were applied to Neonectria genomes prior to analysis: Data qc Genome assembly Repeatmasking Gene prediction Functional annotation
 
-Note - all this work was performed in the directory:
-/home/groups/harrisonlab/project_files/N.ditissima
-
+Note - all this work was performed in the directory: /home/groups/harrisonlab/project_files/N.ditissima
 
 # Identify sequencing coverage
 
 For Minion data:
+
 ```bash
-	for RawData in $(ls raw_dna/minion/*/*/*q.gz); do
-		echo $RawData;
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
-		GenomeSz=45
-		OutDir=$(dirname $RawData)
-		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
-	done
+    for RawData in $(ls raw_dna/minion/*/*/*q.gz); do
+        echo $RawData;
+        ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
+        GenomeSz=45
+        OutDir=$(dirname $RawData)
+        qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
+    done
 ```
 
 ```bash
-	for RawData in $(ls raw_dna/minion/*/*/03-12-17/*/*/*q.gz); do
-		echo $RawData;
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
-		GenomeSz=45
-		OutDir=$(dirname $RawData)
-		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
-	done
+    for RawData in $(ls raw_dna/minion/*/*/03-12-17/*/*/*q.gz); do
+        echo $RawData;
+        ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
+        GenomeSz=45
+        OutDir=$(dirname $RawData)
+        qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
+    done
 ```
 
 ```bash
@@ -137,52 +133,49 @@ For Minion data:
       cat $File | tail -n1 | rev | cut -f2 -d ' ' | rev;
     done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
   done
-
 ```
-Allfiles MinION coverage was:
-94.46
 
-03-12-17 MinION coverage was:
-71.39
+Allfiles MinION coverage was: 94.46
+
+03-12-17 MinION coverage was: 71.39
 
 For Miseq data:
+
 ```bash
-	for RawData in $(ls qc_dna/paired/*/Hg199/*/*q.gz); do
-		echo $RawData;
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
-		qsub $ProgDir/run_fastqc.sh $RawData;
-		GenomeSz=45
-		OutDir=$(dirname $RawData)
-		qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
-	done
+    for RawData in $(ls qc_dna/paired/*/Hg199/*/*q.gz); do
+        echo $RawData;
+        ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc;
+        qsub $ProgDir/run_fastqc.sh $RawData;
+        GenomeSz=45
+        OutDir=$(dirname $RawData)
+        qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
+    done
 ```
 
 ```bash
-	for StrainDir in $(ls -d qc_dna/paired/*/Hg199); do
-		Strain=$(basename $StrainDir)
-		printf "$Strain\t"
-		for File in $(ls $StrainDir/*/*.txt); do
-			echo $(basename $File);
-			cat $File | tail -n1 | rev | cut -f2 -d ' ' | rev;
-		done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
-	done
+    for StrainDir in $(ls -d qc_dna/paired/*/Hg199); do
+        Strain=$(basename $StrainDir)
+        printf "$Strain\t"
+        for File in $(ls $StrainDir/*/*.txt); do
+            echo $(basename $File);
+            cat $File | tail -n1 | rev | cut -f2 -d ' ' | rev;
+        done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
+    done
 ```
 
-Miseq coverage was:
-89.92
-
+Miseq coverage was: 89.92
 
 ## Assembly
-
 
 ### Assembly will with full trimming of reads:
 
 Splitting reads and trimming adapters using porechop
+
 ```bash
-	RawReads=raw_dna/minion/N.ditissima/Hg199/*allfiles.fastq.gz
-	OutDir=qc_dna/minion/N.ditissima/Hg199
-	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-	qsub $ProgDir/sub_porechop.sh $RawReads $OutDir
+    RawReads=raw_dna/minion/N.ditissima/Hg199/*allfiles.fastq.gz
+    OutDir=qc_dna/minion/N.ditissima/Hg199
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+    qsub $ProgDir/sub_porechop.sh $RawReads $OutDir
 ```
 
 Read correction using Canu
@@ -207,7 +200,6 @@ OutDir=assembly/canu_minion2/N.ditissima/"$Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
 qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 45m $Strain $OutDir
 done
-
 ```
 
 Assembbly using SMARTdenovo
@@ -250,7 +242,6 @@ qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
-
 ```bash
 # printf "Organism\tStrain\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
@@ -268,7 +259,6 @@ Total=$(cat $File | grep "Total" | cut -f2)
 printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
-
 
 Error correction using racon:
 
@@ -297,7 +287,6 @@ for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/*.fasta); d
 done
 ```
 
-
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/*.fasta); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
@@ -312,6 +301,7 @@ done
 ```
 
 # Assembly correction using nanopolish
+
 ```bash
 ScratchDir=/data/scratch/nanopore_tmp_data/Neonectria_temp
 mkdir -p $ScratchDir
@@ -331,14 +321,14 @@ echo "$Organism - $Strain"
 Fast5Dir=$(ls -d raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/fast5_runid_298a8dbc00c3db453901232f1ad01b11fd094980_pass.tar.gz)
 ReadDir=raw_dna/nanopolish/$Organism/$Strain
 if [ -d $ReadDir ]; then
-	echo "reads already extracted"
+    echo "reads already extracted"
 else
-	echo "extracting reads"
-	mkdir -p $ReadDir
-	CurDir=$PWD
-	cd $ReadDir
-	nanopolish extract -r $Fast5Dir | gzip -cf > "$Strain"_reads.fa.gz
-	cd $CurDir
+    echo "extracting reads"
+    mkdir -p $ReadDir
+    CurDir=$PWD
+    cd $ReadDir
+    nanopolish extract -r $Fast5Dir | gzip -cf > "$Strain"_reads.fa.gz
+    cd $CurDir
 fi
 
 RawReads=$(ls $ReadDir/"$Strain"_reads.fa.gz)
@@ -349,8 +339,7 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $RawReads $OutDir/nanopolish
 ```
 
-Split the assembly into 50Kb fragments and submit each to the cluster for
-nanopolish correction
+Split the assembly into 50Kb fragments and submit each to the cluster for nanopolish correction
 
 ```bash
 Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_racon_round_10.fasta)
@@ -392,16 +381,14 @@ NanoPolishDir=/home/armita/prog/nanopolish/nanopolish/scripts
 python $NanoPolishDir/nanopolish_merge.py assembly/SMARTdenovo/$Organism/$Strain/racon_10/*/*.fa > $OutDir/"$Strain"_nanoplish.fa
 
 # for File in $(ls assembly/SMARTdenovo/F.*/*/racon2/*/*.fa | grep ":*-"); do
-# 	# echo $File
-# 	cat $File >> $OutDir/"$Strain"_nanoplish.fa
+#     # echo $File
+#     cat $File >> $OutDir/"$Strain"_nanoplish.fa
 # done
 
 echo "" > tmp.txt
 ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
 $ProgDir/remove_contaminants.py --keep_mitochondria --inp $OutDir/"$Strain"_nanoplish.fa --out $OutDir/"$Strain"_nanoplish_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
-
 ```
-
 
 Quast and busco were run to assess the effects of racon on assembly quality:
 
@@ -414,7 +401,6 @@ for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/nanop
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
-
 
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/nanopolish/Stocks4_nanoplish_min_500bp_renamed.fasta); do
@@ -429,7 +415,6 @@ qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
-
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
 for File in $(ls gene_pred/busco/F*/*/assembly/*/short_summary_*.txt | grep 'Stocks4'); do
@@ -443,26 +428,26 @@ printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
 
-### Pilon error correction
-
+## Pilon error correction
 
 Assemblies were polished using Pilon
 
 ```bash
-	for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep 'Stocks4'); do
-		Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-		Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-		IlluminaDir=$(ls -d qc_dna/paired/*/$Strain)
-		TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
-		TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
-		OutDir=$(dirname $Assembly)/../pilon
-		Iterations=5
-		ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
-		qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
-	done
+    for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep 'Stocks4'); do
+        Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+        Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+        IlluminaDir=$(ls -d qc_dna/paired/*/$Strain)
+        TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
+        TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
+        OutDir=$(dirname $Assembly)/../pilon
+        Iterations=5
+        ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+        qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+    done
 ```
 
 Contigs were renamed
+
 ```bash
 echo "" > tmp.txt
 Assembly=$(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/pilon/*.fasta | grep 'pilon_5')
@@ -483,7 +468,6 @@ for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/pilon
 done
 ```
 
-
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/pilon/*.fasta ); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
@@ -496,7 +480,6 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly
 qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
 done
 ```
-
 
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
@@ -512,27 +495,26 @@ done
 ```
 
 ```
-Filename	Complete	Duplicated	Fragmented	Missing	Total
-short_summary_Stocks4_SMARTdenovo.txt	365	0	400	2960	3725
-short_summary_wtasm_racon_round_1.txt	1940	11	873	912	3725
-short_summary_wtasm_racon_round_2.txt	2239	13	744	742	3725
-short_summary_wtasm_racon_round_3.txt	2308	16	717	700	3725
-short_summary_wtasm_racon_round_4.txt	2281	17	750	694	3725
-short_summary_wtasm_racon_round_5.txt	2312	17	709	704	3725
-short_summary_wtasm_racon_round_6.txt	2286	14	749	690	3725
-short_summary_wtasm_racon_round_7.txt	2306	17	741	678	3725
-short_summary_wtasm_racon_round_8.txt	2314	12	740	671	3725
-short_summary_wtasm_racon_round_9.txt	2314	19	736	675	3725
-short_summary_wtasm_racon_round_10.txt	2350	18	730	645	3725
-short_summary_Stocks4_nanoplish_min_500bp_renamed.txt	3326	27	211	188	3725
-short_summary_pilon_1.txt	3669	33	21	35	3725
-short_summary_pilon_2.txt	3679	34	18	28	3725
-short_summary_pilon_3.txt	3684	34	15	26	3725
-short_summary_pilon_4.txt	3684	34	15	26	3725
-short_summary_pilon_5.txt	3684	34	15	26	3725
-short_summary_pilon_min_500bp_renamed.txt	3684	34	15	26	3725
+Filename    Complete    Duplicated    Fragmented    Missing    Total
+short_summary_Stocks4_SMARTdenovo.txt    365    0    400    2960    3725
+short_summary_wtasm_racon_round_1.txt    1940    11    873    912    3725
+short_summary_wtasm_racon_round_2.txt    2239    13    744    742    3725
+short_summary_wtasm_racon_round_3.txt    2308    16    717    700    3725
+short_summary_wtasm_racon_round_4.txt    2281    17    750    694    3725
+short_summary_wtasm_racon_round_5.txt    2312    17    709    704    3725
+short_summary_wtasm_racon_round_6.txt    2286    14    749    690    3725
+short_summary_wtasm_racon_round_7.txt    2306    17    741    678    3725
+short_summary_wtasm_racon_round_8.txt    2314    12    740    671    3725
+short_summary_wtasm_racon_round_9.txt    2314    19    736    675    3725
+short_summary_wtasm_racon_round_10.txt    2350    18    730    645    3725
+short_summary_Stocks4_nanoplish_min_500bp_renamed.txt    3326    27    211    188    3725
+short_summary_pilon_1.txt    3669    33    21    35    3725
+short_summary_pilon_2.txt    3679    34    18    28    3725
+short_summary_pilon_3.txt    3684    34    15    26    3725
+short_summary_pilon_4.txt    3684    34    15    26    3725
+short_summary_pilon_5.txt    3684    34    15    26    3725
+short_summary_pilon_min_500bp_renamed.txt    3684    34    15    26    3725
 ```
-
 
 # Hybrid Assembly
 
@@ -591,8 +573,7 @@ done
 
 ## Merging MinION and hybrid assemblies
 
-Note - the anchor length is the starting point for contigs to be merged - only contigs
-larger than these will be extended.
+Note - the anchor length is the starting point for contigs to be merged - only contigs larger than these will be extended.
 
 ```bash
 for MinIONAssembly in $(ls assembly/SMARTdenovo/F.oxysporum_fsp_mathioli/Stocks4/pilon/*.fasta | grep 'pilon_min_500bp_renamed.fasta'); do
@@ -619,7 +600,6 @@ qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorL
 done
 ```
 
-
 Quast and busco were run to assess the quality of hybrid assemblies:
 
 ```bash
@@ -631,7 +611,6 @@ for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta | grep 'Stocks
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
-
 
 ```bash
 for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta | grep 'Stocks4'); do
@@ -645,7 +624,9 @@ OutDir=$(dirname $Assembly)
 qsub $ProgDir/sub_busco2.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
 -->
+
 # Repeat Masking
 
 Repeat masking was performed on the non-hybrid assembly.
@@ -662,9 +643,7 @@ qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
 done
 ```
 
-
-The TransposonPSI masked bases were used to mask additional bases from the
-repeatmasker / repeatmodeller softmasked and hardmasked files.
+The TransposonPSI masked bases were used to mask additional bases from the repeatmasker / repeatmodeller softmasked and hardmasked files.
 
 ```bash
 
@@ -686,6 +665,7 @@ echo "$OutFile"
 bedtools maskfasta -fi $File -bed $TPSI -fo $OutFile
 done
 ```
+
 ```
 Number of masked bases:
 8321901
