@@ -303,10 +303,9 @@ done
 # Assembly correction using nanopolish
 
 ```bash
-ScratchDir=/data/scratch/nanopore_tmp_data/Neonectria_temp
+ScratchDir=/data/scratch/gomeza
 mkdir -p $ScratchDir
-cp raw_dna/minion/N.ditissima/Hg199/pass/*.tar.gz /data/scratch/nanopore_tmp_data/Neonectria_temp
-
+cp raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/*.tar.gz $ScratchDir/.
 for Tar in $(ls $ScratchDir/*.tar.gz); do
   tar -zxvf $Tar -C $ScratchDir
 done
