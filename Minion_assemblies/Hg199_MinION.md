@@ -312,7 +312,15 @@ done
 ```
 
 # Assembly correction using nanopolish
+```bash
+ScratchDir=/data/scratch/nanopore_tmp_data/Neonectria_temp
+mkdir -p $ScratchDir
+cp raw_dna/minion/N.ditissima/Hg199/pass/*.tar.gz /data/scratch/nanopore_tmp_data/Neonectria_temp
 
+for Tar in $(ls $ScratchDir/*.tar.gz); do
+  tar -zxvf $Tar -C $ScratchDir
+done
+```
 
 ```bash
 Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_racon_round_10.fasta)
@@ -320,7 +328,7 @@ Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
 # Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
-Fast5Dir=$(ls -d /data/seq_data/minion/2017/20171203_Hg199/Hg199/GA50000/reads)
+Fast5Dir=$(ls -d raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/fast5_runid_298a8dbc00c3db453901232f1ad01b11fd094980_pass.tar.gz)
 ReadDir=raw_dna/nanopolish/$Organism/$Strain
 if [ -d $ReadDir ]; then
 	echo "reads already extracted"
