@@ -306,6 +306,7 @@ done
 ScratchDir=/data/scratch/gomeza
 mkdir -p $ScratchDir
 cp raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/*.tar.gz $ScratchDir/.
+cp raw_dna/minion/N.ditissima/Hg199/25-10-17/rebasecalled/pass/*.tar.gz $ScratchDir/.
 for Tar in $(ls $ScratchDir/*.tar.gz); do
   tar -zxvf $Tar -C $ScratchDir
 done
@@ -316,29 +317,36 @@ Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_racon_round_
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
-# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
-Fast5Dir=$(ls -d raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/fast5_runid_298a8dbc00c3db453901232f1ad01b11fd094980_pass.tar.gz)
 ReadDir=raw_dna/nanopolish/$Organism/$Strain
-if [ -d $ReadDir ]; then
-    echo "reads already extracted"
-else
-    echo "extracting reads"
-    mkdir -p $ReadDir
-    CurDir=$PWD
-    cd $ReadDir
-    nanopolish extract -r $Fast5Dir | gzip -cf > "$Strain"_reads.fa.gz
-    cd $CurDir
-fi
-
-RawReads=$(ls $ReadDir/"$Strain"_reads.fa.gz)
+mkdir -p $ReadDir
+# Step 1 extract reads as a .fq file which contain info on the location of the fast5 files
+# Event information would have been used from all of the runs, however MinKnow doesnt
+# produce event-level information and therefore just the albacore data was used.
+Fast5Dir1=$(ls -d /data/scratch/gomeza/Nd_Hg199_20171203)
+Fast5Dir2=$(ls -d /data/scratch/gomeza/Nd_Hg199_20171025)
+nanopolish index -d $Fast5Dir1 -d $Fast5Dir2 $ReadDir/"$Strain"_concatenated_reads_filtered.fastq
+#if [ -d $ReadDir ]; then
+#    echo "reads already extracted"
+#else
+#    echo "extracting reads"
+#    mkdir -p $ReadDir
+#    CurDir=$PWD
+#    cd $ReadDir
+#    nanopolish extract -r $Fast5Dir1 $Fast5Dir2 | gzip -cf > "$Strain"_reads.fa.gz
+#    cd $CurDir
+#fi
+#RawReads=$(ls $ReadDir/"$Strain"_reads.fa.gz)
 OutDir=$(dirname $Assembly)
 mkdir -p $OutDir
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 # submit alignments for nanoppolish
-qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $RawReads $OutDir/nanopolish
+qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $ReadDir/"$Strain"_concatenated_reads_filtered.fastq.fa.gz $OutDir/nanopolish
+done
+
 ```
 
 Split the assembly into 50Kb fragments and submit each to the cluster for nanopolish correction
+
 
 ```bash
 Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_racon_round_10.fasta)
