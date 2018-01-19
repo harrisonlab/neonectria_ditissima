@@ -389,7 +389,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 ```
 
 ```bash
-for Strain in Ag02; do
+for Strain in Ag02 Ag05 ND8 R37-15; do
   for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 		#for Assembly in $(ls repeat_masked/N.ditissima/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
