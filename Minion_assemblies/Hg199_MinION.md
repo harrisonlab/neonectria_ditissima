@@ -344,7 +344,7 @@ OutDir=$(dirname $Assembly)
 mkdir -p $OutDir
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 # submit alignments for nanoppolish
-qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $ReadDir/"$Strain"_concatenated_reads_filtered2.fastq.fa.gz $OutDir/nanopolish
+qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $ReadDir/"$Strain"_concatenated_reads_filtered.fastq $OutDir/nanopolish
 done
 
 Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_racon_round_10.fasta)
@@ -378,12 +378,10 @@ Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
 OutDir=$(dirname $Assembly)
-RawReads=$(ls raw_dna/nanopolish/$Organism/$Strain/Hg199_reads.fa.gz)
+RawReads=$(ls raw_dna/nanopolish/$Organism/$Strain/"$Strain"_concatenated_reads_filtered.fastq)
 AlignedReads=$(ls $OutDir/nanopolish/reads.sorted.bam)
-
 NanoPolishDir=/home/armita/prog/nanopolish/nanopolish/scripts
 python $NanoPolishDir/nanopolish_makerange.py $Assembly > $OutDir/nanopolish/nanopolish_range.txt
-
 Ploidy=1
 echo "nanopolish log:" > nanopolish_log.txt
 for Region in $(cat $OutDir/nanopolish/nanopolish_range.txt | tail -n+21); do
