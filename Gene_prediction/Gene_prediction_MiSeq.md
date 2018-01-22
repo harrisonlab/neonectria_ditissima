@@ -431,7 +431,7 @@ done
 Fasta and gff files were extracted from Braker1 output.
 
 ```bash
-  for File in $(ls gene_pred/braker/N.*/*Jan2018/*/augustus.gff); do
+  for File in $(ls gene_pred/braker/N.*/*/*/augustus.gff); do
     getAnnoFasta.pl $File
     OutDir=$(dirname $File)
     echo "##gff-version 3" > $OutDir/augustus_extracted.gff
@@ -450,7 +450,8 @@ Note - cufflinks doesn't always predict direction of a transcript and
 therefore features can not be restricted by strand when they are intersected.
 
 ```bash
-    for Assembly in $(ls repeat_masked/N*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+for Strain in Ag02 Ag05 ND8 R37-15; do
+    for Assembly in $(ls repeat_masked/N*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
     echo "$Organism - $Strain"
@@ -460,6 +461,7 @@ therefore features can not be restricted by strand when they are intersected.
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
     qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
     done
+	done
 
     for Assembly in $(ls repeat_masked/N*/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
