@@ -74,28 +74,28 @@ cp /data/seq_data/external/20180118_novogene_gomeza/C101HW17030405/data_release/
 ##Perform qc on RNA-Seq timecourse and mycelium data
 
 ```bash
-for FilePath in $(ls -d /data/scratch/gomeza/rna_seq/20171211/*/*/)
+for FilePath in $(ls -d rna_seq/N.ditissima/*/*)
 do
-    echo $FilePath
-    FileNum=$(ls $FilePath/F/*.gz | wc -l)
-    for num in $(seq 1 $FileNum)
-    do
-        FileF=$(ls $FilePath/F/*.gz | head -n $num | tail -n1)
-        FileR=$(ls $FilePath/R/*.gz | head -n $num | tail -n1)
-        echo $FileF
-        echo $FileR
-        Jobs=$(qstat -u "*" | grep 'rna_qc' | grep 'qw' | wc -l)
-        while [ $Jobs -gt 16 ]
-        do
-            sleep 5m
-            printf "."
-            Jobs=$(qstat | grep 'rna_qc' | grep 'qw' | wc -l)
-        done
-        printf "\n"
-        IlluminaAdapters=/home/adamst/git_repos/tools/seq_tools/ncbi_adapters.fa
-        ProgDir=/home/adamst/git_repos/tools/seq_tools/rna_qc
-        qsub $ProgDir/rna_qc_fastq-mcf_2.sh $FileF $FileR $IlluminaAdapters RNA
-    done
+echo $FilePath
+FileNum=$(ls $FilePath/F/*.gz | wc -l)
+for num in $(seq 1 $FileNum)
+do
+  FileF=$(ls $FilePath/F/*.gz | head -n $num | tail -n1)
+  FileR=$(ls $FilePath/R/*.gz | head -n $num | tail -n1)
+  echo $FileF
+  echo $FileR
+  Jobs=$(qstat -u "*" | grep 'rna_qc' | grep 'qw' | wc -l)
+  while [ $Jobs -gt 16 ]
+  do
+      sleep 5m
+      printf "."
+      Jobs=$(qstat | grep 'rna_qc' | grep 'qw' | wc -l)
+  done
+  printf "\n"
+  IlluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+  qsub $ProgDir/rna_qc_fastq-mcf.sh $FileF $FileR $IlluminaAdapters RNA
+done
 done
 
 mv qc_rna/Bc1/ qc_rna/novogene/P.fragariae/.
