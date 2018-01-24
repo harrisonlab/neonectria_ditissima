@@ -100,7 +100,6 @@ short_summary_AgN04_contigs_unmasked.txt
         23      Fragmented BUSCOs (F)
         39      Missing BUSCOs (M)
         3725    Total BUSCO groups searched
-
 short_summary_R45-15_contigs_unmasked.txt	3674	15	22	29	3725
 				3674    Complete BUSCOs (C)
         3659    Complete and single-copy BUSCOs (S)
@@ -108,8 +107,6 @@ short_summary_R45-15_contigs_unmasked.txt	3674	15	22	29	3725
         22      Fragmented BUSCOs (F)
         29      Missing BUSCOs (M)
         3725    Total BUSCO groups searched
-
-
 short_summary_Hg199_contigs_unmasked.txt
 				3670    Complete BUSCOs (C)
         3655    Complete and single-copy BUSCOs (S)
@@ -124,7 +121,6 @@ short_summary_contigs_min_500bp.txt Hg199
         24      Fragmented BUSCOs (F)
         28      Missing BUSCOs (M)
         3725    Total BUSCO groups searched
-
 short_summary_R0905_contigs_unmasked.txt R0905_merged_assembly
 				3510    Complete BUSCOs (C)
         3417    Complete and single-copy BUSCOs (S)
@@ -146,7 +142,6 @@ short_summary_R0905_contigs_unmasked.txt R0905_canu_2017_v2
         21      Fragmented BUSCOs (F)
         36      Missing BUSCOs (M)
         3725    Total BUSCO groups searched
-
 short_summary_Ag02_contigs_unmasked.txt
 				3669    Complete BUSCOs (C)
 				3655    Complete and single-copy BUSCOs (S)
@@ -176,7 +171,6 @@ short_summary_R37-15_contigs_unmasked.txt
         28      Missing BUSCOs (M)
         3725    Total BUSCO groups searched
 
-
 # Gene model training
 
 ```bash
@@ -198,28 +192,12 @@ for Strain in Ag02 Ag05 ND8 R37-15; do
 done
 ```
 
-```bash
-for Assembly in $(ls repeat_masked/*/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-  Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-  Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-  echo "$Organism - $Strain"
-  for RNADir in $(ls -d qc_rna/paired/N.ditissima/Hg199); do
-    Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
-    echo "$Timepoint"
-    FileF=$(ls $RNADir/F/*_trim.fq.gz)
-    FileR=$(ls $RNADir/R/*_trim.fq.gz)
-    OutDir=alignment/$Organism/$Strain/$Timepoint
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-    qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir
-  done
-done
-```
-
 Alignments were concatenated prior to running cufflinks:
 Cufflinks was run to produce the fragment length and stdev statistics:
 
-```bash
 screen -a
+
+```bash
 for Strain in Ag02 Ag05 ND8 R37-15; do
 for Assembly in $(ls repeat_masked/*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
@@ -236,6 +214,7 @@ done
 I have aligned every isolate with the Hg199 RNA reads.
 
 Output from stdout included:
+
 ```
 N.ditissima - AgN04
 tee: gene_pred/cufflinks/N.ditissima/AgN04/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
@@ -472,7 +451,7 @@ models:
 
 ```bash
 for Strain in Ag02 Ag05 ND8 R37-15; do
-for BrakerGff in $(ls gene_pred/braker/$Organism/"$Strain"_braker_Jan2018/*/augustus.gff3); do
+for BrakerGff in $(ls gene_pred/braker/$Organism/$Strain/*/augustus.gff3); do
 #Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
 Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
@@ -522,22 +501,40 @@ cat $DirPath/final_genes_combined.pep.fasta | grep '>' | wc -l;
 echo "";
 done
 ```
-
+gene_pred/codingquary/N.ditissima/Ag02/final
+13282
+761
+14043
 
 gene_pred/codingquary/N.ditissima/Ag04/final
 12805
 854
 13659
 
+gene_pred/codingquary/N.ditissima/Ag05/final
+13269
+758
+14027
+
 gene_pred/codingquary/N.ditissima/Hg199/final
 12818
 905
 13723
 
+gene_pred/codingquary/N.ditissima/ND8/final
+13257
+745
+14002
+
 gene_pred/codingquary/N.ditissima/R0905_canu_2017_v2/final
 12848
 898
 13746
+
+gene_pred/codingquary/N.ditissima/R37-15/final
+13283
+737
+14020
 
 gene_pred/codingquary/N.ditissima/R45-15/final
 12635
@@ -663,12 +660,14 @@ gene models using a number of approaches:
  Proteins that were predicted to contain signal peptides were identified using
  the following commands:
 
+screen -a
+
  ```bash
-  screen -a
+	for Strain in Ag02 Ag05 ND8 R37-15; do
  	SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
  	CurPath=$PWD
- 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
  		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
  		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
  		SplitDir=gene_pred/final_genes_split/$Organism/$Strain
@@ -687,12 +686,14 @@ gene models using a number of approaches:
  			qsub $ProgDir/pred_sigP.sh $File signalp-4.1
  		done
  	done
+done
  ```
 
  The batch files of predicted secreted proteins needed to be combined into a
  single file for each strain. This was done with the following commands:
  ```bash
- 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/*); do
+ for Strain in Ag02 Ag05 ND8 R37-15; do
+ 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/$Strain); do
  		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
  		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
  		InStringAA=''
@@ -711,6 +712,7 @@ gene models using a number of approaches:
  		tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
  		cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
  	done
+done
  ```
 
  Some proteins that are incorporated into the cell membrane require secretion.
