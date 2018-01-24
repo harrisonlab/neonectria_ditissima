@@ -791,7 +791,8 @@ done
 ```
 
 ```bash
-  for File in $(ls analysis/effectorP/*/*/*_EffectorP.txt); do
+for Strain in Ag02 Ag05 ND8 R37-15; do
+  for File in $(ls analysis/effectorP/*/$Strain/*_EffectorP.txt); do
     Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
     echo "$Organism - $Strain"
@@ -810,6 +811,7 @@ done
     $ProgDir/extract_gff_for_sigP_hits.pl $OutFileHeaders $Gff effectorP ID > $EffectorP_Gff
     cat $EffectorP_Gff | grep -w 'gene' | wc -l
   done > tmp.txt
+done
 ```
 
 ### C) CAZY proteins
@@ -838,7 +840,8 @@ Those proteins with a signal peptide were extracted from the list and gff files
 representing these proteins made.
 
   ```bash
-  for File in $(ls gene_pred/CAZY/N.*/R0905_canu_2017_v2/*CAZY.out.dm); do
+	for Strain in Ag02 Ag05 ND8 R37-15; do
+  for File in $(ls gene_pred/CAZY/N.*/$Strain/*CAZY.out.dm); do
   Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $File)
@@ -862,6 +865,7 @@ representing these proteins made.
   echo "number of Secreted CAZY genes identified:"
   cat $CazyGffSecreted | grep -w 'gene' | cut -f9 | tr -d 'ID=' | wc -l
   done
+done
 ```
   N.ditissima - Ag04
   number of CAZY genes identified:
@@ -883,6 +887,27 @@ representing these proteins made.
   719
   number of Secreted CAZY genes identified:
   286
+	
+	N.ditissima - Ag02
+	number of CAZY genes identified:
+	720
+	number of Secreted CAZY genes identified:
+	281
+	N.ditissima - Ag05
+	number of CAZY genes identified:
+	722
+	number of Secreted CAZY genes identified:
+	279
+	N.ditissima - ND8
+	number of CAZY genes identified:
+	717
+	number of Secreted CAZY genes identified:
+	275
+	N.ditissima - R37-15
+	number of CAZY genes identified:
+	713
+	number of Secreted CAZY genes identified:
+	272
 
 
 Note - the CAZY genes identified may need further filtering based on e value and
