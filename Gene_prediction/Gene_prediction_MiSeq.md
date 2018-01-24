@@ -462,41 +462,22 @@ for Strain in Ag02 Ag05 ND8 R37-15; do
     qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
     done
 	done
-
-    for Assembly in $(ls repeat_masked/N*/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-    echo "$Organism - $Strain"
-    OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
-    mkdir -p $OutDir
-    AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-    qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
-    done
 ```
 
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-    for Assembly in $(ls repeat_masked/N*/Hg199/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+for Strain in Ag02 Ag05 ND8 R37-15; do
+    for Assembly in $(ls repeat_masked/N*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
     echo "$Organism - $Strain"
-    OutDir=gene_pred/codingquary/$Organism/$Strain/NewHg199
+    OutDir=gene_pred/codingquary/$Organism/$Strain/20180124/
     CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
     qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
     done
-
-    for Assembly in $(ls repeat_masked/N*/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-    echo "$Organism - $Strain"
-    OutDir=gene_pred/codingquary/$Organism/$Strain
-    CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
-    qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
-    done
+	done
 ```
 
 Then, additional transcripts were added to Braker gene models, when CodingQuary
