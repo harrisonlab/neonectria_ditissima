@@ -402,26 +402,12 @@ for Strain in Ag02 Ag05 ND8 R37-15; do
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
     echo "$Organism - $Strain"
-    OutDir=gene_pred/braker/$Organism/"$Strain"_braker_Jan2018
+    OutDir=gene_pred/braker/$Organism/$Strain
 		#OutDir=gene_pred/braker/$Organism/"$Strain"_braker_Nov2017
     AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
     GeneModelName="$Organism"_"$Strain"_braker_Jan2018
 		#GeneModelName="$Organism"_"$Strain"_braker_Nov2017
     rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_Jan2018
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
-    qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
-  done
-done
-
-for Strain in Ag02; do
-  for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
-    echo "$Organism - $Strain"
-    OutDir=gene_pred/braker/$Organism/"$Strain"_braker_Jan2018
-    AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
-    GeneModelName="$Organism"_"$Strain"_braker
-    rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
     qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
   done
@@ -472,7 +458,7 @@ for Strain in Ag02 Ag05 ND8 R37-15; do
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
     echo "$Organism - $Strain"
-    OutDir=gene_pred/codingquary/$Organism/$Strain/20180124/
+    OutDir=gene_pred/codingquary/$Organism/$Strain/
     CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
     qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
@@ -485,8 +471,9 @@ genes were predicted in regions of the genome, not containing Braker gene
 models:
 
 ```bash
-for BrakerGff in $(ls gene_pred/braker/$Organism/Hg199/*/augustus.gff3); do
-Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
+for Strain in Ag02 Ag05 ND8 R37-15; do
+for BrakerGff in $(ls gene_pred/braker/$Organism/"$Strain"_braker_Jan2018/*/augustus.gff3); do
+#Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
 Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
 Assembly=$(ls repeat_masked/$Organism/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
@@ -521,6 +508,7 @@ GffQuary=$FinalDir/final_genes_Braker.gff3
 GffAppended=$FinalDir/final_genes_appended.gff3
 cat $GffBraker $GffQuary > $GffAppended
 
+done
 done
 ```
 
