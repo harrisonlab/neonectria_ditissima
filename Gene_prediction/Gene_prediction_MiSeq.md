@@ -722,12 +722,14 @@ done
  Proteins containing a transmembrane domain were identified:
 
  ```bash
- 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ for Strain in Ag02 Ag05 ND8 R37-15; do
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
  		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
  		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
  		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
  		qsub $ProgDir/submit_TMHMM.sh $Proteome
  	done
+done
  ```
 
  Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
