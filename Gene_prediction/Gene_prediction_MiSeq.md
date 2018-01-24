@@ -749,16 +749,28 @@ done
    done
  ```
 
-
-    N.ditissima - Ag04
-    1006
-    N.ditissima - Hg199
-    1009
-    N.ditissima - R0905_canu_2017_v2
-    1022
-    N.ditissima - R45-15
-    1005
-
+N.ditissima - Ag02
+992
+N.ditissima - Ag04
+1006
+N.ditissima - Ag05
+966
+N.ditissima - Hg199
+1009
+N.ditissima - ND8
+951
+N.ditissima - R0905_canu_2017_v2
+1022
+N.ditissima - R0905_merged_2017
+991
+N.ditissima - R0905_merged_assembly
+1002
+N.ditissima - R0905_pacbio_canu
+1021
+N.ditissima - R37-15
+989
+N.ditissima - R45-15
+1005
 
 ### B) From Augustus gene models - Effector identification using EffectorP
 
@@ -766,7 +778,8 @@ Required programs:
  * EffectorP.py
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+for Strain in Ag02 Ag05 ND8 R37-15; do
+	for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		BaseName="$Organism"_"$Strain"_EffectorP
@@ -774,6 +787,7 @@ Required programs:
 		ProgDir=~/git_repos/emr_repos/tools/seq_tools/feature_annotation/fungal_effectors
 		qsub $ProgDir/pred_effectorP.sh $Proteome $BaseName $OutDir
 	done
+done
 ```
 
 ```bash
@@ -804,7 +818,8 @@ Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
 at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
 
 ```bash
-  for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+for Strain in Ag02 Ag05 ND8 R37-15; do
+  for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
     Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
     OutDir=gene_pred/CAZY/$Organism/$Strain
@@ -814,6 +829,7 @@ at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/HMMER
     qsub $ProgDir/sub_hmmscan.sh $CazyHmm $Proteome $Prefix $OutDir
   done
+done
 ```
 
 The Hmm parser was used to filter hits by an E-value of E1x10-5 or E 1x10-e3 if they had a hit over a length of X %.
