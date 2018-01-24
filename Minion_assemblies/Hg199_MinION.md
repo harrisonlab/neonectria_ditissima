@@ -440,6 +440,7 @@ short_summary_Hg199_nanoplish_min_500bp_renamed.txt	3317	11	160	248	3725
 ## Pilon error correction
 
 Assemblies were polished using Pilon
+Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
 
 ```bash
     for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep 'Hg199'); do
@@ -451,7 +452,7 @@ Assemblies were polished using Pilon
         OutDir=$(dirname $Assembly)/../pilon
         Iterations=5
         ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
-        qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+        qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
     done
 ```
 
