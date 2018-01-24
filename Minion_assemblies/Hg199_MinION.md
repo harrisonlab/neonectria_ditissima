@@ -422,7 +422,7 @@ done
 
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/F*/*/assembly/*/short_summary_*.txt | grep 'Stocks4'); do
+for File in $(ls gene_pred/busco/N*/*/assembly/*/short_summary_*.txt | grep 'Hg199'); do
 FileName=$(basename $File)
 Complete=$(cat $File | grep "(C)" | cut -f2)
 Duplicated=$(cat $File | grep "(D)" | cut -f2)
@@ -433,12 +433,16 @@ printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
 
+short_summary_contigs_min_500bp.txt	3673	15	24	28	3725
+short_summary_Hg199_nanoplish_min_500bp_renamed.txt	3317	11	160	248	3725
+
+
 ## Pilon error correction
 
 Assemblies were polished using Pilon
 
 ```bash
-    for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep 'Stocks4'); do
+    for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep 'Hg199'); do
         Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
         Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
         IlluminaDir=$(ls -d qc_dna/paired/*/$Strain)
