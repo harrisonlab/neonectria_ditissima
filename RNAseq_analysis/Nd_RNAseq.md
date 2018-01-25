@@ -74,7 +74,7 @@ cp /data/seq_data/external/20180118_novogene_gomeza/C101HW17030405/data_release/
 ##Perform qc on RNA-Seq timecourse and mycelium data
 
 ```bash
-for FilePath in $(ls -d rna_seq/N.ditissima/*/*)
+for FilePath in $(ls -d rna_seq/N.ditissima/GD/*)
 do
 echo $FilePath
 FileNum=$(ls $FilePath/F/*.gz | wc -l)
@@ -107,7 +107,7 @@ mv qc_rna/Nov9/ qc_rna/novogene/P.fragariae/.
 Only submit three jobs at a time, copying 30 files is too much!
 
 ```bash
-for RawData in $(ls qc_rna/novogene/P.fragariae/*/*/*/* | grep -v 'Bc16')
+for RawData in $(ls qc_rna/N.ditissima/*/*/*/*)
 do
     echo $RawData
     Jobs=$(qstat -u "*" | grep 'run_fastqc' | wc -l)
