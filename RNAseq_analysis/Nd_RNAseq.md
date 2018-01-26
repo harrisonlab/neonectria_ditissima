@@ -76,26 +76,68 @@ cp /data/seq_data/external/20180118_novogene_gomeza/C101HW17030405/data_release/
 ```bash
 for FilePath in $(ls -d rna_seq/N.ditissima/GD/*)
 do
-echo $FilePath
-FileNum=$(ls $FilePath/F/*.gz | wc -l)
-for num in $(seq 1 $FileNum)
-do
-  FileF=$(ls $FilePath/F/*.gz | head -n $num | tail -n1)
-  FileR=$(ls $FilePath/R/*.gz | head -n $num | tail -n1)
-  echo $FileF
-  echo $FileR
-  Jobs=$(qstat -u "*" | grep 'rna_qc' | grep 'qw' | wc -l)
-  while [ $Jobs -gt 16 ]
-  do
-      sleep 5m
-      printf "."
-      Jobs=$(qstat | grep 'rna_qc' | grep 'qw' | wc -l)
-  done
-  printf "\n"
-  IlluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
-  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
-  qsub $ProgDir/rna_qc_fastq-mcf.sh $FileF $FileR $IlluminaAdapters RNA
-done
+    echo $FilePath
+    FileNum=$(ls $FilePath/F/*.gz | wc -l)
+    for num in $(seq 1 $FileNum)
+    do
+        FileF=$(ls $FilePath/F/*.gz | head -n $num | tail -n1)
+        FileR=$(ls $FilePath/R/*.gz | head -n $num | tail -n1)
+        echo $FileF
+        echo $FileR
+        Jobs=$(qstat -u "*" | grep 'rna_qc' | grep 'qw' | wc -l)
+        while [ $Jobs -gt 16 ]
+        do
+            sleep 5m
+            printf "."
+            Jobs=$(qstat | grep 'rna_qc' | grep 'qw' | wc -l)
+        done        
+        printf "\n"
+        IlluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/ncbi_adapters.fa
+        ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+        qsub -h $ProgDir/rna_qc_fastq-mcf.sh $FileF $FileR $IlluminaAdapters RNA
+        JobID=$(qstat | grep 'rna' | tail -n 1 | cut -d ' ' -f1)
+        Queue_Status=$(qstat | grep 'rna' | grep 'hqw' | wc -l)
+        while (($Queue_Status > 0))
+        do
+            Queue_Status=$(qstat | grep 'rna' | grep 'hqw' | wc -l)
+            load02=$(qstat -u "*" | grep 'blacklace02'| grep 'rna' | wc -l)
+            load05=$(qstat -u "*" | grep 'blacklace05'| grep 'rna' | wc -l)
+            load06=$(qstat -u "*" | grep 'blacklace06'| grep 'rna' | wc -l)
+            load10=$(qstat -u "*" | grep 'blacklace10'| grep 'rna' | wc -l)
+            if (($load02 < 3))
+            then
+                qalter $JobID -l h=blacklace02.blacklace
+                sleep 5s
+                qalter $JobID -h U
+                sleep 5s
+                echo "Submitted to node 2"
+            elif (($load05 < 3))
+            then
+                qalter $JobID -l h=blacklace05.blacklace
+                sleep 5s
+                qalter $JobID -h U
+                sleep 5s
+                echo "Submitted to node 5"
+            elif (($load06 < 3))
+            then
+                qalter $JobID -l h=blacklace06.blacklace
+                sleep 5s
+                qalter $JobID -h U
+                sleep 5s
+                echo "Submitted to node 6"
+            elif (($load10 < 3))
+            then
+                qalter $JobID -l h=blacklace10.blacklace
+                sleep 5s
+                qalter $JobID -h U
+                sleep 5s
+                echo "Submitted to node 10"
+            else
+                echo "all nodes full, waiting ten minutes"
+                sleep 10m
+            fi
+        done    
+    done
 done
 
 mv qc_rna/Bc1/ qc_rna/novogene/P.fragariae/.
