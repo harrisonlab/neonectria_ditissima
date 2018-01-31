@@ -585,16 +585,14 @@ HybridAssembly=$(ls assembly/spades_minion/$Organism/$Strain/filtered_contigs/co
 # QuastReport=$(ls assembly/canu/$Organism/$Strain/filtered_contigs/report.tsv)
 # N50=$(cat $QuastReport | grep 'N50' | cut -f2)
 # AnchorLength=$N50
-
-AnchorLength=1000000
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_1M
+AnchorLength=100
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_100
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
 qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
-124
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_1M
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_100
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
-538
+
 
 
 AnchorLength=5000
@@ -613,7 +611,7 @@ Quast and busco were run to assess the quality of hybrid assemblies:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/merged_canu_spades/*/*_50k/merged.fasta | grep 'Hg199'); do
+for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta | grep 'Hg199'); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 OutDir=$(dirname $Assembly)
@@ -622,7 +620,7 @@ done
 ```
 
 ```bash
-for Assembly in $(ls assembly/merged_canu_spades/*/*second*/merged.fasta | grep 'Hg199'); do
+for Assembly in $(ls assembly/merged_canu_spades/*/*_minion_5k/merged.fasta | grep 'Hg199'); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -645,14 +643,30 @@ Total=$(cat $File | grep "Total" | cut -f2)
 printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
+
+# Isolate R09/05 Reference
+
+```bash
+for Assembly in $(ls assembly/merged_canu_spades/*/R0905/*_contigs/*.fasta); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+Contigs=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+echo "$Organism - $Strain - $Contigs"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/$Contigs
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+
 # Repeat Masking
 
 Repeat masking was performed on the non-hybrid assembly.
 
 ```bash
-for Assembly in $(ls assembly/spades_minion/*/*/filtered_contigs/contigs_min_500bp.fasta | grep 'Stocks4'); do
-Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+for Assembly in $(ls assembly/merged_canu_spades/*/*_minion_5k/merged.fasta | grep 'Hg199'); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
 OutDir=repeat_masked/$Organism/"$Strain"/filtered_contigs
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/repeat_masking
