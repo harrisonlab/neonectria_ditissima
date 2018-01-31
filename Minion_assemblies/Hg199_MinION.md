@@ -593,8 +593,6 @@ OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_100
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
 
-
-
 AnchorLength=5000
 OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_5k
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
@@ -626,8 +624,20 @@ Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-# OutDir=gene_pred/busco/$Organism/$Strain/assembly
-OutDir=$(dirname $Assembly)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly2
+#OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+```bash
+for Assembly in $(ls assembly/merged_canu_spades/*/*_minion_first_20k/merged.fasta | grep 'Hg199'); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly2
+#OutDir=$(dirname $Assembly)
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
@@ -644,6 +654,13 @@ printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
 
+
+3563 Complete BUSCOs (C)
+INFO    3456 Complete and single-copy BUSCOs (S)
+INFO    107 Complete and duplicated BUSCOs (D)
+INFO    23 Fragmented BUSCOs (F)
+INFO    139 Missing BUSCOs (M)
+
 # Isolate R09/05 Reference
 
 ```bash
@@ -658,6 +675,22 @@ OutDir=gene_pred/busco/$Organism/$Strain/$Contigs
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+```bash
+printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
+for File in $(ls gene_pred/busco/N*/R0905/*_contigs/*/short_summary_*.txt); do
+FileName=$(basename $File)
+Complete=$(cat $File | grep "(C)" | cut -f2)
+Duplicated=$(cat $File | grep "(D)" | cut -f2)
+Fragmented=$(cat $File | grep "(F)" | cut -f2)
+Missing=$(cat $File | grep "(M)" | cut -f2)
+Total=$(cat $File | grep "Total" | cut -f2)
+printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
+done
+```
+
+Filename	Complete	Duplicated	Fragmented	Missing	Total
+short_summary_R0905_canu_contigs_modified.txt	3510	93	26	189	3725
+short_summary_R0905_contigs_renamed.txt	3510	94	26	189	3725
 
 # Repeat Masking
 
