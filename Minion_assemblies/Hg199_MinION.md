@@ -585,14 +585,14 @@ HybridAssembly=$(ls assembly/spades_minion/$Organism/$Strain/filtered_contigs/co
 # QuastReport=$(ls assembly/canu/$Organism/$Strain/filtered_contigs/report.tsv)
 # N50=$(cat $QuastReport | grep 'N50' | cut -f2)
 # AnchorLength=$N50
-AnchorLength=100
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_100
+
+AnchorLength=20000
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_first_20k
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
 qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_100
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid__first_20k
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
-
 AnchorLength=5000
 OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_5k
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
@@ -600,8 +600,6 @@ qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorL
 OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_5k
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
-
-
 done
 ```
 
