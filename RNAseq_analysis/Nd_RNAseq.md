@@ -149,7 +149,7 @@ mv qc_rna/Nov9/ qc_rna/novogene/P.fragariae/.
 Only submit three jobs at a time, copying 30 files is too much!
 
 ```bash
-for RawData in $(ls qc_rna/N.ditissima/M9/t1/*/*)
+for RawData in $(ls qc_rna/N.ditissima/*/*/*/*)
 do
     echo $RawData
     Jobs=$(qstat -u "*" | grep 'run_fastqc' | wc -l)
