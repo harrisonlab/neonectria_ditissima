@@ -168,44 +168,15 @@ done
 All seem okay to me
 ```
 
-#Align mycelium reads to BC-1 & NOV-9 assemblies with STAR
+#Align mycelium reads to Hg199 minion assembly with STAR
 
 ```bash
-#BC-1
-for Assembly in $(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/P.fragariae/Bc1/ncbi_edits_repmask/*_contigs_unmasked.fa)
+for Assembly in $(ls /home/groups/harrisonlab/project_files/neonectria_ditissima/repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/*/*_contigs_unmasked.fa)
 do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
     echo "$Organism - $Strain"
-    for FileF in $(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/qc_rna/novogene/P.fragariae/Bc1/mycelium/F/*_trim.fq.gz)
-    do
-        Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-        while [ $Jobs -gt 1 ]
-        do
-            sleep 1m
-            printf "."
-            Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-        done
-        printf "\n"
-        FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1/_2/g')
-        echo $FileF
-        echo $FileR
-        Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
-        echo "$Timepoint"
-        Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
-        OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
-        ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
-        qsub $ProgDir/sub_star_TA.sh $Assembly $FileF $FileR $OutDir
-    done
-done
-
-#NOV-9
-for Assembly in $(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/P.fragariae/Nov9/ncbi_edits_repmask/*_contigs_unmasked.fa)
-do
-    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-    echo "$Organism - $Strain"
-    for FileF in $(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/qc_rna/novogene/P.fragariae/Nov9/mycelium/F/*_trim.fq.gz)
+    for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/Hg199/mycelium/F/*_trim.fq.gz)
     do
         Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
         while [ $Jobs -gt 1 ]
@@ -228,30 +199,31 @@ do
 done
 ```
 
-##Align all timepoints to *Fragaria vesca* genome v1.1
+#Align all timepoints to apple genome.
 
 ```bash
-for FileF in $(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/qc_rna/novogene/P.fragariae/*/*/F/*_trim.fq.gz | grep -e "Bc1" -e "Nov9" | grep -v "Bc16" | grep -v "mycelium")
+for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/GD/*/F/*_trim.fq.gz | grep -v "mycelium")
 do
-    Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-    while [ $Jobs -gt 1 ]
-    do
-        sleep 1m
-        printf "."
-        Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-    done
-    printf "\n"
-    FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1/_2/g')
-    echo $FileF
-    echo $FileR
-    Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
-    echo "$Timepoint"
-    Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
-    OutDir=alignment/star/vesca_alignment/set2/$Timepoint/$Sample_Name
-    ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
-    Assembly=/home/sobczm/popgen/rnaseq/fvesca_v1.1_all.fa
-    GFF=/home/sobczm/popgen/rnaseq/Fragaria_vesca_v1.1.a2.gff3
-    qsub $ProgDir/sub_star_sensitive.sh $Assembly $FileF $FileR $OutDir $GFF
+Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+while [ $Jobs -gt 1 ]
+do
+  sleep 1m
+  printf "."
+  Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+done
+printf "\n"
+FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1/_2/g')
+echo $FileF
+echo $FileR
+Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
+echo "$Timepoint"
+Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
+OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
+Assembly=/home/groups/harrisonlab/project_files/root_architecture/GCA_002114115.1_ASM211411v1/GCA_002114115.1_ASM211411v1_genomic.fna
+GFF=/home/groups/harrisonlab/project_files/root_architecture/GCA_002114115.1_ASM211411v1/GCA_002114115.1_ASM211411v1_genomic.gff
+qsub $ProgDir/sub_star_sensitive.sh $Assembly $FileF $FileR $OutDir $GFF
+done
 done
 ```
 
