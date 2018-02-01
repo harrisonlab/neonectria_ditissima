@@ -221,7 +221,7 @@ Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g
 OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
 ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
 Assembly=/home/groups/harrisonlab/project_files/root_architecture/GCA_002114115.1_ASM211411v1/GCA_002114115.1_ASM211411v1_genomic.fna
-GFF=/home/groups/harrisonlab/project_files/root_architecture/GCA_002114115.1_ASM211411v1/GCA_002114115.1_ASM211411v1_genomic.gff
+GFF=apple_genome/gene_models_20170612.gff3
 qsub $ProgDir/sub_star_sensitive.sh $Assembly $FileF $FileR $OutDir $GFF
 done
 done
