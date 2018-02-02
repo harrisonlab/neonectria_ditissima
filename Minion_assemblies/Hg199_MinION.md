@@ -674,7 +674,7 @@ Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires
       IlluminaDir=$(ls -d qc_dna/paired/*/Hg199)
       TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
       TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
-      OutDir=$(dirname $Assembly)/../pilon
+      OutDir=$(dirname $Assembly)/pilon
       Iterations=5
       ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
       qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
@@ -685,10 +685,33 @@ Contigs were renamed
 
 ```bash
 echo "" > tmp.txt
-Assembly=$(ls assembly/SMARTdenovo/N.d*/Hg199/pilon/*.fasta | grep 'pilon_5')
+Assembly=$(ls assembly/merged_canu_spades/N.ditissima/Hg199_minion_5k/pilon/*.fasta | grep 'pilon_5')
 OutDir=$(dirname $Assembly)
 ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
 $ProgDir/remove_contaminants.py --keep_mitochondria --inp $Assembly --out $OutDir/pilon_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+```
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/Hg199_minion_5k/pilon/pilon_min_500bp_renamed.fasta); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+```bash
+for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/Hg199_minion_5k/pilon/*.fasta); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly2
+#OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
 ```
 
 # Isolate R09/05 Reference
