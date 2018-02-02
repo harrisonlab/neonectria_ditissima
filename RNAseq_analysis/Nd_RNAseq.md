@@ -139,9 +139,6 @@ do
         done    
     done
 done
-
-mv qc_rna/Bc1/ qc_rna/novogene/P.fragariae/.
-mv qc_rna/Nov9/ qc_rna/novogene/P.fragariae/.
 ```
 
 ###Visualise data quality using fastqc
@@ -171,12 +168,12 @@ All seem okay to me
 #Align mycelium reads to Hg199 minion assembly with STAR
 
 ```bash
-for Assembly in $(ls /home/groups/harrisonlab/project_files/neonectria_ditissima/repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/*/*_contigs_unmasked.fa)
+for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/*/*_contigs_unmasked.fa)
 do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
     echo "$Organism - $Strain"
-    for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/Hg199/mycelium/F/*_trim.fq.gz)
+    for FileF in $(ls qc_rna/RNAseq/N.ditissima/Hg199/mycelium/F/*_trim.fq.gz | grep 'Hg199_1')
     do
         Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
         while [ $Jobs -gt 1 ]
@@ -186,16 +183,36 @@ do
             Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
         done
         printf "\n"
-        FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1/_2/g')
+        FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1_trim/_2_trim/g')
         echo $FileF
         echo $FileR
         Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
         echo "$Timepoint"
         Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
         OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
-        ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
+        ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq/
         qsub $ProgDir/sub_star_TA.sh $Assembly $FileF $FileR $OutDir
     done
+done
+```
+
+```bash
+for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/*/*_contigs_unmasked.fa)
+do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+echo "$Organism - $Strain"  
+FileF=qc_rna/RNAseq/N.ditissima/Hg199/mycelium/F/*1_1_trim.fq.gz
+FileR=qc_rna/RNAseq/N.ditissima/Hg199/mycelium/R/*1_2_trim.fq.gz
+echo $FileF
+echo $FileR
+Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
+echo "$Timepoint"
+Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
+OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq/
+qsub $ProgDir/sub_star_TA.sh $Assembly $FileF $FileR $OutDir
+done
 done
 ```
 
