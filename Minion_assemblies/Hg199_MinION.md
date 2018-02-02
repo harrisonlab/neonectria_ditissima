@@ -713,7 +713,18 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly2
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
-
+```bash
+printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
+for File in $(ls gene_pred/busco/N*/*/assembly2/*/short_summary_*.txt | grep 'Hg199'); do
+FileName=$(basename $File)
+Complete=$(cat $File | grep "(C)" | cut -f2)
+Duplicated=$(cat $File | grep "(D)" | cut -f2)
+Fragmented=$(cat $File | grep "(F)" | cut -f2)
+Missing=$(cat $File | grep "(M)" | cut -f2)
+Total=$(cat $File | grep "Total" | cut -f2)
+printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
+done
+```
 # Isolate R09/05 Reference
 
 ```bash
@@ -815,50 +826,12 @@ done
 ```
 
 
-short_summary_Hg199_contigs_unmasked.txt
-				3670    Complete BUSCOs (C)
-        3655    Complete and single-copy BUSCOs (S)
-        15      Complete and duplicated BUSCOs (D)
-        25      Fragmented BUSCOs (F)
-        30      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_contigs_min_500bp.txt Hg199
-				3673    Complete BUSCOs (C)
-        3658    Complete and single-copy BUSCOs (S)
-        15      Complete and duplicated BUSCOs (D)
-        24      Fragmented BUSCOs (F)
-        28      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_R0905_contigs_unmasked.txt R0905_merged_assembly
-				3510    Complete BUSCOs (C)
-        3417    Complete and single-copy BUSCOs (S)
-        93      Complete and duplicated BUSCOs (D)
-        26      Fragmented BUSCOs (F)
-        189     Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_R0905_contigs_unmasked.txt R0905 R0905_merged_2017
-				3651    Complete BUSCOs (C)
-        3635    Complete and single-copy BUSCOs (S)
-        16      Complete and duplicated BUSCOs (D)
-        20      Fragmented BUSCOs (F)
-        54      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_R0905_contigs_unmasked.txt R0905_canu_2017_v2
-				3668    Complete BUSCOs (C)
-        3652    Complete and single-copy BUSCOs (S)
-        16      Complete and duplicated BUSCOs (D)
-        21      Fragmented BUSCOs (F)
-        36      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-
-
 # Gene model training
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
-	for Assembly in $(ls repeat_masked/*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-	  Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-	  Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
+	for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/Hg199*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+	  Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+	  Organism=$(echo $Assembly | rev | cut -d '/' -f5 | rev)
 	  echo "$Organism - $Strain"
 	  for RNADir in $(ls -d qc_rna/paired/N.ditissima/Hg199); do
 	    Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
