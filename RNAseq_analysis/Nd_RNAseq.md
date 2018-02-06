@@ -173,7 +173,7 @@ do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
     echo "$Organism - $Strain"
-    for FileF in $(ls qc_rna/RNAseq/N.ditissima/Hg199/mycelium/F/*_trim.fq.gz | grep 'Hg199_1')
+    for FileF in $(ls qc_rna/RNAseq/N.ditissima/Hg199/mycelium/F/*_trim.fq.gz)
     do
         Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
         while [ $Jobs -gt 1 ]
@@ -191,42 +191,22 @@ do
         Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
         OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
         ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq/
-        qsub $ProgDir/sub_star_TA.sh $Assembly $FileF $FileR $OutDir
+        qsub $ProgDir/sub_star.sh $Assembly $FileF $FileR $OutDir
     done
-done
-```
-
-```bash
-for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/*/*_contigs_unmasked.fa)
-do
-Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
-echo "$Organism - $Strain"  
-FileF=qc_rna/RNAseq/N.ditissima/Hg199/mycelium/F/*1_1_trim.fq.gz
-FileR=qc_rna/RNAseq/N.ditissima/Hg199/mycelium/R/*1_2_trim.fq.gz
-echo $FileF
-echo $FileR
-Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
-echo "$Timepoint"
-Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
-OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
-ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq/
-qsub $ProgDir/sub_star_TA.sh $Assembly $FileF $FileR $OutDir
-done
 done
 ```
 
 #Align all timepoints to apple genome.
 
 ```bash
-for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/GD/*/F/*_trim.fq.gz | grep -v "mycelium")
+for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/M9/t0/F/*_trim.fq.gz | grep -v "mycelium")
 do
 Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
 while [ $Jobs -gt 1 ]
 do
-  sleep 1m
-  printf "."
-  Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+sleep 1m
+printf "."
+Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
 done
 printf "\n"
 FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1/_2/g')
@@ -237,8 +217,8 @@ echo "$Timepoint"
 Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
 OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
 ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
-Assembly=/home/groups/harrisonlab/project_files/root_architecture/GCA_002114115.1_ASM211411v1/GCA_002114115.1_ASM211411v1_genomic.fna
-GFF=apple_genome/gene_models_20170612.gff3
+Assembly=/data/scratch/gomeza/apple_genome/GDDH13_1-1_formatted.fasta
+GFF=/home/groups/harrisonlab/project_files/neonectria_ditissima/apple_genome/gene_models_20170612.gff3
 qsub $ProgDir/sub_star_sensitive.sh $Assembly $FileF $FileR $OutDir $GFF
 done
 done
