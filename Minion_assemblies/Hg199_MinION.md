@@ -725,6 +725,7 @@ Total=$(cat $File | grep "Total" | cut -f2)
 printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
+
 # Isolate R09/05 Reference
 
 ```bash
@@ -852,10 +853,9 @@ Cufflinks was run to produce the fragment length and stdev statistics:
 screen -a
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
-for Assembly in $(ls repeat_masked/*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
+for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/Hg199*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+Organism=$(echo $Assembly | rev | cut -d '/' -f5 | rev)
 # AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
 AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
 OutDir=gene_pred/cufflinks/$Organism/$Strain/vs_Hg199reads/concatenated_prelim
@@ -863,27 +863,38 @@ echo "$Organism - $Strain"
 mkdir -p $OutDir
 cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
 done
-done
 ```
 I have aligned every isolate with the Hg199 RNA reads.
 
 Output from stdout included:
 
+```
+N.ditissima - Hg199_minion
+Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
+[10:39:08] Inspecting reads and determining fragment length distribution.
+> Processed 16659 loci.                        [*************************] 100%
+> Map Properties:
+>       Normalized Map Mass: 13158769.63
+>       Raw Map Mass: 13158769.63
+>       Fragment Length Distribution: Empirical (learned)
+>                     Estimated Mean: 217.58
+>                  Estimated Std Dev: 43.72
+[10:42:00] Assembling transcripts and estimating abundances.
+> Processed 16706 loci.                        [*************************] 100%
 
 The Estimated Mean: 219.68 allowed calculation of of the mean insert gap to be
 -140bp 182-(180*2) where 180? was the mean read length. This was provided to tophat
 on a second run (as the -r option) along with the fragment length stdev to
 increase the accuracy of mapping.
-
+```
 
 Then Rnaseq data was aligned to each genome assembly:
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
-for Assembly in $(ls repeat_masked/N*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
-echo "$Organism - $Strain"
+for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/Hg199*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+Organism=$(echo $Assembly | rev | cut -d '/' -f5 | rev)
+cho "$Organism - $Strain"
 for RNADir in $(ls -d qc_rna/paired/N.ditissima/Hg199 | grep -v -e '_rep'); do
 Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
 echo "$Timepoint"
@@ -901,7 +912,6 @@ done
 printf "\n"
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
 qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
-done
 done
 done
 ```
