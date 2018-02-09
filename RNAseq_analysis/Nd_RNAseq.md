@@ -199,8 +199,11 @@ done
 #Align all timepoints to apple genome.
 
 ```bash
-for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/M9/t0/F/*_trim.fq.gz | grep -v "mycelium")
+for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/M9/t1/F/M9_6*_trim.fq.gz | grep -v "mycelium")
 do
+Strain=$(echo $FileF | rev | cut -f4 -d '/' | rev)
+Organism=$(echo $FileF | rev | cut -f5 -d '/' | rev)
+echo "$Organism - $Strain"
 Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
 while [ $Jobs -gt 1 ]
 do
@@ -215,7 +218,7 @@ echo $FileR
 Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
 echo "$Timepoint"
 Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
-OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+OutDir=/data/scratch/gomeza/alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
 ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
 Assembly=/data/scratch/gomeza/apple_genome/GDDH13_1-1_formatted.fasta
 GFF=/home/groups/harrisonlab/project_files/neonectria_ditissima/apple_genome/gene_models_20170612.gff3
@@ -227,14 +230,14 @@ done
 ##Gzip output files to save space on the disk and allow star to run correctly downstream. ONLY RUN THIS ONCE
 
 ```bash
-for AlignDir in $(ls -d /home/groups/harrisonlab/project_files/phytophthora_fragariae/alignment/star/vesca_alignment/set2/*/*)
+for AlignDir in $(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/alignment/star/N.ditissima/Hg199_minion/*/*)
 do
     cat $AlignDir/star_aligmentUnmapped.out.mate1 | gzip -cf > $AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
     cat $AlignDir/star_aligmentUnmapped.out.mate2 | gzip -cf > $AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
 done
 ```
 
-##Align compressed files of unmapped reads from aligning to vesca
+##Align compressed files of unmapped reads from aligning to Golden Delicious genome
 
 This star script had the following options added to the sub_star.sh script in the ProgDir specified in the below commands:
 --winAnchorMultimapNmax 200
