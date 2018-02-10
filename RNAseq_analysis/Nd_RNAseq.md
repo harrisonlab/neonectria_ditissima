@@ -230,7 +230,7 @@ done
 ##Gzip output files to save space on the disk and allow star to run correctly downstream. ONLY RUN THIS ONCE
 
 ```bash
-for AlignDir in $(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/alignment/star/N.ditissima/Hg199_minion/*/*)
+for AlignDir in $(ls -d alignment/star/N.ditissima/Hg199_minion/*/*)
 do
     cat $AlignDir/star_aligmentUnmapped.out.mate1 | gzip -cf > $AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
     cat $AlignDir/star_aligmentUnmapped.out.mate2 | gzip -cf > $AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
@@ -244,81 +244,36 @@ This star script had the following options added to the sub_star.sh script in th
 --seedSearchStartLmax 30
 
 ```bash
-#BC-1
-for AlignDir in $(ls -d /home/groups/harrisonlab/project_files/phytophthora_fragariae/alignment/star/vesca_alignment/set2/48hr/*)
+for Assembly in $(ls /home/groups/harrisonlab/project_files/neonectria_ditissima/repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/*/*_contigs_unmasked.fa)
 do
-    Organism=P.fragariae
-    Strain=Bc1
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
     echo "$Organism - $Strain"
-    printf "\n"
-    File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
-    File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
-    echo $File1
-    echo $File2
-    Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
-    echo "$Timepoint"
-    Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
-    Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-    while [ $Jobs -gt 1 ]
+    for AlignDir in $(ls -d /data/scratch/gomeza/alignment/star/N.ditissima/Hg199_minion/t2/*)
     do
-        sleep 1m
-        printf "."
+      Strain=$(echo $AlignDir | rev | cut -f3 -d '/' | rev)
+      Organism=$(echo $AlignDir | rev | cut -f4 -d '/' | rev)
+        echo "$Organism - $Strain"
+        printf "\n"
+        File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
+        File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
+        echo $File1
+        echo $File2
+        Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
+        echo "$Timepoint"
+        Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
         Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+        while [ $Jobs -gt 1 ]
+        do
+            sleep 1m
+            printf "."
+            Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+        done
+        OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+        ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+        qsub $ProgDir/sub_star_TA.sh $Assembly $File1 $File2 $OutDir
     done
-    if [ -f /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/$Organism/$Strain/ncbi_edits_repmask/*_softmasked_repeatmasker_TPSI_appended.fa ]
-    then
-        Assembly=$(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/$Organism/$Strain/ncbi_edits_repmask/*_softmasked_repeatmasker_TPSI_appended.fa)
-        echo $Assembly
-    elif [ -f /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/$Organism/$Strain/deconseq_Paen_repmask/*_softmasked_repeatmasker_TPSI_appended.fa ]
-    then
-        Assembly=$(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/$Organism/$Strain/deconseq_Paen_repmask/*_softmasked_repeatmasker_TPSI_appended.fa)
-        echo $Assembly
-    else
-        Assembly=$(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/quiver_results/polished/filtered_contigs_repmask/*_softmasked_repeatmasker_TPSI_appended.fa)
-        echo $Assembly
-    fi
-    OutDir=alignment/star/P.fragariae/$Strain/$Timepoint/$Sample_Name
-    ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
-    qsub $ProgDir/sub_star_TA.sh $Assembly $File1 $File2 $OutDir
-done
-
-#NOV-9
-for AlignDir in $(ls -d /home/groups/harrisonlab/project_files/phytophthora_fragariae/alignment/star/vesca_alignment/set2/72hr/*)
-do
-    Organism=P.fragariae
-    Strain=Nov9
-    echo "$Organism - $Strain"
-    printf "\n"
-    File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
-    File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
-    echo $File1
-    echo $File2
-    Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
-    echo "$Timepoint"
-    Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
-    Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-    while [ $Jobs -gt 1 ]
-    do
-        sleep 1m
-        printf "."
-        Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-    done
-    if [ -f /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/$Organism/$Strain/ncbi_edits_repmask/*_softmasked_repeatmasker_TPSI_appended.fa ]
-    then
-        Assembly=$(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/$Organism/$Strain/ncbi_edits_repmask/*_softmasked_repeatmasker_TPSI_appended.fa)
-        echo $Assembly
-    elif [ -f /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/$Organism/$Strain/deconseq_Paen_repmask/*_softmasked_repeatmasker_TPSI_appended.fa ]
-    then
-        Assembly=$(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/$Organism/$Strain/deconseq_Paen_repmask/*_softmasked_repeatmasker_TPSI_appended.fa)
-        echo $Assembly
-    else
-        Assembly=$(ls /home/groups/harrisonlab/project_files/phytophthora_fragariae/repeat_masked/quiver_results/polished/filtered_contigs_repmask/*_softmasked_repeatmasker_TPSI_appended.fa)
-        echo $Assembly
-    fi
-    OutDir=alignment/star/P.fragariae/$Strain/$Timepoint/$Sample_Name
-    ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
-    qsub $ProgDir/sub_star_TA.sh $Assembly $File1 $File2 $OutDir
-done
+  done
 ```
 
 #Quantification of gene models
