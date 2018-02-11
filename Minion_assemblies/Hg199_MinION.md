@@ -926,7 +926,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 ```
 
 ```bash
-  for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/*/*_contigs_unmasked.fa); do
+  for Assembly in $(ls Hg199_genome/*_contigs_unmasked.fa); do
     Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
     while [ $Jobs -gt 1 ]; do
     sleep 10
@@ -937,8 +937,8 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
     Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f5 | rev)
     echo "$Organism - $Strain"
-    OutDir=/data/scratch/gomeza/gene_pred/braker/$Organism/$Strain
-    AcceptedHits=alignment/N.ditissima/Hg199_minion/Hg199/accepted_hits.bam
+    OutDir=gene_pred/braker/$Organism/$Strain
+    AcceptedHits=Hg199_genome/accepted_hits.bam
     GeneModelName="$Organism"_"$Strain"_braker
     rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
@@ -949,7 +949,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 Fasta and gff files were extracted from Braker1 output.
 
 ```bash
-  for File in $(ls gene_pred/braker/N.*/*/*/augustus.gff); do
+  for File in $(ls gene_pred/braker/N.*/*/augustus.gff); do
     getAnnoFasta.pl $File
     OutDir=$(dirname $File)
     echo "##gff-version 3" > $OutDir/augustus_extracted.gff
@@ -968,34 +968,31 @@ Note - cufflinks doesn't always predict direction of a transcript and
 therefore features can not be restricted by strand when they are intersected.
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
-    for Assembly in $(ls repeat_masked/N*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+    for Assembly in $(ls Hg199_genome/*_contigs_unmasked.fa); do
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
+    Organism=N.ditissima
     echo "$Organism - $Strain"
     OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
     mkdir -p $OutDir
-    AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
+    AcceptedHits=Hg199_genome/accepted_hits.bam
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
     qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
     done
-	done
 ```
 
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
-    for Assembly in $(ls repeat_masked/N*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
-    echo "$Organism - $Strain"
-    OutDir=gene_pred/codingquary/$Organism/$Strain/
-    CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
-    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
-    qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
-    done
-	done
+for Assembly in $(ls Hg199_genome/*_contigs_unmasked.fa); do
+  Strain=Hg199_minion
+  Organism=N.ditissima
+echo "$Organism - $Strain"
+OutDir=gene_pred/codingquary/$Organism/$Strain/
+mkdir -p $OutDir
+CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
+qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
+done
 ```
 
 Then, additional transcripts were added to Braker gene models, when CodingQuary
@@ -1003,12 +1000,11 @@ genes were predicted in regions of the genome, not containing Braker gene
 models:
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
-for BrakerGff in $(ls gene_pred/braker/$Organism/$Strain/*/augustus.gff3); do
-#Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
-Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
+for BrakerGff in $(ls gene_pred/braker/*/*/augustus.gff3); do
+Strain=$(echo $BrakerGff| rev | cut -d '/' -f2 | rev)
+Organism=$(echo $BrakerGff | rev | cut -d '/' -f3 | rev)
 echo "$Organism - $Strain"
-Assembly=$(ls repeat_masked/$Organism/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+Assembly=$(ls Hg199_genome/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
 CodingQuaryGff=gene_pred/codingquary/$Organism/$Strain/out/PredictedPass.gff3
 PGNGff=gene_pred/codingquary/$Organism/$Strain/out/PGN_predictedPass.gff3
 AddDir=gene_pred/codingquary/$Organism/$Strain/additional
@@ -1054,3 +1050,8 @@ cat $DirPath/final_genes_combined.pep.fasta | grep '>' | wc -l;
 echo "";
 done
 ```
+
+gene_pred/codingquary/N.ditissima/Hg199_minion/final
+13674
+1245
+14919
