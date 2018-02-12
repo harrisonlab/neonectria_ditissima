@@ -279,11 +279,9 @@ do
 #Quantification of gene models
 
 ```bash
-for Strain in Bc1 Nov9
-do
-    for BamFile in $(ls alignment/star/P.fragariae/$Strain/*/*/star_aligmentAligned.sortedByCoord.out.bam | grep -v "TA-")
+    for BamFile in $(ls -d alignment/star/N.ditissima/Hg199_minion/*/*/star_aligmentAligned.sortedByCoord.out.bam)
     do
-        Gff=gene_pred/annotation/P.fragariae/$Strain/*_genes_incl_ORFeffectors.gff3
+        Gff=gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3
         OutDir=$(dirname $BamFile)
         Prefix=$(echo $BamFile | rev | cut -f2 -d '/' | rev)
         Jobs=$(qstat | grep 'sub_fea' | wc -l)
@@ -298,54 +296,120 @@ do
         ProgDir=/home/adamst/git_repos/tools/seq_tools/RNAseq
         qsub $ProgDir/sub_featureCounts.sh $BamFile $Gff $OutDir $Prefix
     done
-done
 ```
 
 ##A file was created with columns referring to experimental treatments
 
 ```bash
 #BC-1
-OutDir=alignment/star/P.fragariae/Bc1/DeSeq
+OutDir=alignment/star/N.ditissima/Hg199_minion/DeSeq
 mkdir -p $OutDir
-printf "Sample.name\tTimepoint\tIsolate\n" > $OutDir/P.frag_Bc1_RNAseq_design.txt
+printf "Sample.name\tCultivar\tTimepoint\n" > $OutDir/N.dit_Hg199_RNAseq_design.txt
 # for File in $(ls alignment/star/P.cactorum/10300/Sample_*/Sample_*_featurecounts.txt); do
 # Sample=$(echo $File | rev | cut -f2 -d '/' | rev)
 # i=$(echo $Sample | sed 's/Sample_//g')
-for i in $(seq 1 6)
+for i in $(seq 1 24)
 do
-    if [ $i == '1' ] || [ $i == '2' ] || [ $i == '3' ]
+  if [ $i == '10' ] || [ $i == '11' ] || [ $i == '12' ]
+  then
+      Timepoint='Control'
+      Cultivar='mycellium'
+  elif [ $i == '7' ] || [ $i == '8' ] || [ $i == '9' ]
+  then
+      Timepoint='t0'
+      Cultivar='GD'
+    elif [ $i == '19' ] || [ $i == '20' ] || [ $i == '21' ]
     then
-        Timepoint='48hr'
-    elif [ $i == '4' ] || [ $i == '5' ] || [ $i == '6' ]
+        Timepoint='t0'
+        Cultivar='M9'
+  elif [ $i == '1' ] || [ $i == '4' ] || [ $i == '6' ]
+  then
+      Timepoint='t1'
+      Cultivar='GD'
+  elif [ $i == '14' ] || [ $i == '16' ] || [ $i == '18' ]
+  then
+      Timepoint='t1'
+      Cultivar='M9'
+  elif [ $i == '2' ] || [ $i == '3' ] || [ $i == '5' ]
+  then
+        Timepoint='t2'
+        Cultivar='GD'
+  elif [ $i == '13' ] || [ $i == '15' ] || [ $i == '17' ]
+  then
+        Timepoint='t2'
+        Cultivar='M9'   
+  fi
+  if [ $i == '10' ]
+  then
+      printf "Hg199_1\t$Cultivar\t$Timepoint\n"
+  elif [ $i == '11' ]
+  then
+      printf "Hg199_2\t$Cultivar\t$Timepoint\n"
+  elif [ $i == '12' ]
+  then
+      printf "Hg199_3\t$Cultivar\t$Timepoint\n"
+  elif [ $i == '7' ]
+  then
+      printf "GD_C1_3\t$Cultivar\t$Timepoint\n"
+  elif [ $i == '8' ]
+  then
+      printf "GD_C2_3\t$Cultivar\t$Timepoint\n"
+  elif [ $i == '9' ]
+  then
+      printf "GD_C3_3\t$Cultivar\t$Timepoint\n"
+    elif [ $i == '19' ]
     then
-        Timepoint='mycelium'
-    fi
-    Infection=Bc1
-    if [ $i == '1' ]
+        printf "M9_C1_3\t$Cultivar\t$Timepoint\n"
+    elif [ $i == '20' ]
     then
-        printf "TA_B_P1\t$Timepoint\t$Infection\n"
-    elif [ $i == '2' ]
+        printf "M9_C2_3\t$Cultivar\t$Timepoint\n"
+    elif [ $i == '21' ]
     then
-        printf "TA_B_P2\t$Timepoint\t$Infection\n"
-    elif [ $i == '3' ]
-    then
-        printf "TA_B_P3\t$Timepoint\t$Infection\n"
-    elif [ $i == '4' ]
-    then
-        printf "TA_B_M1\t$Timepoint\t$Infection\n"
-    elif [ $i == '5' ]
-    then
-        printf "TA_B_M2\t$Timepoint\t$Infection\n"
-    elif [ $i == '6' ]
-    then
-        printf "TA_B_M3\t$Timepoint\t$Infection\n"
-    fi
-done >> $OutDir/P.frag_Bc1_RNAseq_design.txt
+        printf "M9_C3_3\t$Cultivar\t$Timepoint\n"
+
+      elif [ $i == '1' ]
+      then
+          printf "GD_4A4\t$Cultivar\t$Timepoint\n"
+      elif [ $i == '4' ]
+      then
+          printf "GD_5A3\t$Cultivar\t$Timepoint\n"
+      elif [ $i == '6' ]
+      then
+          printf "GD_6A3\t$Cultivar\t$Timepoint\n"
+        elif [ $i == '14' ]
+        then
+            printf "M9_2A3\t$Cultivar\t$Timepoint\n"
+        elif [ $i == '16' ]
+        then
+            printf "M9_5A4\t$Cultivar\t$Timepoint\n"
+        elif [ $i == '18' ]
+        then
+            printf "M9_6A3\t$Cultivar\t$Timepoint\n"
+          elif [ $i == '2' ]
+          then
+              printf "GD_4A5\t$Cultivar\t$Timepoint\n"
+          elif [ $i == '3' ]
+          then
+              printf "GD_5A2\t$Cultivar\t$Timepoint\n"
+          elif [ $i == '5' ]
+          then
+              printf "GD_6A2\t$Cultivar\t$Timepoint\n"
+            elif [ $i == '13' ]
+            then
+                printf "M9_2A2\t$Cultivar\t$Timepoint\n"
+            elif [ $i == '15' ]
+            then
+                printf "M9_5A2\t$Cultivar\t$Timepoint\n"
+            elif [ $i == '17' ]
+            then
+                printf "M9_6A2\t$Cultivar\t$Timepoint\n"
+  fi
+done >> $OutDir/N.dit_Hg199_RNAseq_design.txt
 
 # Edit header lines of feature counts files to ensure they have the treatment name rather than file name
 OutDir=alignment/star/P.fragariae/Bc1/DeSeq
 mkdir -p $OutDir
-for File in $(ls alignment/star/P.fragariae/Bc1/*/*/*_featurecounts.txt)
+for File in $(ls alignment/star/N.ditissima/Hg199_minion/*/*/*_featurecounts.txt)
 do
     echo $File
     cp $File $OutDir/.
@@ -355,73 +419,21 @@ do
     Prefix=$(echo $File | rev | cut -f1 -d '/' | rev | sed 's/_featurecounts.txt//g')
     sed -ie "s/star_aligmentAligned.sortedByCoord.out.bam/$Prefix/g" $File
 done
-
-#NOV-9
-OutDir=alignment/star/P.fragariae/Nov9/DeSeq
-mkdir -p $OutDir
-printf "Sample.name\tTimepoint\tIsolate\n" > $OutDir/P.frag_Nov9_RNAseq_design.txt
-# for File in $(ls alignment/star/P.cactorum/10300/Sample_*/Sample_*_featurecounts.txt); do
-# Sample=$(echo $File | rev | cut -f2 -d '/' | rev)
-# i=$(echo $Sample | sed 's/Sample_//g')
-for i in $(seq 1 6)
-do
-    if [ $i == '1' ] || [ $i == '2' ] || [ $i == '3' ]
-    then
-        Timepoint='72hr'
-    elif [ $i == '4' ] || [ $i == '5' ] || [ $i == '6' ]
-    then
-        Timepoint='mycelium'
-    fi
-        Infection='Nov9'
-    if [ $i == '1' ]
-    then
-        printf "TA_NO_P1\t$Timepoint\t$Infection\n"
-    elif [ $i == '2' ]
-    then
-        printf "TA_NO_P2\t$Timepoint\t$Infection\n"
-    elif [ $i == '3' ]
-    then
-        printf "TA_NO_P3\t$Timepoint\t$Infection\n"
-    elif [ $i == '4' ]
-    then
-        printf "TA_NO_M1\t$Timepoint\t$Infection\n"
-    elif [ $i == '5' ]
-    then
-        printf "TA_NO_M2\t$Timepoint\t$Infection\n"
-    elif [ $i == '6' ]
-    then
-        printf "TA_NO_M5\t$Timepoint\t$Infection\n"
-    fi
-done >> $OutDir/P.frag_Nov9_RNAseq_design.txt
-
-# Edit header lines of feature counts files to ensure they have the treatment name rather than file name
-OutDir=alignment/star/P.fragariae/Nov9/DeSeq
-mkdir -p $OutDir
-for File in $(ls alignment/star/P.fragariae/Nov9/*/*/*_featurecounts.txt)
-do
-    echo $File
-    cp $File $OutDir/.
-done
-for File in $(ls $OutDir/*_featurecounts.txt)
-do
-    Prefix=$(echo $File | rev | cut -f1 -d '/' | rev | sed 's/_featurecounts.txt//g')
-    sed -ie "s/star_aligmentAligned.sortedByCoord.out.bam/$Prefix/g" $File
-done
-```
 
 #DeSeq commands
 
 BC-1
 
 ```R
-#install.packages("pheatmap", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
+install.packages("pheatmap", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
+install.packages("data.table", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu")
 
 #install and load libraries
 require("pheatmap")
 require("data.table")
 
 #load tables into a "list of lists"
-qq <- lapply(list.files("alignment/star/P.fragariae/Bc1/DeSeq","*featurecounts.txt$",full.names=T,recursive=T),function(x) fread(x))
+qq <- lapply(list.files("alignment/star/N.ditissima/Hg199_minion/DeSeq","*featurecounts.txt$",full.names=T,recursive=T),function(x) fread(x))
 
 # ensure the samples column is the same name as the treatment you want to use:
 qq[7]
@@ -437,15 +449,15 @@ rownames(countData) <- countData[,1]
 countData <- countData[,-1]
 
 #indexes <- unique(gsub("(.*)_L00.*", "\\1", colnames(countData)))
-indexes <- c("TA_B_P1", "TA_B_P2", "TA_B_P3", "TA_B_M1", "TA_B_M2", "TA_B_M3")
+indexes <- c("GD_4A4","GD_4A5","GD_5A2","GD_5A3","GD_6A2","GD_6A3","GD_C1_3","GD_C2_3","GD_C3_3","Hg199_1","Hg199_2", "Hg199_3","M9_2A2","M9_2A3","M9_5A2","M9_5A4","M9_6A2","M9_6A3","M9_C1_3","M9_C2_3","M9_C3_3")
 
 countData <- round(countData,0)
 
 #output countData
-write.table(countData,"alignment/star/P.fragariae/Bc1/DeSeq/Bc1_countData.txt",sep="\t",na="",quote=F)
+write.table(countData,"alignment/star/N.ditissima/Hg199_minion/DeSeq/Hg199_countData.txt",sep="\t",na="",quote=F)
 
 #output gene details
-write.table(m[,1:6,with=F],"alignment/star/P.fragariae/Bc1/DeSeq/Bc1_genes.txt",sep="\t",quote=F,row.names=F)
+write.table(m[,1:6,with=F],"alignment/star/N.ditissima/Hg199_minion/DeSeq/Hg199_genes.txt",sep="\t",quote=F,row.names=F)
 # colnames(countData) <- sub("X","",colnames(countData)) countData <- countData[,colData$Sample]
 
 #Running DeSeq2
@@ -454,14 +466,14 @@ write.table(m[,1:6,with=F],"alignment/star/P.fragariae/Bc1/DeSeq/Bc1_genes.txt",
 #biocLite("DESeq2")
 require("DESeq2")
 
-unorderedColData <- read.table("alignment/star/P.fragariae/Bc1/DeSeq/P.frag_Bc1_RNAseq_design.txt",header=T,sep="\t")
+unorderedColData <- read.table("alignment/star/N.ditissima/Hg199_minion/DeSeq/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
 rownames(unorderedColData) <- unorderedColData$Sample.name
 unorderedColDataSubset <- unorderedColData[indexes,]
 
 colData <- data.frame(unorderedColDataSubset[ order(unorderedColDataSubset$Sample.name),])
-unorderedData <- read.table("alignment/star/P.fragariae/Bc1/DeSeq/Bc1_countData.txt",header=T,sep="\t")
+unorderedData <- read.table("alignment/star/N.ditissima/Hg199_minion/DeSeq/Hg199_countData.txt",header=T,sep="\t")
 countData <- data.frame(unorderedData[ , order(colnames(unorderedData))])
-colData$Group <- paste0(colData$Isolate,'_', colData$Timepoint)
+colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
 countData <- round(countData,0)
 
 design <- ~Group
@@ -498,7 +510,7 @@ library("ggrepel")
 
 vst<-varianceStabilizingTransformation(dds)
 
-pdf("alignment/star/P.fragariae/Bc1/DeSeq/heatmap_vst.pdf", width=12,height=12)
+pdf("alignment/star/N.ditissima/Hg199_minion/DeSeq/heatmap_vst.pdf", width=12,height=12)
 sampleDists<-dist(t(assay(vst)))
 
 sampleDistMatrix <- as.matrix(sampleDists)
@@ -517,7 +529,7 @@ dev.off()
 
 rld <- rlog( dds )
 
-pdf("alignment/star/P.fragariae/Bc1/DeSeq/heatmap_rld.pdf")
+pdf("alignment/star/N.ditissima/Hg199_minion/DeSeq/heatmap_rld.pdf")
 sampleDists <- dist( t( assay(rld) ) )
 library("RColorBrewer")
 sampleDistMatrix <- as.matrix( sampleDists )
@@ -627,7 +639,7 @@ rownames(countData) <- countData[,1]
 countData <- countData[,-1]
 
 #indexes <- unique(gsub("(.*)_L00.*", "\\1", colnames(countData)))
-indexes <- c("TA_NO_P1", "TA_NO_P2", "TA_NO_P3", "TA_NO_M1", "TA_NO_M2", "TA_NO_M5")
+indexes <- c("GD_4A4","GD_4A5","GD_5A2","GD_5A3","GD_6A2","GD_6A3","GD_C1_3","GD_C2_3","GD_C3_3","Hg199_1","Hg199_2", "Hg199_3","M9_2A2","M9_2A3","M9_5A2","M9_5A4","M9_6A2","M9_6A3","M9_C1_3","M9_C2_3","M9_C3_3")
 
 countData <- round(countData,0)
 
