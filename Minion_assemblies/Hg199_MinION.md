@@ -1055,3 +1055,218 @@ gene_pred/codingquary/N.ditissima/Hg199_minion/final
 13674
 1245
 14919
+
+## Effector genes
+
+Putative pathogenicity and effector related genes were identified within Braker
+gene models using a number of approaches:
+
+ * A) From Augustus gene models - Identifying secreted proteins
+ * B) From Augustus gene models - Effector identification using EffectorP
+ * D) From ORF fragments - Signal peptide & RxLR motif
+ * E) From ORF fragments - Hmm evidence of WY domains
+ * F) From ORF fragments - Hmm evidence of RxLR effectors
+
+
+### A) From Augustus gene models - Identifying secreted proteins
+
+ Required programs:
+  * SignalP-4.1
+  * TMHMM
+
+ Proteins that were predicted to contain signal peptides were identified using
+ the following commands:
+
+ ```bash
+  screen -a
+ 	SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+ 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+ 	CurPath=$PWD
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+ 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+ 		SplitDir=gene_pred/final_genes_split/$Organism/$Strain
+ 		mkdir -p $SplitDir
+ 		BaseName="$Organism""_$Strain"_final_preds
+ 		$SplitfileDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName
+ 		for File in $(ls $SplitDir/*_final_preds_*); do
+ 			Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
+ 			while [ $Jobs -gt 1 ]; do
+ 				sleep 10
+ 				printf "."
+ 				Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
+ 			done
+ 			printf "\n"
+ 			echo $File
+ 			qsub $ProgDir/pred_sigP.sh $File signalp-4.1
+ 		done
+ 	done
+ ```
+
+ The batch files of predicted secreted proteins needed to be combined into a
+ single file for each strain. This was done with the following commands:
+ ```bash
+ 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/*); do
+ 		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
+ 		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
+ 		InStringAA=''
+ 		InStringNeg=''
+ 		InStringTab=''
+ 		InStringTxt=''
+ 		SigpDir=final_genes_signalp-4.1
+ 		for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
+ 			InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
+ 			InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
+ 			InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
+ 			InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
+ 		done
+ 		cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
+ 		cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
+ 		tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
+ 		cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
+ 	done
+ ```
+
+ Some proteins that are incorporated into the cell membrane require secretion.
+ Therefore proteins with a transmembrane domain are not likely to represent
+ cytoplasmic or apoplastic effectors.
+
+ Proteins containing a transmembrane domain were identified:
+
+ ```bash
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+ 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+ 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
+ 		qsub $ProgDir/submit_TMHMM.sh $Proteome
+ 	done
+ ```
+
+ Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
+
+ ```bash
+   for File in $(ls gene_pred/trans_mem/*/*/*_TM_genes_neg.txt); do
+     Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+     Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+     echo "$Organism - $Strain"
+     TmHeaders=$(echo "$File" | sed 's/neg.txt/neg_headers.txt/g')
+     cat $File | cut -f1 > $TmHeaders
+     SigP=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
+     OutDir=$(dirname $SigP)
+     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+     $ProgDir/extract_from_fasta.py --fasta $SigP --headers $TmHeaders > $OutDir/"$Strain"_final_sp_no_trans_mem.aa
+     cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
+   done
+ ```
+
+ N.ditissima - Hg199_minion
+1033
+
+### B) From Augustus gene models - Effector identification using EffectorP
+
+Required programs:
+ * EffectorP.py
+
+```bash
+for Proteome in $(ls gene_pred/codingquary/N.*/*/final/final_genes_combined.pep.fasta); do
+	Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+	Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+	BaseName="$Organism"_"$Strain"_EffectorP
+	OutDir=analysis/effectorP/$Organism/$Strain
+  mkdir -p $OutDir
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/fungal_effectors
+	qsub $ProgDir/pred_effectorP.sh $Proteome $BaseName $OutDir
+done
+```
+
+```bash
+  for File in $(ls analysis/effectorP/*/*/*_EffectorP.txt); do
+    Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    Headers=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_headers.txt/g')
+    cat $File | grep 'Effector' | cut -f1 > $Headers
+    Secretome=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp_no_trans_mem.aa)
+    OutFile=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted.aa/g')
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+    $ProgDir/extract_from_fasta.py --fasta $Secretome --headers $Headers > $OutFile
+    OutFileHeaders=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted_headers.txt/g')
+    cat $OutFile | grep '>' | tr -d '>' > $OutFileHeaders
+    cat $OutFileHeaders | wc -l
+    Gff=$(ls gene_pred/codingquary/$Organism/$Strain/*/final_genes_appended.gff3)
+    EffectorP_Gff=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted.gff/g')
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+    $ProgDir/extract_gff_for_sigP_hits.pl $OutFileHeaders $Gff effectorP ID > $EffectorP_Gff
+    cat $EffectorP_Gff | grep -w 'gene' | wc -l
+  done > tmp.txt
+```
+
+### C) CAZY proteins
+
+Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
+at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
+
+```bash
+  for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+    Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+    OutDir=gene_pred/CAZY/$Organism/$Strain
+    mkdir -p $OutDir
+    Prefix="$Strain"_CAZY
+    CazyHmm=../../dbCAN/dbCAN-fam-HMMs.txt
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/HMMER
+    qsub $ProgDir/sub_hmmscan.sh $CazyHmm $Proteome $Prefix $OutDir
+  done
+```
+
+The Hmm parser was used to filter hits by an E-value of E1x10-5 or E 1x10-e3 if they had a hit over a length of X %.
+
+Those proteins with a signal peptide were extracted from the list and gff files
+representing these proteins made.
+
+  ```bash
+  for File in $(ls gene_pred/CAZY/N.*/R0905_canu_2017_v2/*CAZY.out.dm); do
+  Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+  OutDir=$(dirname $File)
+  echo "$Organism - $Strain"
+  ProgDir=/home/groups/harrisonlab/dbCAN
+  $ProgDir/hmmscan-parser.sh $OutDir/"$Strain"_CAZY.out.dm > $OutDir/"$Strain"_CAZY.out.dm.ps
+  CazyHeaders=$(echo $File | sed 's/.out.dm/_headers.txt/g')
+  cat $OutDir/"$Strain"_CAZY.out.dm.ps | cut -f3 | sort | uniq > $CazyHeaders
+  echo "number of CAZY genes identified:"
+  cat $CazyHeaders | wc -l
+  Gff=$(ls gene_pred/codingquary/$Organism/$Strain/final/final_genes_appended.gff3)
+  CazyGff=$OutDir/"$Strain"_CAZY.gff
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+  $ProgDir/extract_gff_for_sigP_hits.pl $CazyHeaders $Gff CAZyme ID > $CazyGff
+
+  SecretedProts=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
+  SecretedHeaders=$(echo $SecretedProts | sed 's/.aa/_headers.txt/g')
+  cat $SecretedProts | grep '>' | tr -d '>' > $SecretedHeaders
+  CazyGffSecreted=$OutDir/"$Strain"_CAZY_secreted.gff
+  $ProgDir/extract_gff_for_sigP_hits.pl $SecretedHeaders $CazyGff Secreted_CAZyme ID > $CazyGffSecreted
+  echo "number of Secreted CAZY genes identified:"
+  cat $CazyGffSecreted | grep -w 'gene' | cut -f9 | tr -d 'ID=' | wc -l
+  done
+```
+  N.ditissima - Ag04
+  number of CAZY genes identified:
+  726
+  number of Secreted CAZY genes identified:
+  283
+  N.ditissima - R45-15
+  number of CAZY genes identified:
+  722
+  number of Secreted CAZY genes identified:
+  287
+  N.ditissima - Hg199
+  number of CAZY genes identified:
+  721
+  number of Secreted CAZY genes identified:
+  285
+  N.ditissima - R0905_canu_2017_v2
+  number of CAZY genes identified:
+  719
+  number of Secreted CAZY genes identified:
+  286
