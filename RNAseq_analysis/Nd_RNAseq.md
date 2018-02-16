@@ -218,7 +218,7 @@ do
         Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
         echo "$Timepoint"
         Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
-        OutDir=/data/scratch/gomeza/alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+        OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
         ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq/
         qsub $ProgDir/sub_star.sh $Assembly $FileF $FileR $OutDir
     done
@@ -257,7 +257,7 @@ done
 ```
 2nd run
 ```bash
-for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/*/t*/F/*_trim.fq.gz | grep -v "mycelium")
+for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/M9/t*/F/*_trim.fq.gz | grep -v "mycelium")
 do
 Strain=$(echo $FileF | rev | cut -f4 -d '/' | rev)
 Organism=$(echo $FileF | rev | cut -f5 -d '/' | rev)
@@ -277,6 +277,7 @@ Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
 echo "$Timepoint"
 Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
 OutDir=/data/scratch/gomeza/alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+mkdir -p $OutDir
 ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
 Assembly=/data/scratch/gomeza/apple_genome/GDDH13_1-1_formatted.fasta
 GFF=/data/scratch/gomeza/apple_genome/gene_models_20170612.gff3
@@ -288,7 +289,7 @@ done
 ##Gzip output files to save space on the disk and allow star to run correctly downstream. ONLY RUN THIS ONCE
 
 ```bash
-for AlignDir in $(ls -d alignment/star/N.ditissima/Hg199_minion/*/*)
+for AlignDir in $(ls -d alignment/star/N.ditissima/*/*/*)
 do
     cat $AlignDir/star_aligmentUnmapped.out.mate1 | gzip -cf > $AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
     cat $AlignDir/star_aligmentUnmapped.out.mate2 | gzip -cf > $AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
@@ -302,42 +303,75 @@ This star script had the following options added to the sub_star.sh script in th
 --seedSearchStartLmax 30
 
 ```bash
-for Assembly in $(ls /home/groups/harrisonlab/project_files/neonectria_ditissima/repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/*/*_contigs_unmasked.fa)
-do
-    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
-    echo "$Organism - $Strain"
-    for AlignDir in $(ls -d /data/scratch/gomeza/alignment/star/N.ditissima/Hg199_minion/t2/*)
+    for Assembly in $(ls /data/scratch/gomeza/Hg199_genome/*_contigs_unmasked.fa)
     do
-      Strain=$(echo $AlignDir | rev | cut -f3 -d '/' | rev)
-      Organism=$(echo $AlignDir | rev | cut -f4 -d '/' | rev)
-        echo "$Organism - $Strain"
-        printf "\n"
-        File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
-        File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
-        echo $File1
-        echo $File2
-        Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
-        echo "$Timepoint"
-        Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
-        Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-        while [ $Jobs -gt 1 ]
-        do
-            sleep 1m
-            printf "."
-            Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-        done
-        OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
-        ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-        qsub $ProgDir/sub_star_TA.sh $Assembly $File1 $File2 $OutDir
+      #Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+      #Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+      #echo "$Organism - $Strain"
+      for AlignDir in $(ls -d /data/scratch/gomeza/alignment/star/N.ditissima/Hg199_minion/M9/t1/M9_2*)
+      do
+        Strain=$(echo $AlignDir | rev | cut -f4 -d '/' | rev)
+        Organism=$(echo $AlignDir | rev | cut -f5 -d '/' | rev)
+          echo "$Organism - $Strain"
+          printf "\n"
+          File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
+          File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
+          echo $File1
+          echo $File2
+          Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
+          echo "$Timepoint"
+          Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
+          Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+          while [ $Jobs -gt 1 ]
+          do
+              sleep 1m
+              printf "."
+              Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+          done
+          OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+          ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+          qsub $ProgDir/sub_star_TA.sh $Assembly $File1 $File2 $OutDir
+      done
     done
-  done
+```
+
+```bash
+    for Assembly in $(ls Hg199_genome/*_contigs_unmasked.fa)
+    do
+      #Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+      #Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+      #echo "$Organism - $Strain"
+      for AlignDir in $(ls -d alignment/star/N.ditissima/Hg199_minion/M9/t1/*)
+      do
+        Strain=$(echo $AlignDir | rev | cut -f4 -d '/' | rev)
+        Organism=$(echo $AlignDir | rev | cut -f5 -d '/' | rev)
+          echo "$Organism - $Strain"
+          printf "\n"
+          File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
+          File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
+          echo $File1
+          echo $File2
+          Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
+          echo "$Timepoint"
+          Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
+          Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+          while [ $Jobs -gt 1 ]
+          do
+              sleep 1m
+              printf "."
+              Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+          done
+          OutDir=alignment/star/star2/$Organism/$Strain/$Timepoint/$Sample_Name
+          ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+          qsub $ProgDir/sub_star.sh $Assembly $File1 $File2 $OutDir
+      done
+    done
 ```
 
 #Quantification of gene models
 
 ```bash
-    for BamFile in $(ls -d alignment/star/N.ditissima/Hg199_minion/*/*/star_aligmentAligned.sortedByCoord.out.bam)
+    for BamFile in $(ls -d alignment/star/N.ditissima/Hg199_minion/*/M9_C2_3/star_aligmentAligned.sortedByCoord.out.bam)
     do
         Gff=gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3
         OutDir=$(dirname $BamFile)
@@ -359,7 +393,6 @@ do
 ##A file was created with columns referring to experimental treatments
 
 ```bash
-#BC-1
 OutDir=alignment/star/N.ditissima/Hg199_minion/DeSeq
 mkdir -p $OutDir
 printf "Sample.name\tCultivar\tTimepoint\n" > $OutDir/N.dit_Hg199_RNAseq_design.txt
@@ -371,7 +404,7 @@ do
   if [ $i == '10' ] || [ $i == '11' ] || [ $i == '12' ]
   then
       Timepoint='Control'
-      Cultivar='mycellium'
+      Cultivar='mycelium'
   elif [ $i == '7' ] || [ $i == '8' ] || [ $i == '9' ]
   then
       Timepoint='t0'
@@ -465,7 +498,7 @@ do
 done >> $OutDir/N.dit_Hg199_RNAseq_design.txt
 
 # Edit header lines of feature counts files to ensure they have the treatment name rather than file name
-OutDir=alignment/star/P.fragariae/Bc1/DeSeq
+OutDir=alignment/star/N.ditissima/Hg199_minion/DeSeq
 mkdir -p $OutDir
 for File in $(ls alignment/star/N.ditissima/Hg199_minion/*/*/*_featurecounts.txt)
 do
@@ -529,13 +562,64 @@ unorderedColDataSubset <- unorderedColData[indexes,]
 colData <- data.frame(unorderedColDataSubset[ order(unorderedColDataSubset$Sample.name),])
 unorderedData <- read.table("alignment/star/N.ditissima/Hg199_minion/DeSeq/Hg199_countData.txt",header=T,sep="\t")
 countData <- data.frame(unorderedData[ , order(colnames(unorderedData))])
+
 colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
 countData <- round(countData,0)
+
+#Eliminate samples
+colData <- colData[!(colData$Sample=="Hg199_1"),]      
+countData <- subset(countData, select=-Hg199_1)
+colData <- colData[!(colData$Sample=="Hg199_2"),]      
+countData <- subset(countData, select=-Hg199_2)
+colData <- colData[!(colData$Sample=="Hg199_3"),]      
+countData <- subset(countData, select=-Hg199_3)
+
+colData <- colData[!(colData$Sample=="M9_C1_3"),]      
+countData <- subset(countData, select=-M9_C1_3)
+colData <- colData[!(colData$Sample=="M9_C2_3"),]      
+countData <- subset(countData, select=-M9_C2_3)
+colData <- colData[!(colData$Sample=="M9_C3_3"),]      
+countData <- subset(countData, select=-M9_C3_3)
+
+colData <- colData[!(colData$Sample=="M9_2A2"),]      
+countData <- subset(countData, select=-M9_2A2)
+colData <- colData[!(colData$Sample=="M9_6A2"),]      
+countData <- subset(countData, select=-M9_6A2)
+colData <- colData[!(colData$Sample=="M9_5A2"),]      
+countData <- subset(countData, select=-M9_5A2)
+
+colData <- colData[!(colData$Sample=="M9_2A3"),]      
+countData <- subset(countData, select=-M9_2A3)
+colData <- colData[!(colData$Sample=="M9_5A4"),]      
+countData <- subset(countData, select=-M9_5A4)
+colData <- colData[!(colData$Sample=="M9_6A3"),]      
+countData <- subset(countData, select=-M9_6A3)
+
+colData <- colData[!(colData$Sample=="GD_C1_3"),]      
+countData <- subset(countData, select=-GD_C1_3)
+colData <- colData[!(colData$Sample=="GD_C2_3"),]      
+countData <- subset(countData, select=-GD_C2_3)
+colData <- colData[!(colData$Sample=="GD_C3_3"),]      
+countData <- subset(countData, select=-GD_C3_3)
+
+colData <- colData[!(colData$Sample=="GD_4A4"),]      
+countData <- subset(countData, select=-GD_4A4)
+colData <- colData[!(colData$Sample=="GD_6A3"),]      
+countData <- subset(countData, select=-GD_6A3)
+colData <- colData[!(colData$Sample=="GD_5A3"),]      
+countData <- subset(countData, select=-GD_5A3)
+
+colData <- colData[!(colData$Sample=="GD_5A2"),]      
+countData <- subset(countData, select=-GD_5A2)
+colData <- colData[!(colData$Sample=="GD_6A2"),]      
+countData <- subset(countData, select=-GD_6A2)
+colData <- colData[!(colData$Sample=="GD_4A5"),]      
+countData <- subset(countData, select=-GD_4A5)
 
 design <- ~Group
 #design <- colData$Group
 
-dds <-     DESeqDataSetFromMatrix(countData,colData,design)
+dds <- DESeqDataSetFromMatrix(countData,colData,design)
 #sizeFactors(dds) <- sizeFactors(estimateSizeFactors(dds, type = c("iterate")))
 sizeFactors(dds) <- sizeFactors(estimateSizeFactors(dds, type = c("ratio")))
 dds <- DESeq(dds, fitType="local")
@@ -628,7 +712,7 @@ ggsave("alignment/star/N.ditissima/Hg199_minion/DeSeq/PCA_sample_names.pdf", pca
 #48hr vs mycelium
 
 alpha <- 0.05
-res= results(dds, alpha=alpha,contrast=c("Group","Bc1_48hr","Bc1_mycelium"))
+res= results(dds, alpha=alpha,contrast=c("Group","GD_t1","GD_t2"))
 sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
 #Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
@@ -639,18 +723,18 @@ sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 sig.res.upregulated2 <- sig.res[sig.res$log2FoldChange >0, ]
 sig.res.downregulated2 <- sig.res[sig.res$log2FoldChange <0, ]
 
-write.table(sig.res,"alignment/star/P.fragariae/Bc1/DeSeq/Bc1_48hr_vs_Bc1_mycelium.txt",sep="\t",na="",quote=F)
-write.table(sig.res.upregulated,"alignment/star/P.fragariae/Bc1/DeSeq/Bc1_48hr_vs_Bc1_mycelium_up.txt",sep="\t",na="",quote=F)
-write.table(sig.res.downregulated,"alignment/star/P.fragariae/Bc1/DeSeq/Bc1_48hr_vs_Bc1_mycelium_down.txt",sep="\t",na="",quote=F)
+write.table(sig.res,"alignment/star/N.ditissima/Hg199_minion/DeSeq/GD_t1_vs_GD_t2.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/star/N.ditissima/Hg199_minion/DeSeq/GD_t1_vs_GD_t2_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/star/N.ditissima/Hg199_minion/DeSeq/GD_t1_vs_GD_t2_down.txt",sep="\t",na="",quote=F)
 
 #Make a table of raw counts, normalised counts and fpkm values:
 
 raw_counts <- data.frame(counts(dds, normalized=FALSE))
 colnames(raw_counts) <- paste(colData$Group)
-write.table(raw_counts,"alignment/star/P.fragariae/Bc1/DeSeq/raw_counts.txt",sep="\t",na="",quote=F)
+write.table(raw_counts,"alignment/star/N.ditissima/Hg199_minion/DeSeq/raw_counts.txt",sep="\t",na="",quote=F)
 norm_counts <- data.frame(counts(dds, normalized=TRUE))
 colnames(norm_counts) <- paste(colData$Group)
-write.table(norm_counts,"alignment/star/P.fragariae/Bc1/DeSeq/normalised_counts.txt",sep="\t",na="",quote=F)
+write.table(norm_counts,"alignment/star/N.ditissima/Hg199_minion/DeSeq/normalised_counts.txt",sep="\t",na="",quote=F)
 
 library(Biostrings)
 library(naturalsort)
@@ -668,170 +752,6 @@ fpkm_counts <- data.frame(fpkm(dds, robust = FALSE))
 colnames(fpkm_counts) <- paste(colData$Group)
 write.table(fpkm_counts,"alignment/star/P.fragariae/Bc1/DeSeq/fpkm_counts.txt",sep="\t",na="",quote=F)
 ```
-
-Method 2. Removing apple controls
-
-
-
-# Edit header lines of feature counts files to ensure they have the treatment name rather than file name
-OutDir=alignment/star/N.ditissima/Hg199_minion/DeSeq2
-mkdir -p $OutDir
-for File in $(ls alignment/star/N.ditissima/Hg199_minion/*/DeSeq2/*_featurecounts.txt)
-do
-    echo $File
-    cp $File $OutDir/.
-done
-for File in $(ls $OutDir/*_featurecounts.txt)
-do
-    Prefix=$(echo $File | rev | cut -f1 -d '/' | rev | sed 's/_featurecounts.txt//g')
-    sed -ie "s/star_aligmentAligned.sortedByCoord.out.bam/$Prefix/g" $File
-done
-
-#DeSeq commands
-
-```R
-install.packages("pheatmap", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu" )
-install.packages("data.table", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu")
-
-#install and load libraries
-require("pheatmap")
-require("data.table")
-
-#load tables into a "list of lists"
-qq <- lapply(list.files("alignment/star/N.ditissima/Hg199_minion/DeSeq","*featurecounts.txt$",full.names=T,recursive=T),function(x) fread(x))
-
-# ensure the samples column is the same name as the treatment you want to use:
-qq[7]
-
-#mm <- qq%>%Reduce(function(dtf1,dtf2) inner_join(dtf1,dtf2,by=c("Geneid","Chr","Start","End","Strand","Length")), .)
-
-#merge the "list of lists" into a single table
-m <- Reduce(function(...) merge(..., all = T,by=c("Geneid","Chr","Start","End","Strand","Length")), qq)
-
-#convert data.table to data.frame for use with DESeq2
-countData <- data.frame(m[,c(1,7:(ncol(m))),with=F])
-rownames(countData) <- countData[,1]
-countData <- countData[,-1]
-
-#indexes <- unique(gsub("(.*)_L00.*", "\\1", colnames(countData)))
-indexes <- c("GD_4A4","GD_4A5","GD_5A2","GD_5A3","GD_6A2","GD_6A3","GD_C1_3","GD_C2_3","GD_C3_3","Hg199_1","Hg199_2", "Hg199_3","M9_2A2","M9_2A3","M9_5A2","M9_5A4","M9_6A2","M9_6A3","M9_C1_3","M9_C2_3","M9_C3_3")
-
-countData <- round(countData,0)
-
-#output countData
-write.table(countData,"alignment/star/N.ditissima/Hg199_minion/DeSeq/Hg199_countData.txt",sep="\t",na="",quote=F)
-
-#output gene details
-write.table(m[,1:6,with=F],"alignment/star/N.ditissima/Hg199_minion/DeSeq/Hg199_genes.txt",sep="\t",quote=F,row.names=F)
-# colnames(countData) <- sub("X","",colnames(countData)) countData <- countData[,colData$Sample]
-
-#Running DeSeq2
-
-#source("http://bioconductor.org/biocLite.R")
-#biocLite("DESeq2")
-require("DESeq2")
-
-unorderedColData <- read.table("alignment/star/N.ditissima/Hg199_minion/DeSeq/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
-rownames(unorderedColData) <- unorderedColData$Sample.name
-unorderedColDataSubset <- unorderedColData[indexes,]
-
-colData <- data.frame(unorderedColDataSubset[ order(unorderedColDataSubset$Sample.name),])
-unorderedData <- read.table("alignment/star/N.ditissima/Hg199_minion/DeSeq/Hg199_countData.txt",header=T,sep="\t")
-countData <- data.frame(unorderedData[ , order(colnames(unorderedData))])
-colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
-countData <- round(countData,0)
-
-design <- ~Group
-#design <- colData$Group
-
-dds <-     DESeqDataSetFromMatrix(countData,colData,design)
-#sizeFactors(dds) <- sizeFactors(estimateSizeFactors(dds, type = c("iterate")))
-sizeFactors(dds) <- sizeFactors(estimateSizeFactors(dds, type = c("ratio")))
-dds <- DESeq(dds, fitType="local")
-
-
-#  #Run DESeq2 removing an outlier
-#
-#  library(DESeq2)
-#  colData <- read.table("colData",header=T,sep="\t")
-#  countData <- read.table("countData2",header=T,sep="\t")
-#
-#  colData$Group <- paste0(colData$Strain,colData$Light,colData$Time)
-#  #Eliminate Frq08_DD24_rep3 sample from colData and countData
-#  colData <- colData[!(colData$Sample=="Frq08_DD24_rep3"),]
-#  countData <- subset(countData, select=-Frq08_DD24_rep3)
-#
-#  design <- ~Group
-#  dds <-  DESeqDataSetFromMatrix(countData,colData,design)
-#  sizeFactors(dds) <- sizeFactors(estimateSizeFactors(dds))
-#  dds <- DESeq(dds, fitType="local")
-#
-#Sample Distances
-
-library("RColorBrewer")
-library("gplots", Sys.getenv("R_LIBS_USER"))
-library("ggplot2")
-library("ggrepel")
-
-vst<-varianceStabilizingTransformation(dds)
-
-pdf("alignment/star/N.ditissima/Hg199_minion/DeSeq/heatmap_vst.pdf", width=12,height=12)
-sampleDists<-dist(t(assay(vst)))
-
-sampleDistMatrix <- as.matrix(sampleDists)
-rownames(sampleDistMatrix) <- paste(vst$Group)
-colnames(sampleDistMatrix) <- paste(vst$Group)
-colours <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-heatmap( sampleDistMatrix,
-  trace="none",  # turns off trace lines inside the heat map
-  col=colours, # use on color palette defined earlier
-  margins=c(12,12), # widens margins around plot
-  srtCol=45,
-  srtCol=45)
-dev.off()
-
-# Sample distances measured with rlog transformation:
-
-rld <- rlog( dds )
-
-pdf("alignment/star/N.ditissima/Hg199_minion/DeSeq/heatmap_rld.pdf")
-sampleDists <- dist( t( assay(rld) ) )
-library("RColorBrewer")
-sampleDistMatrix <- as.matrix( sampleDists )
-rownames(sampleDistMatrix) <- paste(rld$Group)
-colnames(sampleDistMatrix) <- paste(rld$Group)
-colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-heatmap( sampleDistMatrix, trace="none", col=colours, margins=c(12,12),srtCol=45)
-
-#PCA plotsPl
-
-#vst<-varianceStabilizingTransformation(dds)
-pdf("alignment/star/N.ditissima/Hg199_minion/DeSeq/PCA_vst.pdf")
-plotPCA(vst,intgroup=c("Cultivar", "Timepoint"))
-dev.off()
-
-#Plot using rlog transformation:
-pdf("alignment/star/N.ditissima/Hg199_minion/DeSeq/PCA_rld.pdf")
-plotPCA(rld,intgroup=c("Cultivar", "Timepoint"))
-dev.off()
-
-pdf("alignment/star/N.ditissima/Hg199_minion/DeSeq/PCA_additional.pdf")
-
-dev.off()
-
-#Plot using rlog transformation, showing sample names:
-
-data <- plotPCA(rld, intgroup="Group", returnData=TRUE)
-percentVar <- round(100 * attr(data, "percentVar"))
-
-pca_plot<- ggplot(data, aes(PC1, PC2, color=Group)) +
- geom_point(size=3) +
- xlab(paste0("PC1: ",percentVar[1],"% variance")) +
- ylab(paste0("PC2: ",percentVar[2],"% variance")) + geom_text_repel(aes(label=colnames(rld)))
- coord_fixed()
-
-ggsave("alignment/star/N.ditissima/Hg199_minion/DeSeq/PCA_sample_names.pdf", pca_plot, dpi=300, height=10, width=12)
-
 
 #Inital analysis of tables of DEGs
 
