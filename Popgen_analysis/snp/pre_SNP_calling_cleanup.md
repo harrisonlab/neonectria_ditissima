@@ -1,5 +1,25 @@
 Sets up correct formatting for SNP calling analysis
 
+Alignment of raw reads vs the Nd genome
+
+Sequence data for isolates with a data from a single sequencing run was aligned against the Nd genome
+
+```bash
+  Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
+  for StrainPath in $(ls -d qc_dna/paired/N.ditissima/*); do
+    Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
+    Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
+    echo "$Organism - $Strain"
+    F_Read=$(ls $StrainPath/F/*.fq.gz)
+    R_Read=$(ls $StrainPath/R/*.fq.gz)
+    echo $F_Read
+    echo $R_Read
+    OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
+    qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
+  done
+  ```
+
 ```bash
 input=/home/groups/harrisonlab/project_files/neonectria_ditissima/analysis/genome_alignment/bowtie/*/
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp

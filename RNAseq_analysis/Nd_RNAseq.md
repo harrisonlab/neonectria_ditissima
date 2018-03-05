@@ -1568,10 +1568,104 @@ Total number of secretedeffector in dataset:
 76
 Total number of CAZY in dataset:
 95
-
-
 ```
 ```
+#Draw venn diagrams of differentially expressed genes
+
+##All genes
+
+###All DEGs
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control.txt
+inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t2_vs_mycelium_Control.txt
+OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_all_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t1_vs_mycelium_Control.txt
+inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t2_vs_mycelium_Control.txt
+OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_all_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control.txt
+inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t1_vs_mycelium_Control.txt
+OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/t1_all_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+
+###Upregulated DEGs
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control_up.txt
+inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t2_vs_mycelium_Control_up.txt
+OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_up_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t1_vs_mycelium_Control_up.txt
+inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t2_vs_mycelium_Control_up.txt
+OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_up_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control_up.txt
+inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t1_vs_mycelium_Control_up.txt
+OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/t1_up_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+###Downregulated DEGs
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control_down.txt
+inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t2_vs_mycelium_Control_down.txt
+OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_down_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t1_vs_mycelium_Control_down.txt
+inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t2_vs_mycelium_Control_down.txt
+OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_down_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control_down.txt
+inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t1_vs_mycelium_Control_down.txt
+OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/t1_down_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+###Venn diagrams
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+WorkDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq
+$ProgDir/All_DEGs_venn_diag_2.r --inp $WorkDir/GD_all_DEGs.tsv --out $WorkDir/GD_all_DEGs.pdf
+$ProgDir/All_DEGs_venn_diag_2.r --inp $WorkDir/t1_all_DEGs.tsv --out $WorkDir/t1_all_DEGs.pdf
+$ProgDir/All_DEGs_venn_diag_2.r --inp $WorkDir/t1_up_DEGs.tsv --out $WorkDir/t1_up_DEGs.pdf
+$ProgDir/All_DEGs_venn_diag_2.r --inp $WorkDir/t1_down_DEGs.tsv --out $WorkDir/t1_down_DEGs.pdf
+```
+
+
+
 ##Produce a more detailed table of analyses
 
 ```bash
@@ -1584,24 +1678,33 @@ Total number of CAZY in dataset:
         SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/N.ditissima/Hg199_minion/swissprot_vJul2016_tophit_parsed.tbl)
         OutDir=gene_pred/annotation/$Organism/$Strain
         mkdir -p $OutDir
-        GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.cdna.fasta)
-
+        GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta)
 
         SigP4=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/Hg199_minion_final_sp_no_trans_mem.aa)
-        effector_names=analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_headers.txt
+        effector_total=analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_headers.txt
         CAZY_total=gene_pred/CAZY/N.ditissima/Hg199_minion/Hg199_minion_CAZY_headers.txt
 
+        TMHMM_headers=$(ls gene_pred/trans_mem/$Organism/$Strain/*_TM_genes_pos_headers.txt)
 
+        ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
 
-        ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae
-        DEG_Files=$(ls alignment/star/P.fragariae/$Strain/DeSeq/*_vs_*.txt  | grep -v -e 'up' -e 'down' -e "CRN" -e "RxLR" | sed -e "s/$/ /g" | tr -d "\n")
+        Dir1=$(ls -d /data/scratch/gomeza/alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq)
+        DEG_Files=$(ls \
+            $Dir1/GD_t1_vs_mycelium_Control.txt \
+            $Dir1/M9_t1_vs_mycelium_Control.txt \
+            $Dir1/GD_t2_vs_mycelium_Control.txt \
+            $Dir1/M9_t2_vs_mycelium_Control.txt \
+            $Dir1/M9_t1_vs_GD_t1.txt \
+            | sed -e "s/$/ /g" | tr -d "\n")
+
+        #DEG_Files=$(ls alignment/star/N.ditisima/Hg199_minion/unmapped_to_Nd/DeSeq/*_vs_*.txt  | grep -v -e 'up' -e 'down' -e "CAZY" -e "Effector" | sed -e "s/$/ /g" | tr -d "\n")
         # $ProgDir/pacbio_anntoation_tables.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP2 $SigP2 --SigP4 $SigP4 --phobius $PhobiusTxt --RxLR_motif $RxLR_Motif --RxLR_Hmm $RxLR_Hmm --RxLR_WY $RxLR_WY --RxLR_total $RxLR_total --CRN_LFLAK $CRN_LFLAK --CRN_DWL $CRN_DWL --CRN_total $CRN_total --DEG_files $DEG_Files  > $OutDir/414_v2_gene_table_incl_exp.tsv
         # NormCount=$(ls alignment/star/P.cactorum/414_v2/DeSeq/normalised_counts.txt)
-        RawCount=$(ls alignment/star/P.fragariae/$Strain/DeSeq/raw_counts.txt)
-        FPKM=$(ls alignment/star/P.fragariae/$Strain/DeSeq/fpkm_counts.txt)
-        OrthoName=$Strain
-        OrthoFile=analysis/orthology/orthomcl/All_Strains_plus_rubi_no_removal/All_Strains_plus_rubi_no_removal_orthogroups.txt
-        $ProgDir/pacbio_anntoation_tables_modified.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP2 $SigP2 --SigP2_ORF $SigP2_ORF --SigP3 $SigP3 --SigP3_ORF $SigP3_ORF --SigP4 $SigP4 --SigP4_ORF $SigP4_ORF --phobius $PhobiusFa --phobius_ORF $PhobiusFa_ORF --trans_mem $TMHMM_headers --GPI_anchor $GPI_headers --RxLR_total $RxLR_total --RxLR_total_ORF $RxLR_ORF_total --RxLR_EER_total $RxLR_EER_total --RxLR_EER_total_ORF $RxLR_EER_ORF_total --CRN_total $CRN_total --ApoP_total $ApoP_total --ortho_name $OrthoName --ortho_file $OrthoFile --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
+        RawCount=$(ls alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/raw_counts.txt )
+        FPKM=$(ls alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/fpkm_counts.txt)
+        #OrthoName=$Strain
+      #OrthoFile=analysis/orthology/orthomcl/All_Strains_plus_rubi_no_removal/All_Strains_plus_rubi_no_removal_orthogroups.txt
+        $ProgDir/pacbio_anntoation_tables_modified.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
     done
 done
 ```
@@ -1625,7 +1728,7 @@ for GeneGff in $(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199
     SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/N.ditissima/Hg199_minion/swissprot_vJul2016_tophit_parsed.tbl)
     OutDir=gene_pred/annotation/$Organism/$Strain
     mkdir -p $OutDir
-    GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.cdna.fasta)
+    GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta)
 
 
     Dir1=$(ls -d /data/scratch/gomeza/alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq)
@@ -1643,17 +1746,46 @@ for GeneGff in $(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199
     $ProgDir/Vd_annotation_tables.py --gene_gff $GeneGff --gene_fasta $GeneFasta --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --InterPro $InterPro --Swissprot $SwissProt > $OutDir/"$Strain"_gene_table_incl_exp.tsv
 done
 ```
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 #Extract fasta file of all DEGs for BLAST analysis
 
 ```bash
-for Strain in Bc1 Nov9
+for Cultivar in GD M9
 do
-    input=alignment/star/P.fragariae/$Strain/DeSeq/*_vs_*mycelium.txt
-    DEGFile=alignment/star/P.fragariae/$Strain/DeSeq/"$Strain"_all_DEGs.tsv
+    input=alignment/star/N.ditisima/Hg199_minion/unmapped_to_Nd/DeSeq/*_vs_mycelium_Control.txt
+    DEGFile=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/"$Cultivar"_all_DEGs.tsv
     ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae
     $ProgDir/parse_RNA-Seq_1_timepoint.py --input $input --out_dir $DEGFile
+
     DEGNames=alignment/star/P.fragariae/$Strain/DeSeq/"$Strain"_all_DEGs_names.txt
     Genes=gene_pred/annotation/P.fragariae/$Strain/"$Strain"_genes_incl_ORFeffectors.cds.fasta
     DEGFasta=alignment/star/P.fragariae/$Strain/DeSeq/"$Strain"_all_DEGs.fa
@@ -1690,124 +1822,4 @@ do
 
     $ProgDir/GO_enrichment.r --all_genes $AllGenes --GO_annotations $OutDir/"$Strain"_gene_GO_annots.tsv --out_dir $OutDir > $OutDir/output.txt
 done
-```
-
-
-#Draw venn diagrams of differenitally expressed genes
-
-##All genes
-
-###All DEGs
-
-```bash
-ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
-inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control.txt
-inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t2_vs_mycelium_Control.txt
-OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_all_DEGs.tsv
-$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
-```
-```bash
-ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
-inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control.txt
-inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t1_vs_mycelium_Control.txt
-OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/t1_all_DEGs.tsv
-$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
-```
-
-
-###Upregulated DEGs
-
-```bash
-ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
-inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control_up.txt
-inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t1_vs_mycelium_Control_up.txt
-OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/t1_up_DEGs.tsv
-$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
-```
-
-###Downregulated DEGs
-
-```bash
-ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
-inp1=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/GD_t1_vs_mycelium_Control_down.txt
-inp2=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/M9_t1_vs_mycelium_Control_down.txt
-OutDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/t1_down_DEGs.tsv
-$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
-```
-
-###Venn diagrams
-
-```bash
-ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
-WorkDir=alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq
-$ProgDir/All_DEGs_venn_diag_2.r --inp $WorkDir/GD_all_DEGs.tsv --out $WorkDir/GD_all_DEGs.pdf
-$ProgDir/All_DEGs_venn_diag_2.r --inp $WorkDir/t1_all_DEGs.tsv --out $WorkDir/t1_all_DEGs.pdf
-$ProgDir/All_DEGs_venn_diag_2.r --inp $WorkDir/t1_up_DEGs.tsv --out $WorkDir/t1_up_DEGs.pdf
-$ProgDir/All_DEGs_venn_diag_2.r --inp $WorkDir/t1_down_DEGs.tsv --out $WorkDir/t1_down_DEGs.pdf
-```
-
-##Effector
-
-###Create cut down tables of DEGs just containing Effector
-
-```bash
-WorkDir=alignment/star/N.ditissima/Hg199_minion/DeSeq_method_2
-RxLRs=analysis/RxLR_effectors/combined_evidence/P.fragarie/Bc16/Bc16_Total_RxLR_motif_hmm.txt
-cat $WorkDir/method_2_all_DEGs.tsv | grep -w -f $RxLRs > $WorkDir/method_2_all_DEGs_RxLRs.tsv
-cat $WorkDir/method_2_up_DEGs.tsv | grep -w -f $RxLRs > $WorkDir/method_2_up_DEGs_RxLRs.tsv
-cat $WorkDir/method_2_down_DEGs.tsv | grep -w -f $RxLRs > $WorkDir/method_2_down_DEGs_RxLRs.tsv
-```
-
-###Venn diagrams
-
-```bash
-ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae
-WorkDir=alignment/star/P.fragariae/$Strain/DeSeq_method_2
-$ProgDir/BC-16_method_2_All_DEGs_venn_diag.r --inp $WorkDir/method_2_all_RxLRs_DEGs.tsv --out $WorkDir/method_2_all_RxLRs_DEGs.pdf
-$ProgDir/BC-16_method_2_All_DEGs_venn_diag.r --inp $WorkDir/method_2_up_RxLRs_DEGs.tsv --out $WorkDir/method_2_up_RxLRs_DEGs.pdf
-$ProgDir/BC-16_method_2_All_DEGs_venn_diag.r --inp $WorkDir/method_2_down_RxLRs_DEGs.tsv --out $WorkDir/method_2_down_RxLRs_DEGs.pdf
-```
-
-##CRNs
-
-###Create cut down tables of DEGs just containing CRNs
-
-```bash
-WorkDir=alignment/star/P.fragariae/Bc16/DeSeq_method_2
-CNRs=analysis/CRN_effectors/hmmer_CRN/P.fragarie/Bc16/Bc16_final_CRN.txt
-cat $WorkDir/method_2_all_DEGs.tsv | grep -w -f $CRNs > $WorkDir/method_2_all_DEGs_CRNs.tsv
-cat $WorkDir/method_2_up_DEGs.tsv | grep -w -f $CRNs > $WorkDir/method_2_up_DEGs_CRNs.tsv
-cat $WorkDir/method_2_down_DEGs.tsv | grep -w -f $CRNs > $WorkDir/method_2_down_DEGs_CRNs.tsv
-```
-
-###Venn diagrams
-
-```bash
-ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae
-WorkDir=alignment/star/P.fragariae/$Strain/DeSeq_method_2
-$ProgDir/BC-16_method_2_All_DEGs_venn_diag.r --inp $WorkDir/method_2_all_CRNs_DEGs.tsv --out $WorkDir/method_2_all_CRNs_DEGs.pdf
-$ProgDir/BC-16_method_2_All_DEGs_venn_diag.r --inp $WorkDir/method_2_up_CRNs_DEGs.tsv --out $WorkDir/method_2_up_CRNs_DEGs.pdf
-$ProgDir/BC-16_method_2_All_DEGs_venn_diag.r --inp $WorkDir/method_2_down_CRNs_DEGs.tsv --out $WorkDir/method_2_down_CRNs_DEGs.pdf
-```
-
-##Apoplastic effectors
-
-###Create cut down tables of DEGs just containing CRNs
-
-```bash
-WorkDir=alignment/star/P.fragariae/Bc16/DeSeq_method_2
-ApoP=analysis/ApoplastP/P.fragariae/Bc16/Bc16_Total_ApoplastP.txt
-cat $WorkDir/method_2_all_DEGs.tsv | grep -w -f $ApoP > $WorkDir/method_2_all_DEGs_ApoP.tsv
-cat $WorkDir/method_2_up_DEGs.tsv | grep -w -f $ApoP > $WorkDir/method_2_up_DEGs_ApoP.tsv
-cat $WorkDir/method_2_down_DEGs.tsv | grep -w -f $ApoP > $WorkDir/method_2_down_DEGs_ApoP.tsv
-```
-
-###Venn diagrams
-
-```bash
-ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae
-WorkDir=alignment/star/P.fragariae/Bc16/DeSeq_method_2
-$ProgDir/BC-16_method_2_All_DEGs_venn_diag.r --inp $WorkDir/method_2_all_ApoP_DEGs.tsv --out $WorkDir/method_2_all_ApoP_DEGs.pdf
-$ProgDir/BC-16_method_2_All_DEGs_venn_diag.r --inp $WorkDir/method_2_up_ApoP_DEGs.tsv --out $WorkDir/method_2_up_ApoP_DEGs.pdf
-$ProgDir/BC-16_method_2_All_DEGs_venn_diag.r --inp $WorkDir/method_2_down_ApoP_DEGs.tsv --out $WorkDir/method_2_down_ApoP_DEGs.pdf
 ```
