@@ -1056,6 +1056,103 @@ gene_pred/codingquary/N.ditissima/Hg199_minion/final
 1245
 14919
 
+## ORF finder
+
+The genome was searched in six reading frames for any start codon and following
+translated identification of a start codon translating sequence until a stop
+codon was found. Additional functionality was added to this script by
+also printing ORFs in .gff format.
+
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+for Genome in $(ls Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa); do
+	qsub $ProgDir/run_ORF_finder.sh $Genome
+done
+```
+
+The Gff files from the the ORF finder are not in true Gff3 format. These were
+corrected using the following commands:
+
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation
+	for ORF_Gff in $(ls gene_pred/ORF_finder/*/*/*_ORF.gff | grep -v '_F_atg_' | grep -v '_R_atg_'); do
+		ORF_Gff_mod=$(echo $ORF_Gff | sed 's/_ORF.gff/_ORF_corrected.gff3/g')
+		echo ""
+		echo "Correcting the following file:"
+		echo $ORF_Gff
+		echo "Redirecting to:"
+		echo $ORF_Gff_mod
+		$ProgDir/gff_corrector.pl $ORF_Gff > $ORF_Gff_mod
+	done
+```
+
+#Functional annotation
+
+## A) Interproscan
+
+Interproscan was used to give gene models functional annotations.
+Annotation was run using the commands below:
+
+Note: This is a long-running script. As such, these commands were run using
+'screen' to allow jobs to be submitted and monitored in the background.
+This allows the session to be disconnected and reconnected over time.
+
+Screen ouput detailing the progress of submission of interporscan jobs
+was redirected to a temporary output file named interproscan_submission.log .
+
+```bash
+	screen -a
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
+	for Genes in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	echo $Genes
+	$ProgDir/sub_interproscan.sh $Genes
+	done 2>&1 | tee -a interproscan_submisison.log
+```
+
+Following interproscan annotation split files were combined using the following
+commands:
+
+```bash
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
+	for Proteins in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
+		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
+		echo "$Organism - $Strain"
+		echo $Strain
+		InterProRaw=gene_pred/interproscan/$Organism/$Strain/raw
+		$ProgDir/append_interpro.sh $Proteins $InterProRaw
+	done
+```
+
+
+## B) SwissProt
+
+```bash
+	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+		OutDir=gene_pred/swissprot/$Organism/$Strain
+		SwissDbDir=../../../../home/groups/harrisonlab/uniprot/swissprot
+		SwissDbName=uniprot_sprot
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
+		qsub $ProgDir/sub_swissprot.sh $Proteome $OutDir $SwissDbDir $SwissDbName
+	done
+```
+
+```bash
+	for SwissTable in $(ls gene_pred/swissprot/*/*/swissprot_vJul2016_10_hits.tbl); do
+		Strain=$(echo $SwissTable | rev | cut -f2 -d '/' | rev)
+		Organism=$(echo $SwissTable | rev | cut -f3 -d '/' | rev)
+		echo "$Organism - $Strain"
+		OutTable=gene_pred/swissprot/$Organism/$Strain/swissprot_vJul2016_tophit_parsed.tbl
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
+		$ProgDir/swissprot_parser.py --blast_tbl $SwissTable --blast_db_fasta /home/groups/harrisonlab/uniprot/swissprot/uniprot_sprot.fasta > $OutTable
+	done
+```
+
+
+
 ## Effector genes
 
 Putative pathogenicity and effector related genes were identified within Braker
@@ -1168,16 +1265,17 @@ Required programs:
  * EffectorP.py
 
 ```bash
-for Proteome in $(ls gene_pred/codingquary/N.*/*/final/final_genes_combined.pep.fasta); do
-	Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
-	Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-	BaseName="$Organism"_"$Strain"_EffectorP
-	OutDir=analysis/effectorP/$Organism/$Strain
-  mkdir -p $OutDir
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/fungal_effectors
-	qsub $ProgDir/pred_effectorP.sh $Proteome $BaseName $OutDir
-done
+cp gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta prog/EffectorP/EffectorP_1.0/Scripts/
+cd prog/EffectorP/EffectorP_1.0/Scripts/
+python EffectorP.py -i final_genes_combined.pep.fasta -o N.ditissima_Hg199_minion_EffectorP.txt
+mv N.ditissima_Hg199_minion_EffectorP.txt ../../../../analysis/effectoP/N.ditissima/Hg199_minion
 ```
+
+Number of proteins that were tested: 14919
+Number of predicted effectors: 2777
+
+-----------------
+18.6 percent are predicted to be effectors.
 
 ```bash
   for File in $(ls analysis/effectorP/*/*/*_EffectorP.txt); do
@@ -1213,7 +1311,7 @@ at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
     OutDir=gene_pred/CAZY/$Organism/$Strain
     mkdir -p $OutDir
     Prefix="$Strain"_CAZY
-    CazyHmm=../../dbCAN/dbCAN-fam-HMMs.txt
+    CazyHmm=dbCAN/dbCAN-fam-HMMs.txt
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/HMMER
     qsub $ProgDir/sub_hmmscan.sh $CazyHmm $Proteome $Prefix $OutDir
   done
@@ -1225,12 +1323,12 @@ Those proteins with a signal peptide were extracted from the list and gff files
 representing these proteins made.
 
   ```bash
-  for File in $(ls gene_pred/CAZY/N.*/R0905_canu_2017_v2/*CAZY.out.dm); do
+  for File in $(ls gene_pred/CAZY/N.*/*/*CAZY.out.dm); do
   Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $File)
   echo "$Organism - $Strain"
-  ProgDir=/home/groups/harrisonlab/dbCAN
+  ProgDir=dbCAN
   $ProgDir/hmmscan-parser.sh $OutDir/"$Strain"_CAZY.out.dm > $OutDir/"$Strain"_CAZY.out.dm.ps
   CazyHeaders=$(echo $File | sed 's/.out.dm/_headers.txt/g')
   cat $OutDir/"$Strain"_CAZY.out.dm.ps | cut -f3 | sort | uniq > $CazyHeaders
@@ -1250,23 +1348,8 @@ representing these proteins made.
   cat $CazyGffSecreted | grep -w 'gene' | cut -f9 | tr -d 'ID=' | wc -l
   done
 ```
-  N.ditissima - Ag04
-  number of CAZY genes identified:
-  726
-  number of Secreted CAZY genes identified:
-  283
-  N.ditissima - R45-15
-  number of CAZY genes identified:
-  722
-  number of Secreted CAZY genes identified:
-  287
-  N.ditissima - Hg199
-  number of CAZY genes identified:
-  721
-  number of Secreted CAZY genes identified:
-  285
-  N.ditissima - R0905_canu_2017_v2
-  number of CAZY genes identified:
-  719
-  number of Secreted CAZY genes identified:
-  286
+N.ditissima - Hg199_minion
+number of CAZY genes identified:
+753
+number of Secreted CAZY genes identified:
+290
