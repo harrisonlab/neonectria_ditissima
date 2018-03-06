@@ -20,8 +20,25 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
   done
   ```
 
+
+  ```bash
+    Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
+    for StrainPath in $(ls -d /data/scratch/gomeza/Nz_Genomes); do
+      Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
+      Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
+      echo "$Organism - $Strain"
+      F_Read=$(ls $StrainPath/F/*.fq.gz)
+      R_Read=$(ls $StrainPath/R/*.fq.gz)
+      echo $F_Read
+      echo $R_Read
+      OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/
+      ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
+      qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
+    done
+    ```
+
 ```bash
-input=/home/groups/harrisonlab/project_files/neonectria_ditissima/analysis/genome_alignment/bowtie/*/
+input=/analysis/genome_alignment/bowtie/*/
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 ```
 
@@ -29,20 +46,21 @@ scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_ana
 
 ```bash
 
-  for filename in $(ls -d analysis/genome_alignment/bowtie/*/*/vs_R0905_canu_2017); do
-  Organism=$(echo $filename | rev | cut -f3 -d '/' | rev)
-  Strain=$(echo $filename | rev | cut -f2 -d '/' | rev)
+  for filename in $(ls -d analysis/genome_alignment/bowtie/*/*); do
+  Organism=$(echo $filename | rev | cut -f2 -d '/' | rev)
+  Strain=$(echo $filename | rev | cut -f1 -d '/' | rev)
   echo "$Organism - $Strain"
-      cp "$filename/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam" "$filename/"$Strain"_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam"
+      cp "$filename/N.ditissima_contigs_unmasked.fa_aligned.sam" "$filename/"$Strain"_unmasked.fa_aligned.sam"
   done
 ```
 
 ## Remove multimapping reads, discordant reads. PCR and optical duplicates, and add read group and sample name to each mapped read (preferably, the shortest ID possible)
+
 Convention used:
 qsub $scripts/sub_pre_snp_calling.sh <INPUT SAM FILE> <SAMPLE_ID>
 
 ```bash
-for Strain in AgN04 Hg199 R0905 R45-15
+for Strain in Ag02 Ag04 Ag05 Ag06 Hg199 ND8 R0905 R37-15 R45-15
 do
     Jobs=$(qstat | grep 'sub_pre_sn' | wc -l)
     while [ $Jobs -gt 5 ]
@@ -51,7 +69,7 @@ do
         printf "."
         Jobs=$(qstat | grep 'sub_pre_sn' | wc -l)
     done
-    qsub $scripts/sub_pre_snp_calling.sh $input/$Strain/vs_R0905_canu_2017/"$Strain"_softmasked_repeatmasker_TPSI_appended.fa_aligned.sam $Strain
+    qsub $scripts/sub_pre_snp_calling.sh $input/$Strain/"$Strain"_unmasked.fa_aligned.sam $Strain
 done
 ```
 
