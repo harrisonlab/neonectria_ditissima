@@ -38,7 +38,7 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
     ```
 
 ```bash
-input=/analysis/genome_alignment/bowtie/*/
+input=analysis/genome_alignment/bowtie/N.ditissima
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 ```
 
@@ -56,8 +56,7 @@ scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_ana
 
 ## Remove multimapping reads, discordant reads. PCR and optical duplicates, and add read group and sample name to each mapped read (preferably, the shortest ID possible)
 
-Convention used:
-qsub $scripts/sub_pre_snp_calling.sh <INPUT SAM FILE> <SAMPLE_ID>
+Convention used: qsub $scripts/sub_pre_snp_calling.sh <SAMPLE_ID> This needs to use samtools 0.1.18 - hash out 1.5 from profile while this is run
 
 ```bash
 for Strain in Ag02 Ag04 Ag05 Ag06 Hg199 ND8 R0905 R37-15 R45-15
