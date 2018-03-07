@@ -230,59 +230,59 @@ done
 ```bash
 for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/M9/t1/F/M9_6*_trim.fq.gz | grep -v "mycelium")
 do
-Strain=$(echo $FileF | rev | cut -f4 -d '/' | rev)
-Organism=$(echo $FileF | rev | cut -f5 -d '/' | rev)
-echo "$Organism - $Strain"
-Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-while [ $Jobs -gt 1 ]
-do
-sleep 1m
-printf "."
-Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-done
-printf "\n"
-FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1/_2/g')
-echo $FileF
-echo $FileR
-Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
-echo "$Timepoint"
-Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
-OutDir=/data/scratch/gomeza/alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
-ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
-Assembly=/data/scratch/gomeza/apple_genome/GDDH13_1-1_formatted.fasta
-GFF=/home/groups/harrisonlab/project_files/neonectria_ditissima/apple_genome/gene_models_20170612.gff3
-qsub $ProgDir/sub_star_sensitive.sh $Assembly $FileF $FileR $OutDir $GFF
-done
+    Strain=$(echo $FileF | rev | cut -f4 -d '/' | rev)
+    Organism=$(echo $FileF | rev | cut -f5 -d '/' | rev)
+    echo "$Organism - $Strain"
+    Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+    while [ $Jobs -gt 1 ]
+    do
+        sleep 1m
+        printf "."
+        Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+    done
+    printf "\n"
+    FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1/_2/g')
+    echo $FileF
+    echo $FileR
+    Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
+    echo "$Timepoint"
+    Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
+    OutDir=/data/scratch/gomeza/alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+    ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
+    Assembly=/data/scratch/gomeza/apple_genome/GDDH13_1-1_formatted.fasta
+    GFF=/home/groups/harrisonlab/project_files/neonectria_ditissima/apple_genome/gene_models_20170612.gff3
+    qsub $ProgDir/sub_star_sensitive.sh $Assembly $FileF $FileR $OutDir $GFF
+    done
 done
 ```
 2nd run
 ```bash
 for FileF in $(ls /data/scratch/gomeza/qc_rna/N.ditissima/M9/t*/F/*_trim.fq.gz | grep -v "mycelium")
 do
-Strain=$(echo $FileF | rev | cut -f4 -d '/' | rev)
-Organism=$(echo $FileF | rev | cut -f5 -d '/' | rev)
-echo "$Organism - $Strain"
-Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-while [ $Jobs -gt 1 ]
-do
-sleep 1m
-printf "."
-Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-done
-printf "\n"
-FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1/_2/g')
-echo $FileF
-echo $FileR
-Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
-echo "$Timepoint"
-Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
-OutDir=/data/scratch/gomeza/alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
-mkdir -p $OutDir
-ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
-Assembly=/data/scratch/gomeza/apple_genome/GDDH13_1-1_formatted.fasta
-GFF=/data/scratch/gomeza/apple_genome/gene_models_20170612.gff3
-qsub $ProgDir/sub_star_sensitive.sh $Assembly $FileF $FileR $OutDir $GFF
-done
+    Strain=$(echo $FileF | rev | cut -f4 -d '/' | rev)
+    Organism=$(echo $FileF | rev | cut -f5 -d '/' | rev)
+    echo "$Organism - $Strain"
+    Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+    while [ $Jobs -gt 1 ]
+    do
+        sleep 1m
+        printf "."
+        Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+    done
+    printf "\n"
+    FileR=$(echo $FileF | sed 's&/F/&/R/&g'| sed 's/_1/_2/g')
+    echo $FileF
+    echo $FileR
+    Timepoint=$(echo $FileF | rev | cut -d '/' -f3 | rev)
+    echo "$Timepoint"
+    Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
+    OutDir=/data/scratch/gomeza/alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+    mkdir -p $OutDir
+    ProgDir=/home/adamst/git_repos/scripts/popgen/rnaseq
+    Assembly=/data/scratch/gomeza/apple_genome/GDDH13_1-1_formatted.fasta
+    GFF=/data/scratch/gomeza/apple_genome/gene_models_20170612.gff3
+    qsub $ProgDir/sub_star_sensitive.sh $Assembly $FileF $FileR $OutDir $GFF
+    done
 done
 ```
 
@@ -303,69 +303,69 @@ This star script had the following options added to the sub_star.sh script in th
 --seedSearchStartLmax 30
 
 ```bash
-    for Assembly in $(ls /data/scratch/gomeza/Hg199_genome/*_contigs_unmasked.fa)
-    do
-      #Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-      #Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
-      #echo "$Organism - $Strain"
-      for AlignDir in $(ls -d /data/scratch/gomeza/alignment/star/N.ditissima/Hg199_minion/M9/t1/M9_2*)
+for Assembly in $(ls /data/scratch/gomeza/Hg199_genome/*_contigs_unmasked.fa)
+do
+  #Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  #Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+  #echo "$Organism - $Strain"
+  for AlignDir in $(ls -d /data/scratch/gomeza/alignment/star/N.ditissima/Hg199_minion/M9/t1/M9_2*)
+  do
+    Strain=$(echo $AlignDir | rev | cut -f4 -d '/' | rev)
+    Organism=$(echo $AlignDir | rev | cut -f5 -d '/' | rev)
+      echo "$Organism - $Strain"
+      printf "\n"
+      File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
+      File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
+      echo $File1
+      echo $File2
+      Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
+      echo "$Timepoint"
+      Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
+      Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+      while [ $Jobs -gt 1 ]
       do
-        Strain=$(echo $AlignDir | rev | cut -f4 -d '/' | rev)
-        Organism=$(echo $AlignDir | rev | cut -f5 -d '/' | rev)
-          echo "$Organism - $Strain"
-          printf "\n"
-          File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
-          File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
-          echo $File1
-          echo $File2
-          Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
-          echo "$Timepoint"
-          Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
+          sleep 1m
+          printf "."
           Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-          while [ $Jobs -gt 1 ]
-          do
-              sleep 1m
-              printf "."
-              Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-          done
-          OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
-          ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-          qsub $ProgDir/sub_star_TA.sh $Assembly $File1 $File2 $OutDir
       done
-    done
+      OutDir=alignment/star/$Organism/$Strain/$Timepoint/$Sample_Name
+      ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+      qsub $ProgDir/sub_star_TA.sh $Assembly $File1 $File2 $OutDir
+  done
+done
 ```
 
 ```bash
-    for Assembly in $(ls Hg199_genome/*_contigs_unmasked.fa)
-    do
-      #Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-      #Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
-      #echo "$Organism - $Strain"
-      for AlignDir in $(ls -d alignment/star/N.ditissima/Hg199_minion/M9/t1/*)
+for Assembly in $(ls Hg199_genome/*_contigs_unmasked.fa)
+do
+  #Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  #Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+  #echo "$Organism - $Strain"
+  for AlignDir in $(ls -d alignment/star/N.ditissima/Hg199_minion/M9/t1/*)
+  do
+    Strain=$(echo $AlignDir | rev | cut -f4 -d '/' | rev)
+    Organism=$(echo $AlignDir | rev | cut -f5 -d '/' | rev)
+      echo "$Organism - $Strain"
+      printf "\n"
+      File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
+      File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
+      echo $File1
+      echo $File2
+      Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
+      echo "$Timepoint"
+      Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
+      Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
+      while [ $Jobs -gt 1 ]
       do
-        Strain=$(echo $AlignDir | rev | cut -f4 -d '/' | rev)
-        Organism=$(echo $AlignDir | rev | cut -f5 -d '/' | rev)
-          echo "$Organism - $Strain"
-          printf "\n"
-          File1=$AlignDir/star_aligmentUnmapped.out.mate1.fq.gz
-          File2=$AlignDir/star_aligmentUnmapped.out.mate2.fq.gz
-          echo $File1
-          echo $File2
-          Timepoint=$(echo $AlignDir | rev | cut -d '/' -f2 | rev)
-          echo "$Timepoint"
-          Sample_Name=$(echo $AlignDir | rev | cut -d '/' -f1 | rev)
+          sleep 1m
+          printf "."
           Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-          while [ $Jobs -gt 1 ]
-          do
-              sleep 1m
-              printf "."
-              Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
-          done
-          OutDir=alignment/star/star2/$Organism/$Strain/$Timepoint/$Sample_Name
-          ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-          qsub $ProgDir/sub_star.sh $Assembly $File1 $File2 $OutDir
       done
-    done
+      OutDir=alignment/star/star2/$Organism/$Strain/$Timepoint/$Sample_Name
+      ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+      qsub $ProgDir/sub_star.sh $Assembly $File1 $File2 $OutDir
+  done
+done
 ```
 
 #Quantification of gene models
@@ -530,6 +530,11 @@ do
     Prefix=$(echo $File | rev | cut -f1 -d '/' | rev | sed 's/_featurecounts.txt//g')
     sed -ie "s/star_aligmentAligned.sortedByCoord.out.bam/$Prefix/g" $File
 done
+
+
+#Create a gene sequence fastafile
+gffread gene_models_20170612.gff -g GDDH13_1-1_formatted.fasta -w your_transcripts.fasta
+cat your_transcripts.fasta | sed 's/gene=.*//g' > transcripts_modified.fasta
 
 #DeSeq commands
 
@@ -859,7 +864,7 @@ LFC < 0 (down)   : 4990, 45%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 1)
-
+tar xvjf filename.tar.bz2
 
 #Make a table of raw counts, normalised counts and fpkm values:
 
@@ -873,13 +878,13 @@ write.table(norm_counts,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq
 library("naturalsort",lib.loc="/home/adamst/R/x86_64-pc-linux-gnu-library/3.2/")
 library(Biostrings)
 library(naturalsort)
-mygenes <- readDNAStringSet("/data/scratch/gomeza/apple_genome/GDDH13_1-1_formatted.fasta")
+mygenes <- readDNAStringSet("/data/scratch/gomeza/apple_genome/transcripts_modified.fasta")
 t1 <- counts(dds)
 t1 <- mygenes[rownames(t1)]
 rowRanges(dds) <- GRanges(t1@ranges@NAMES,t1@ranges)
 
 
-# robust may be better set at fasle to normalise based on total counts rather than 'library normalisation factors'
+# robust may be better set at false to normalise based on total counts rather than 'library normalisation factors'
 fpkm_counts <- data.frame(fpkm(dds, robust = TRUE))
 colnames(fpkm_counts) <- paste(colData$Group)
 write.table(fpkm_counts,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/fpkm_norm_counts.txt",sep="\t",na="",quote=F)
@@ -898,10 +903,10 @@ sequence and functional information for annotated gene models and RxLRs.
 Run with commands:
 
 ```bash
-for GeneGff in $(ls public_genomes/JR2/Verticillium_dahliaejr2.GCA_000400815.2.33_parsed.gff3); do
-    Strain=JR2
-    Organism=V.dahliae
-    Assembly=$(ls public_genomes/JR2/Verticillium_dahliaejr2.GCA_000400815.2.dna.toplevel.fa)
+for GeneGff in $(ls apple_genome/gene_models_20170612.gff3); do
+    #Strain=JR2
+    #Organism=V.dahliae
+    Assembly=$(ls apple_genome/GDDH13_1-1_formatted.fasta)
     InterPro=$(ls /home/groups/harrisonlab/project_files/verticillium_dahliae/pathogenomics/gene_pred/interproscan/V.dahliae/JR2/JR2_interproscan.tsv)
     SwissProt=$(ls /home/groups/harrisonlab/project_files/verticillium_dahliae/pathogenomics/gene_pred/swissprot/V.dahliae/12008/swissprot_vJul2016_tophit_parsed.tbl)
     OutDir=gene_pred/annotation/$Organism/$Strain
