@@ -78,11 +78,11 @@ done
 ```bash
 for Strain in AgN04 Hg199 R0905 R45-15
 do
-    Bam="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup.bam
+    #Bam="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup.bam
     rgBam="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam
     Bai="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam.bai
     Txt="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup.txt
-    Directory=analysis/genome_alignment/bowtie/*/$Strain/vs_Bc16_FALCON/
+    Directory=analysis/genome_alignment/bowtie/*/$Strain/vs_Hg199_minion/
     mv $Bam $Directory
     mv $rgBam $Directory
     mv $Bai $Directory
