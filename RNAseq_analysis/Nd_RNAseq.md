@@ -536,6 +536,9 @@ done
 gffread gene_models_20170612.gff -g GDDH13_1-1_formatted.fasta -w your_transcripts.fasta
 cat your_transcripts.fasta | sed 's/gene=.*//g' > transcripts_modified.fasta
 
+gffread gene_models_20170612.gff -g GDDH13_1-1_formatted.fasta -w your_transcripts.fasta
+cat transcripts_modified2.fasta | sed 's/ncRNA://g' > transcripts_modified3.fasta
+
 #DeSeq commands
 
 ```R
@@ -904,164 +907,76 @@ Run with commands:
 
 ```bash
 for GeneGff in $(ls apple_genome/gene_models_20170612.gff3); do
-    #Strain=JR2
-    #Organism=V.dahliae
+    Organism=N.ditissima
     Assembly=$(ls apple_genome/GDDH13_1-1_formatted.fasta)
-    InterPro=$(ls /home/groups/harrisonlab/project_files/verticillium_dahliae/pathogenomics/gene_pred/interproscan/V.dahliae/JR2/JR2_interproscan.tsv)
-    SwissProt=$(ls /home/groups/harrisonlab/project_files/verticillium_dahliae/pathogenomics/gene_pred/swissprot/V.dahliae/12008/swissprot_vJul2016_tophit_parsed.tbl)
-    OutDir=gene_pred/annotation/$Organism/$Strain
+    InterPro=$(ls apple_genome/Interproscan/interpro_1v1.tsv)
+    #SwissProt=$(ls /home/groups/harrisonlab/project_files/verticillium_dahliae/pathogenomics/gene_pred/swissprot/V.dahliae/12008/swissprot_vJul2016_tophit_parsed.tbl)
+    OutDir=gene_pred/annotation/$Organism/Cultivars
     mkdir -p $OutDir
-    GeneFasta=$(ls public_genomes/JR2/Verticillium_dahliaejr2.VDAG_JR2v.4.0.cds.all.fa)
-    Dir1=$(ls -d RNA_alignment/featureCounts/experiment_53)
-    Dir2=$(ls -d RNA_alignment/featureCounts/experiment_53/WT53)
+    GeneFasta=$(ls apple_genome/transcripts_modified3.fasta)
+    Dir1=$(ls -d /data/scratch/gomeza/alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq)
     DEG_Files=$(ls \
-        $Dir1/Frq53_LD_06h.txt \
-        $Dir1/Wc153_LD_06h.txt \
-        $Dir1/Wt53_Frq53_bl06h.txt \
-        $Dir1/Wt53_Frq53_d06h.txt \
-        $Dir1/Wt53_bl06h_vs_d06h.txt \
-        $Dir1/Wt53_Wc153_bl06h.txt \
-        $Dir1/Wt53_Wc153_d06h.txt \
-        $Dir2/Wt53_d06h_d12h.txt \
-        $Dir2/Wt53_d06h_d18h.txt \
-        $Dir2/Wt53_d06h_d24h.txt \
-        $Dir2/Wt53_d12h_d18h.txt \
-        $Dir2/Wt53_d12h_d24h.txt \
-        $Dir2/Wt53_d24h_d18h.txt \
-        $Dir2/Wt53_LD_06h.txt \
+        $Dir1/GD_t1_vs_GD_t0.txt \
+        $Dir1/GD_t2_vs_GD_t0.txt \
+        $Dir1/M9_t1_vs_M9_t0.txt \
+        $Dir1/M9_t2_vs_M9_t0.txt \
+        $Dir1/GD_t1_vs_GD_t2.txt \
+        $Dir1/M9_t1_vs_M9_t2.txt \
         | sed -e "s/$/ /g" | tr -d "\n")
 
-    RawCount=$(ls $Dir1/raw_counts_53.txt)
-    FPKM=$(ls $Dir1/countData_53.fpkm)
-    ProgDir=/home/armita/git_repos/emr_repos/scripts/verticillium_clocks/annotation
-    $ProgDir/Vd_annotation_tables.py --gene_gff $GeneGff --gene_fasta $GeneFasta --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --InterPro $InterPro --Swissprot $SwissProt > $OutDir/"$Strain"_gene_table_incl_exp.tsv
+    RawCount=$(ls $Dir1/raw_counts.txt)
+    FPKM=$(ls $Dir1/fpkm_counts.txt)
+    ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+
+    $ProgDir/pacbio_anntoation_tables_modified.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
 done
+
 ```
-
-#Inital analysis of tables of DEGs
-
-```bash
-  effector_names=analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_secreted_headers.txt
-  CAZY_names=gene_pred/CAZY/N.ditissima/Hg199_minion/Hg199_minion_CAZY_headers.txt
-  for File in $(ls alignment/star/N.ditissima/Hg199_minion/DeSeq/GD*.txt | grep -v "genes" | grep -v "countData")
-  do
-      Assessment=$(basename $File | sed "s/.txt//g")
-      echo $Assessment
-      echo "Total number of genes in dataset:"
-      cat $File | grep -v 'baseMean' | wc -l
-      echo "Total number of secretedeffector in dataset:"
-      Effector_File=$(echo $File | sed "s/.txt/_Effector.txt/g")
-      cat $File | head -n 1 > $Effector_File
-      cat $File | grep -w -f $effector_names >> $Effector_File
-      cat $Effector_File | tail -n +2 | wc -l
-        echo "Total number of CAZY in dataset:"
-        CAZY_File=$(echo $File | sed "s/.txt/_CAZY.txt/g")
-        cat $File | head -n 1 > $CAZY_File
-        cat $File | grep -w -f $CAZY_names >> $CAZY_File
-        cat $CAZY_File | tail -n +2 | wc -l
-
-    done
-done
-```
-
 
 ##Produce a more detailed table of analyses
 
 ```bash
-for Strain in Bc1 Nov9
-do
-    for GeneGff in $(ls gene_pred/annotation/P.fragariae/$Strain/"$Strain"_genes_incl_ORFeffectors.gff3)
+    for GeneGff in $(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3)
     do
-        Organism=$(echo $GeneGff | rev | cut -f3 -d '/' | rev)
-        Assembly=$(ls repeat_masked/P.fragariae/$Strain/ncbi_edits_repmask/*_contigs_unmasked.fa)
-        InterPro=$(ls gene_pred/interproscan/$Organism/$Strain/greedy/*_interproscan.tsv)
-        SwissProt=$(ls gene_pred/swissprot/$Organism/$Strain/greedy/swissprot_vJul2016_tophit_parsed.tbl)
+      Strain=Hg199_minion
+      Organism=N.ditissima
+        Assembly=$(ls /data/scratch/gomeza/Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/*_contigs_unmasked.fa)
+        InterPro=$(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199_minion/Hg199_minion_interproscan.tsv)
+        SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/N.ditissima/Hg199_minion/swissprot_vJul2016_tophit_parsed.tbl)
         OutDir=gene_pred/annotation/$Organism/$Strain
         mkdir -p $OutDir
-        # GeneFasta=$(ls gene_pred/annotation/P.cactorum/414_v2/414_v2_genes_incl_ORFeffectors.pep.fasta)
-        GeneFasta=$(ls gene_pred/annotation/P.fragariae/$Strain/"$Strain"_genes_incl_ORFeffectors.cds.fasta)
-        SigP2=$(ls gene_pred/final_sigP/$Organism/$Strain/*_aug_sp.aa)
-        SigP2_ORF=$(ls gene_pred/ORF_sigP/$Organism/$Strain/*_aug_sp.aa)
-        SigP3=$(ls gene_pred/final_signalp-3.0/$Organism/$Strain/*_aug_sp.aa)
-        SigP3_ORF=$(ls gene_pred/ORF_signalp-3.0/$Organism/$Strain/*_aug_sp.aa)
-        SigP4=$(ls gene_pred/final_signalp-4.1/$Organism/$Strain/*_aug_sp.aa)
-        SigP4_ORF=$(ls gene_pred/ORF_signalp-4.1/$Organism/$Strain/*_aug_sp.aa)
-        TMHMM_headers=$(ls gene_pred/trans_mem/$Organism/$Strain/greedy/*_TM_genes_pos_headers.txt)
-        GPI_headers=$(ls gene_pred/GPIsom/$Organism/$Strain/greedy/GPI_pos.txt)
-        PhobiusFa=$(ls analysis/phobius_CQ/$Organism/$Strain/*_phobius.fa)
-        PhobiusFa_ORF=$(ls analysis/phobius_ORF/$Organism/$Strain/*_phobius.fa)
-        #RxLR_Motif=$(ls analysis/RxLR_effectors/RxLR_EER_regex_finder/$Organism/$Strain/*_RxLR_EER_regex.fa | grep -v 'ORF')
-        #RxLR_Hmm=$(ls analysis/RxLR_effectors/hmmer_RxLR/$Organism/$Strain/*_RxLR_hmmer.fa | grep -v 'ORF')
-        #RxLR_WY=$(ls analysis/RxLR_effectors/hmmer_WY/$Organism/$Strain/*_WY_hmmer_headers.txt | grep -v 'ORF')
-        RxLR_total=$(ls analysis/RxLR_effectors/combined_evidence/$Organism/$Strain/*_Total_RxLR_motif_hmm.txt)
-        RxLR_ORF_total=$(ls analysis/RxLR_effectors/combined_evidence/$Organism/$Strain/*_total_ORF_RxLR_headers.txt)
-        RxLR_EER_total=$(ls analysis/RxLR_effectors/combined_evidence/$Organism/$Strain/*_Total_RxLR_EER_motif_hmm.txt)
-        RxLR_EER_ORF_total=$(ls analysis/RxLR_effectors/combined_evidence/$Organism/$Strain/*_total_ORF_RxLR_EER_headers.txt)
-        #CRN_LFLAK=$(ls analysis/CRN_effectors/hmmer_CRN/$Organism/$Strain/*_pub_CRN_LFLAK_hmm.fa | grep -v 'ORF')
-        #CRN_DWL=$(ls analysis/CRN_effectors/hmmer_CRN/$Organism/$Strain/*_pub_CRN_DWL_hmm.fa | grep -v 'ORF')
-        CRN_total=$(ls analysis/CRN_effectors/hmmer_CRN/$Organism/$Strain/*_final_CRN.txt)
-        ApoP_total=$(ls analysis/ApoplastP/$Organism/$Strain/*_Total_ApoplastP.txt)
-        #	OrthoName=Pcac
-        #	OrthoFile=$(ls analysis/orthology/orthomcl/Pcac_Pinf_Ppar_Pcap_Psoj/Pcac_Pinf_Ppar_Pcap_Psoj_orthogroups.txt)
-        ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae
-        DEG_Files=$(ls alignment/star/P.fragariae/$Strain/DeSeq/*_vs_*.txt  | grep -v -e 'up' -e 'down' -e "CRN" -e "RxLR" | sed -e "s/$/ /g" | tr -d "\n")
+        GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta)
+
+        SigP4=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/Hg199_minion_final_sp_no_trans_mem.aa)
+        effector_total=analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_headers.txt
+        CAZY_total=gene_pred/CAZY/N.ditissima/Hg199_minion/Hg199_minion_CAZY_headers.txt
+
+        TMHMM_headers=$(ls gene_pred/trans_mem/$Organism/$Strain/*_TM_genes_pos_headers.txt)
+
+        ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+
+        Dir1=$(ls -d /data/scratch/gomeza/alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq)
+        DEG_Files=$(ls \
+            $Dir1/GD_t1_vs_mycelium_Control.txt \
+            $Dir1/M9_t1_vs_mycelium_Control.txt \
+            $Dir1/GD_t2_vs_mycelium_Control.txt \
+            $Dir1/M9_t2_vs_mycelium_Control.txt \
+            $Dir1/M9_t1_vs_GD_t1.txt \
+            | sed -e "s/$/ /g" | tr -d "\n")
+
+        #DEG_Files=$(ls alignment/star/N.ditisima/Hg199_minion/unmapped_to_Nd/DeSeq/*_vs_*.txt  | grep -v -e 'up' -e 'down' -e "CAZY" -e "Effector" | sed -e "s/$/ /g" | tr -d "\n")
         # $ProgDir/pacbio_anntoation_tables.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP2 $SigP2 --SigP4 $SigP4 --phobius $PhobiusTxt --RxLR_motif $RxLR_Motif --RxLR_Hmm $RxLR_Hmm --RxLR_WY $RxLR_WY --RxLR_total $RxLR_total --CRN_LFLAK $CRN_LFLAK --CRN_DWL $CRN_DWL --CRN_total $CRN_total --DEG_files $DEG_Files  > $OutDir/414_v2_gene_table_incl_exp.tsv
         # NormCount=$(ls alignment/star/P.cactorum/414_v2/DeSeq/normalised_counts.txt)
-        RawCount=$(ls alignment/star/P.fragariae/$Strain/DeSeq/raw_counts.txt)
-        FPKM=$(ls alignment/star/P.fragariae/$Strain/DeSeq/fpkm_counts.txt)
-        OrthoName=$Strain
-        OrthoFile=analysis/orthology/orthomcl/All_Strains_plus_rubi_no_removal/All_Strains_plus_rubi_no_removal_orthogroups.txt
-        $ProgDir/pacbio_anntoation_tables_modified.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP2 $SigP2 --SigP2_ORF $SigP2_ORF --SigP3 $SigP3 --SigP3_ORF $SigP3_ORF --SigP4 $SigP4 --SigP4_ORF $SigP4_ORF --phobius $PhobiusFa --phobius_ORF $PhobiusFa_ORF --trans_mem $TMHMM_headers --GPI_anchor $GPI_headers --RxLR_total $RxLR_total --RxLR_total_ORF $RxLR_ORF_total --RxLR_EER_total $RxLR_EER_total --RxLR_EER_total_ORF $RxLR_EER_ORF_total --CRN_total $CRN_total --ApoP_total $ApoP_total --ortho_name $OrthoName --ortho_file $OrthoFile --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
+        RawCount=$(ls alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/raw_counts.txt )
+        FPKM=$(ls alignment/star/N.ditissima/Hg199_minion/unmapped_to_Nd/DeSeq/fpkm_counts.txt)
+        #OrthoName=$Strain
+      #OrthoFile=analysis/orthology/orthomcl/All_Strains_plus_rubi_no_removal/All_Strains_plus_rubi_no_removal_orthogroups.txt
+        $ProgDir/pacbio_anntoation_tables_modified.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
     done
 done
 ```
 
-#Extract fasta file of all DEGs for BLAST analysis
 
-```bash
-for Strain in Bc1 Nov9
-do
-    input=alignment/star/P.fragariae/$Strain/DeSeq/*_vs_*mycelium.txt
-    DEGFile=alignment/star/P.fragariae/$Strain/DeSeq/"$Strain"_all_DEGs.tsv
-    ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae
-    $ProgDir/parse_RNA-Seq_1_timepoint.py --input $input --out_dir $DEGFile
-    DEGNames=alignment/star/P.fragariae/$Strain/DeSeq/"$Strain"_all_DEGs_names.txt
-    Genes=gene_pred/annotation/P.fragariae/$Strain/"$Strain"_genes_incl_ORFeffectors.cds.fasta
-    DEGFasta=alignment/star/P.fragariae/$Strain/DeSeq/"$Strain"_all_DEGs.fa
-    $ProgDir/extract_DEG_Names_1_timepoint.py --input $DEGFile --output $DEGNames
-    ProgDir=/home/adamst/git_repos/tools/gene_prediction/ORF_finder
-    $ProgDir/extract_from_fasta.py --fasta $Genes --headers $DEGNames > $DEGFasta
-done
-```
-
-#Investigate enriched functional annotations in DEGs vs all genes
-
-##Analysis of DEGs vs all genes
-
-```bash
-for Strain in Bc1 Nov9
-do
-    OutDir=analysis/enrichment/P.fragariae/$Strain/Whole_Genome
-    mkdir -p $OutDir
-    InterProTSV=gene_pred/interproscan/P.fragariae/$Strain/greedy/"$Strain"_interproscan.tsv
-    ProgDir=/home/adamst/git_repos/scripts/fusarium/analysis/gene_enrichment
-    $ProgDir/GO_prep_table.py --interpro $InterProTSV > $OutDir/"$Strain"_gene_GO_annots.tsv
-
-    ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae
-    AnnotTable=gene_pred/annotation/P.fragariae/$Strain/"$Strain"_gene_table_incl_exp.tsv
-    DEGs=alignment/star/P.fragariae/$Strain/DeSeq/"$Strain"_all_DEGs_names.txt
-    AllGenes=$OutDir/"$Strain"_all_genes.txt
-    cat $AnnotTable | tail -n+2  | cut -f1 > $AllGenes
-    Set1Genes=$OutDir/"$Strain"_DEGs.txt
-    Set2Genes=$OutDir/"$Strain"_all_genes2.txt
-    AllGenes=$OutDir/"$Strain"_all_genes.txt
-    cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-    cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
-    cat $Set1Genes $Set2Genes > $AllGenes
-
-    $ProgDir/GO_enrichment.r --all_genes $AllGenes --GO_annotations $OutDir/"$Strain"_gene_GO_annots.tsv --out_dir $OutDir > $OutDir/output.txt
-done
-```
 
 Method 2
 
@@ -1272,8 +1187,8 @@ sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
 #Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
 #               downregulated: min. 0.5x fold change, ie. log2foldchange max -1.
-sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
-sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=2, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-2, ]
 # No threshold
 sig.res.upregulated <- sig.res[sig.res$log2FoldChange >0, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <0, ]
