@@ -23,19 +23,17 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
 
   ```bash
     Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
-    for StrainPath in $(ls -d /data/scratch/gomeza/Nz_Genomes); do
-      Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
-      Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
-      echo "$Organism - $Strain"
-      F_Read=$(ls $StrainPath/F/*.fq.gz)
-      R_Read=$(ls $StrainPath/R/*.fq.gz)
-      echo $F_Read
-      echo $R_Read
+    for GenomePath in $(ls -d /data/scratch/gomeza/Nd_genomes/*); do
+      Organism=$(echo $GenomePath | rev | cut -f2 -d '/' | rev)
+      Strain=$(echo $GenomePath | rev | cut -f1 -d '/' | rev)
+      Genome2=$(ls $GenomePath/*nt.gz)
+      echo "$Reference - $Genome2"
       OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/
       ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
-      qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
+      qsub $ProgDir/mauve/run_progressive_mauve.sh $OutDir $Reference $Genome2
     done
     ```
+    progressiveMauve --output=analysis/genome_alignment/bowtie/$Organism/$Strain/my_seqs.xmfa repeat_masked/N.ditisima/Ref_Genomes/Hg199_minion/filtered_contigs/N.ditissima_contigs_unmasked.fa /data/scratch/gomeza/Nd_genomes/RS324p/LDPL01.1.fsa_nt
 
 ```bash
 input=analysis/genome_alignment/bowtie/N.ditissima
