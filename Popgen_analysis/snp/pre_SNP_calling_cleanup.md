@@ -34,11 +34,14 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
 ## Rename input mapping files in each folder by prefixing with the strain ID
 
 ```bash
-  for filename in $(ls -d analysis/genome_alignment/bowtie/*/*); do
-  Organism=$(echo $filename | rev | cut -f2 -d '/' | rev)
-  Strain=$(echo $filename | rev | cut -f1 -d '/' | rev)
+  for filename in $(ls -d analysis/genome_alignment/bowtie/*/*/vs_Hg199_minion); do
+  Organism=$(echo $filename | rev | cut -f3 -d '/' | rev)
+  Strain=$(echo $filename | rev | cut -f2 -d '/' | rev)
   echo "$Organism - $Strain"
       cp "$filename/N.ditissima_contigs_unmasked.fa_aligned.sam" "$filename/"$Strain"_unmasked.fa_aligned.sam"
+      cp "$filename/N.ditissima_contigs_unmasked.fa_aligned.bam" "$filename/"$Strain"_unmasked.fa_aligned.bam"
+      cp "$filename/N.ditissima_contigs_unmasked.fa_aligned_sorted.bam" "$filename/"$Strain"_unmasked.fa_aligned_sorted.bam"
+      cp "$filename/N.ditissima_contigs_unmasked.fa_aligned_sorted.bam.index" "$filename/"$Strain"_unmasked.fa_aligned_sorted.bam.index"
   done
 ```
 
@@ -56,7 +59,7 @@ do
         printf "."
         Jobs=$(qstat | grep 'sub_pre_sn' | wc -l)
     done
-    qsub $scripts/sub_pre_snp_calling.sh $input/$Strain/"$Strain"_unmasked.fa_aligned.sam $Strain
+    qsub $scripts/sub_pre_snp_calling_maria.sh $input/$Strain/vs_Hg199_minion/"$Strain"_unmasked.fa_aligned.sam $Strain
 done
 ```
 

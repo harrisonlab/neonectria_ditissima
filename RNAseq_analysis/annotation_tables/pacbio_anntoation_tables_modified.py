@@ -23,12 +23,12 @@ ap.add_argument('--gene_gff', required=True, type=str,
                 help='Gff file of predicyted gene models')
 ap.add_argument('--gene_fasta', required=True, type=str,
                 help='amino acid sequence of predicted proteins')
-#ap.add_argument('--SigP4', required=True, type=str,
-#                help='fasta file of genes testing positive for signal peptide \
-#using SigP4.1')
-#ap.add_argument('--trans_mem', required=True, type=str,
-#                help='txt file of headers from gene testing positive for \
-#transmembrane proteins by TMHMM')
+ap.add_argument('--SigP4', required=True, type=str,
+                help='fasta file of genes testing positive for signal peptide \
+using SigP4.1')
+ap.add_argument('--trans_mem', required=True, type=str,
+                help='txt file of headers from gene testing positive for \
+transmembrane proteins by TMHMM')
 #ap.add_argument('--GPI_anchor', required=True, type=str,
 #                help='txt file of headers from gene testing positive for GPI \
 #anchors as identified by GPI-SOM')
@@ -40,9 +40,9 @@ ap.add_argument('--gene_fasta', required=True, type=str,
 # ap.add_argument('--RxLR_WY', required=True, type=str,
 #                 help='fasta file of genes testing positive for WY domains \
 #                 using an hmm model')
-#ap.add_argument('--effector_total', required=True, type=str,
-#                help='txt file of all transcripts considered low confidence \
-#                effector')
+ap.add_argument('--effector_total', required=True, type=str,
+                help='txt file of all transcripts considered low confidence \
+                effector')
 #ap.add_argument('--RxLR_total_ORF', required=True, type=str,
 #                help='fasta file of all transcripts considered low \
 #               confidence RxLRs from ORFs')
@@ -58,8 +58,8 @@ ap.add_argument('--gene_fasta', required=True, type=str,
 # ap.add_argument('--CRN_DWL', required=True, type=str,
 #                 help='fasta file of genes testing positive for DWL domains \
 #                 using an hmm model')
-#ap.add_argument('--CAZY_total', required=True, type=str,
-#                help='txt file of all transcripts considered CAZY')
+ap.add_argument('--CAZY_total', required=True, type=str,
+                help='txt file of all transcripts considered CAZY')
 #ap.add_argument('--ApoP_total', required=True, type=str,
 #                help='fasta file of all transcripts considered Apoplastic \
 #                effectors')
@@ -77,10 +77,10 @@ ap.add_argument('--fpkm', required=True, type=str,
                 help='normalised fpkm count data as output from DESeq')
 ap.add_argument('--InterPro', required=True, type=str,
                 help='The Interproscan functional annotation .tsv file')
-#ap.add_argument('--Swissprot', required=True, type=str,
-#                help='A parsed table of BLAST results against the Swissprot \
-#                database. Note - must have been parsed with \
-#                swissprot_parser.py')
+ap.add_argument('--Swissprot', required=True, type=str,
+                help='A parsed table of BLAST results against the Swissprot \
+                database. Note - must have been parsed with \
+                swissprot_parser.py')
 
 
 conf = ap.parse_args()
@@ -104,8 +104,8 @@ with open(conf.gene_fasta) as f:
 #with open(conf.SigP3_ORF) as f:
 #    sigp3_orf_lines = f.readlines()
 
-#with open(conf.SigP4) as f:
-#    sigP4_lines = f.readlines()
+with open(conf.SigP4) as f:
+    sigP4_lines = f.readlines()
 
 #with open(conf.SigP4_ORF) as f:
 #    sigp4_orf_lines = f.readlines()
@@ -116,8 +116,8 @@ with open(conf.gene_fasta) as f:
 #with open(conf.phobius_ORF) as f:
 #    phobius_orf_lines = f.readlines()
 
-#with open(conf.trans_mem) as f:
-#    trans_mem_lines = f.readlines()
+with open(conf.trans_mem) as f:
+    trans_mem_lines = f.readlines()
 
 #with open(conf.GPI_anchor) as f:
 #    gpi_lines = f.readlines()
@@ -131,8 +131,8 @@ with open(conf.gene_fasta) as f:
 # with open(conf.RxLR_WY) as f:
 #     RxLR_WY_lines = f.readlines()
 
-#with open(conf.effector_total) as f:
-#    effector_total_lines = f.readlines()
+with open(conf.effector_total) as f:
+    effector_total_lines = f.readlines()
 
 #with open(conf.RxLR_total_ORF) as f:
 #    RxLR_orf_total_lines = f.readlines()
@@ -149,8 +149,8 @@ with open(conf.gene_fasta) as f:
 # with open(conf.CRN_DWL) as f:
 #     CRN_DWL_lines = f.readlines()
 
-#with open(conf.CAZY_total) as f:
-#    CAZY_total_lines = f.readlines()
+with open(conf.CAZY_total) as f:
+    CAZY_total_lines = f.readlines()
 
 #with open(conf.ApoP_total) as f:
 #    ApoP_total_lines = f.readlines()
@@ -184,8 +184,8 @@ with open(conf.fpkm) as f:
 with open(conf.InterPro) as f:
     InterPro_lines = f.readlines()
 
-#with open(conf.Swissprot) as f:
-#    swissprot_lines = f.readlines()
+with open(conf.Swissprot) as f:
+    swissprot_lines = f.readlines()
 
 # -----------------------------------------------------
 # Load protein sequence data into a dictionary
@@ -253,13 +253,13 @@ for line in prot_lines:
 # Load signalP4.1 files into a set
 # -----------------------------------------------------
 
-#SigP4_set = Set()
-#for line in sigP4_lines:
-#    line = line.rstrip()
-#    if line.startswith('>'):
-#        split_line = line.split()
-#        header = split_line[0].replace('>', '')
-#        SigP4_set.add(header)
+SigP4_set = Set()
+for line in sigP4_lines:
+    line = line.rstrip()
+    if line.startswith('>'):
+        split_line = line.split()
+        header = split_line[0].replace('>', '')
+        SigP4_set.add(header)
 
 # -----------------------------------------------------
 # Load signalP4.1_ORF files into a set
@@ -303,10 +303,10 @@ for line in prot_lines:
 # Load TMHMM headers into a set
 # -----------------------------------------------------
 
-#trans_mem_set = Set()
-#for line in trans_mem_lines:
-#    header = line.rstrip()
-#    trans_mem_set.add(header)
+trans_mem_set = Set()
+for line in trans_mem_lines:
+    header = line.rstrip()
+    trans_mem_set.add(header)
 
 # -----------------------------------------------------
 # Load GPI-anchored proteins into a set
@@ -357,10 +357,10 @@ for line in prot_lines:
 # Load RxLR total +ve proteins into a set
 # -----------------------------------------------------
 
-#effector_total_set = Set()
-#for line in effector_total_lines:
-#    header = line.rstrip()
-#    effector_total_set.add(header)
+effector_total_set = Set()
+for line in effector_total_lines:
+    header = line.rstrip()
+    effector_total_set.add(header)
     # line = line.rstrip()
     # if line.startswith('>'):
     #     split_line = line.split()
@@ -441,12 +441,12 @@ for line in prot_lines:
 # Load CRN total proteins into a set
 # -----------------------------------------------------
 
-#CAZY_total_set = Set()
-#for line in CAZY_total_lines:
-#    header = line.rstrip()
-#    if 'contig' in header:
-#        header = header + '.t1'
-#    CAZY_total_set.add(header)
+CAZY_total_set = Set()
+for line in CAZY_total_lines:
+    header = line.rstrip()
+    if 'contig' in header:
+        header = header + '.t1'
+    CAZY_total_set.add(header)
     # line = line.rstrip()
     # if line.startswith('>'):
     #     split_line = line.split()
@@ -563,15 +563,15 @@ for line in InterPro_lines:
 # Build a dictionary of Swissprot annotations
 # -----------------------------------------------------
 
-#swissprot_dict = defaultdict(list)
+swissprot_dict = defaultdict(list)
 
-#for line in swissprot_lines:
-#    line = line.rstrip("\n")
-#    split_line = line.split("\t")
-#    gene_id = split_line[0]
-#    swissprot_columns = itemgetter(14, 12, 13)(split_line)
+for line in swissprot_lines:
+    line = line.rstrip("\n")
+    split_line = line.split("\t")
+    gene_id = split_line[0]
+    swissprot_columns = itemgetter(14, 12, 13)(split_line)
 
-#    swissprot_dict[gene_id].extend(swissprot_columns)
+    swissprot_dict[gene_id].extend(swissprot_columns)
 
 # -----------------------------------------------------
 # Step 3
@@ -585,8 +585,8 @@ header_line.extend(['contig', 'start', 'stop', 'strand'])
 # header_line.extend(['sigP2', 'sigP4', 'phobius', 'RxLR_motif', 'RxLR_hmm',
 #                     'WY_hmm', 'RxLR_total', 'CRN_LFLAK', 'CRN_DWL',
 #                     'CRN_total', 'orthogroup'])
-#header_line.extend(['sigP4', 'TMHMM',
-#                    'secreted', 'effector_total', 'CAZY_total'])
+header_line.extend(['sigP4', 'TMHMM',
+                    'secreted', 'effector_total', 'CAZY_total'])
 for treatment in sorted(set(count_treatment_list)):
     treatment = "raw_count_" + treatment
     header_line.append(treatment)
@@ -656,17 +656,17 @@ for line in transcript_lines:
     split_line = line.split("\t")
     useful_cols = [split_line[0],  split_line[3], split_line[4], split_line[6]]
     # Set defaults
-    #sigP4 = ''
-    #trans_mem = ''
+    sigP4 = ''
+    trans_mem = ''
     # RxLR_motif = ''
     # RxLR_hmm = ''
     # WY_hmm = ''
-    #effector_total = ''
+    effector_total = ''
     # CRN_LFLAK = ''
     # CRN_DWL = ''
-    #CAZY_total = ''
+    CAZY_total = ''
     prot_seq = ''
-    #swissprot_cols = []
+    swissprot_cols = []
     interpro_col = []
     # Identify gene id
     if 'ID' in split_line[8]:
@@ -676,14 +676,14 @@ for line in transcript_lines:
     else:
         transcript_id = split_line[8]
 
-    #if transcript_id in SigP4_set:
-    #    sigP4 = 'Yes'
-    #if transcript_id in trans_mem_set:
-    #    trans_mem = 'Yes'
-    #if any([sigP4 == 'Yes']) and all([trans_mem == '']):
-    #    secreted = 'Yes'
-    #else:
-    #    secreted = ''
+    if transcript_id in SigP4_set:
+        sigP4 = 'Yes'
+    if transcript_id in trans_mem_set:
+        trans_mem = 'Yes'
+    if any([sigP4 == 'Yes']) and all([trans_mem == '']):
+        secreted = 'Yes'
+    else:
+        secreted = ''
     # if transcript_id in RxLR_motif_set:
     #     RxLR_motif = 'Yes'
     # if transcript_id in RxLR_hmm_set:
@@ -691,8 +691,8 @@ for line in transcript_lines:
     # if transcript_id in RxLR_WY_set:
     #     WY_hmm = 'Yes'
     # gene_id = transcript_id.split('.')[0]
-    #if transcript_id in effector_total_set:
-    #    effector_total = 'Yes'
+    if transcript_id in effector_total_set:
+        effector_total = 'Yes'
     #if transcript_id in RxLR_ORF_total_set:
     #    RxLR_total = 'Yes'
     #if transcript_id in RxLR_EER_total_set:
@@ -703,8 +703,8 @@ for line in transcript_lines:
     #     CRN_LFLAK = 'Yes'
     # if transcript_id in CRN_DWL_set:
     #     CRN_DWL = 'Yes'
-    #if transcript_id in CAZY_total_set:
-    #    CAZY_total = 'Yes'
+    if transcript_id in CAZY_total_set:
+        CAZY_total = 'Yes'
     #if transcript_id in ApoP_total_set:
     #    ApoP_total = 'Yes'
     #if ortho_dict[transcript_id]:
@@ -742,10 +742,10 @@ for line in transcript_lines:
         # print mean_fpkm_cols
 
     # # Add in Swissprot info
-    #if swissprot_dict[transcript_id]:
-    #    swissprot_cols = swissprot_dict[transcript_id]
-    #else:
-    #    swissprot_cols = ['.', '.', '.']
+    if swissprot_dict[transcript_id]:
+        swissprot_cols = swissprot_dict[transcript_id]
+    else:
+        swissprot_cols = ['.', '.', '.']
     # # Add in interproscan info
     if interpro_dict[transcript_id]:
         interpro_col = "|".join(interpro_dict[transcript_id])
@@ -760,14 +760,14 @@ for line in transcript_lines:
     # outline.extend([sigP2, sigP4, phobius, RxLR_motif, RxLR_hmm,
     #                 WY_hmm, RxLR_total, CRN_LFLAK, CRN_DWL, CRN_total,
     #                 orthogroup])
-    #outline.extend([sigP4])
-    #outline.extend([trans_mem, secreted])
-    #outline.extend([effector_total, CAZY_total])
+    outline.extend([sigP4])
+    outline.extend([trans_mem, secreted])
+    outline.extend([effector_total, CAZY_total])
     outline.extend(mean_count_cols)
     outline.extend(mean_fpkm_cols)
     outline.extend(DEG_out)
     outline.append(prot_seq)
-    #outline.extend(swissprot_cols)
+    outline.extend(swissprot_cols)
     outline.append(interpro_col)
     print "\t".join(outline)
     # print DEG_out
