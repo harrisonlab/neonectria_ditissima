@@ -39,6 +39,6 @@ The submission script required need to be custom-prepared for each analysis, dep
 See inside the submission script below:
 
 ```bash
-scripts=/home/adamst/git_repos/scripts/phytophthora_fragariae/popgen_analysis
+scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 qsub $scripts/sub_SNP_calling_multithreaded.sh
 ```
