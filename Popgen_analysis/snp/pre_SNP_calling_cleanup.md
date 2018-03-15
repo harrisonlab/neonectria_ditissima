@@ -66,14 +66,14 @@ done
 ##Copy outputs from cleanup to alignment folder
 
 ```bash
-for Strain in AgN04 Hg199 R0905 R45-15
+for Strain in Ag02 Ag04 Ag05 Ag06 Hg199 ND8 R0905 R37-15 R45-15
 do
     #Bam="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup.bam
-    rgBam="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam
-    Bai="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam.bai
+    rgBam="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam
+    Bai="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam.bai
     Txt="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup.txt
     Directory=analysis/genome_alignment/bowtie/*/$Strain/vs_Hg199_minion/
-    mv $Bam $Directory
+    #mv $Bam $Directory
     mv $rgBam $Directory
     mv $Bai $Directory
     mv $Txt $Directory
