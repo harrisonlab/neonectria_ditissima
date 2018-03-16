@@ -30,15 +30,15 @@ java -jar $gatk/GenomeAnalysisTK.jar \
      -ploidy 1 \
      -nct 6 \
      --allow_potentially_misencoded_quality_scores \
-     -I $input/*/Ag02/vs_Hg199_minion/Ag02_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag04/vs_Hg199_minion/Ag04_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag05/vs_Hg199_minion/Ag05_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag06/vs_Hg199_minion/Ag06_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Hg199/vs_Hg199_minion/Hg199_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/ND8/vs_Hg199_minion/ND8_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R0905/vs_Hg199_minion/R0905_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R37-15/vs_Hg100_minion/R37-15_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R45-15/vs_Hg199_minion/R45-15_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag02/vs_Hg199_minion/Ag02_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag04/vs_Hg199_minion/Ag04_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag05/vs_Hg199_minion/Ag05_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag06/vs_Hg199_minion/Ag06_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Hg199/vs_Hg199_minion/Hg199_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/ND8/vs_Hg199_minion/ND8_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R0905/vs_Hg199_minion/R0905_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R37-15/vs_Hg199_minion/R37-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R45-15/vs_Hg199_minion/R45-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
      -o $output
 
 #Break down complex SNPs into primitive ones with VariantsToAllelicPrimitives
