@@ -1,9 +1,13 @@
-Sets up correct formatting for SNP calling analysis
+## Sets up correct formatting for SNP calling analysis
 
-Alignment of raw reads vs the Nd genome
+```bash
+  input=analysis/genome_alignment/bowtie/N.ditissima
+  scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
+```
+
+## Alignment of raw reads vs the Nd genome
 
 Sequence data for isolates with a data from a single sequencing run was aligned against the Nd genome
-
 
 ```bash
   Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
