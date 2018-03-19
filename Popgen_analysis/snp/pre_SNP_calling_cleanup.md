@@ -21,21 +21,6 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
   done
   ```
 
-  ```bash
-    cat LDPK01.1.fsa_nt | sed 's/ Neo.*//g' > LDPK01.1.fsa_nt.fasta
-    progressiveMauve --output=RS305p.xmfa N.ditissima_contigs_unmasked.fa LDPK01.1.fsa_nt.fasta
-  
-
-  java -cp Mauve.jar org.gel.mauve.analysis.SnpExporter -f RS305p.xmfa -o
-RS305p.snps
-
-java -Xmx500m -cp Mauve.jar org.gel.mauve.contigs.ContigOrderer -output analysis/genome_alignment/mauve/N.ditissima/RS305p/"$GENOME_SHORT"_dir -ref $REFERENCE -draft $GENOME
-```
-  ```bash
-    input=analysis/genome_alignment/bowtie/N.ditissima
-    scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
-  ```
-
 ## Rename input mapping files in each folder by prefixing with the strain ID
 
 ```bash
