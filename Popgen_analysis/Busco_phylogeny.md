@@ -2,9 +2,10 @@
 
 New Zealand genomes. Edit headers and convert to fasta.
 
+```bash
 cat LDPK01.1.fsa_nt | sed 's/ Neo.*//g' > LDPK01.1.fsa_nt.fasta
 cat LDPL01.1.fsa_nt | sed 's/ Neo.*//g' > LDPL01.1.fsa_nt.fasta
-
+```
 ```bash
 for Assembly in $(ls assembly/Nz_genomes/*/*_nt.fasta); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
