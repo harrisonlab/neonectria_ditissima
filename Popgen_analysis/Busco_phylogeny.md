@@ -28,7 +28,7 @@ cd /home/groups/harrisonlab/project_files/neonectria_ditissima
 # pushd /home/sobczm/bin/BUSCO_v1.22/fungi/hmms
 OutDir=analysis/popgen/busco_phylogeny
 mkdir -p $OutDir
-BuscoDb="eukaryota_odb9"
+BuscoDb="sordariomyceta_odb9"
 ls -1 /home/groups/harrisonlab/dbBusco/$BuscoDb/hmms/*hmm | rev | cut -f1 -d '/' | rev | sed -e 's/.hmm//' > $OutDir/all_buscos_"$BuscoDb".txt
 ```
 
@@ -43,7 +43,7 @@ for Busco in $(cat analysis/popgen/busco_phylogeny/all_buscos_*.txt); do
 echo $Busco
 OutDir=analysis/popgen/busco_phylogeny/$Busco
 mkdir -p $OutDir
-for Fasta in $(ls gene_pred/busco/*/*/assembly/*/single_copy_busco_sequences/$Busco*.fna | grep -e 'run_contigs_min_500bp' -e 'filtered_contigs_renamed' | grep -v -e '414_old' -e '414_v2'); do
+for Fasta in $(ls gene_pred/busco/*/*/assembly/*/single_copy_busco_sequences/$Busco*.fna); do
 Strain=$(echo $Fasta | rev | cut -f5 -d '/' | rev)
 Organism=$(echo $Fasta | rev | cut -f6 -d '/' | rev)
 FileName=$(basename $Fasta)
