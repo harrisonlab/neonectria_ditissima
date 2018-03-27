@@ -52,7 +52,7 @@ done
 cat $OutDir/*_*_"$Busco".fasta > $OutDir/"$Busco"_appended.fasta
 SingleBuscoNum=$(cat $OutDir/"$Busco"_appended.fasta | grep '>' | wc -l)
 printf "$Busco\t$SingleBuscoNum\n" >> analysis/popgen/busco_phylogeny/single_hits.txt
-done
+one
 ```
 
 If all isolates have a single copy of a busco gene, move the appended fasta to
@@ -78,7 +78,7 @@ Submit alignment for single copy busco genes with a hit in each organism
   AlignDir=analysis/popgen/busco_phylogeny/alignments
   CurDir=$PWD
   cd $AlignDir
-  ProgDir=/home/armita/git_repos/emr_repos/scripts/popgen/phylogenetics
+  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
   qsub $ProgDir/sub_mafft_alignment.sh
   cd $CurDir
 ```
@@ -99,7 +99,7 @@ for Alignment in $(ls *aligned.fasta); do
 ProgDir=/home/armita/git_repos/emr_repos/scripts/popgen/phylogenetics
 python $ProgDir/calculate_nucleotide_diversity.py $Alignment
 Busco=$(echo $Alignment | cut -f1 -d '_')
-mv sequence_stats.txt "$Busco"_seqeunce_stats.txt
+mv sequence_stats.txt "$Busco"_sequence_stats.txt
 mv excel_stats.txt "$Busco"_excel_stats.txt
 mkdir -p ../phylogeny
 ## Copy FASTA files of the aligments into a new directory
