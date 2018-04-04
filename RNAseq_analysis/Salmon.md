@@ -69,7 +69,6 @@ done
 # Put files in a convenient location for DeSeq. Analysis was not performed on
 # Apple control samples.
 for File in $(ls alignment/salmon/*/Hg199_minion/*/*/*/quant.sf | grep -v -e 'GD_C1_3' -e 'GD_C2_3' -e 'GD_C3_3' -e 'M9_C1_3' -e 'M9_C2_3' -e 'M9_C3_3'); do
-  # cat $File | grep 'g6.t1'
   Prefix=$(echo $File | cut -f7 -d '/' --output-delimiter '_')
   mkdir -p alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/$Prefix
   cp $PWD/$File alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/$Prefix/quant.sf
@@ -84,10 +83,9 @@ for File in $(ls alignment/salmon/*/Cultivar/*/*/*/quant.sf | head -n1); do
 done
 # Put files in a convenient location for DeSeq. Analysis was not performed on
 # mycelium control samples.
-for File in $(ls alignment/salmon/*/*/*/*/quant.sf | grep -v -e 'PRO1467_S1_' -e 'PRO1467_S2_' -e 'PRO1467_S3_' -e 'PRO1467_S10_' -e 'PRO1467_S11_' -e 'PRO1467_S12_'); do
-  # cat $File | grep 'g6.t1'
-  Prefix=$(echo $File | cut -f6 -d '/' --output-delimiter '_')
-  mkdir -p alignment/salmon/DeSeq2/$Prefix
+for File in $(ls alignment/salmon/*/Cultivar/*/*/*/quant.sf | grep -v -e 'Hg199_1' -e 'Hg199_2' -e 'Hg199_3'); do
+  Prefix=$(echo $File | cut -f7 -d '/' --output-delimiter '_')
+  mkdir -p alignment/salmon/N.ditissima/Cultivar/DeSeq2/$Prefix
   cp $PWD/$File alignment/salmon/DeSeq2/$Prefix/quant.sf
   # rm alignment/salmon/DeSeq2/$Prefix/quant.sf
 done
@@ -108,6 +106,7 @@ setwd("/data/scratch/gomeza/")
 #       Load libraries
 #===============================================================================
 
+library("naturalsort",lib.loc="/home/armita/R/x86_64-pc-linux-gnu-library/3.4/")
 library(DESeq2)
 library("BiocParallel")
 register(MulticoreParam(12))
@@ -169,6 +168,8 @@ design <- ~Group
 design(dds) <- design
 
 dds <- DESeq(dds,parallel=T)
+
+# Plots
 
 library("RColorBrewer")
 library("gplots", Sys.getenv("R_LIBS_USER"))
@@ -240,7 +241,7 @@ ggsave("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/PCA_sample_names.pdf", 
 
 #set the significance level for BH adjustment	    
 alpha <- 0.05
-res= results(dds, alpha=alpha,contrast=c("Group","GD_t1","GD_t2"))
+res= results(dds, alpha=alpha,contrast=c("Group","GD_t1","mycelium_Control"))
 sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
 #Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
@@ -248,20 +249,20 @@ sig.res <- sig.res[order(sig.res$padj),]
 sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
-write.table(sig.res,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/GD_t1_vs_GD_t2.txt",sep="\t",na="",quote=F)
-write.table(sig.res.upregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/GD_t1_vs_GD_t2_up.txt",sep="\t",na="",quote=F)
-write.table(sig.res.downregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/GD_t1_vs_GD_t2_down.txt",sep="\t",na="",quote=F)
+write.table(sig.res,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/GD_t1_vs_mycelium_Control.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/GD_t1_vs_mycelium_Control_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/GD_t1_vs_mycelium_Control_down.txt",sep="\t",na="",quote=F)
 
-out of 412 with nonzero total read count
+out of 5051 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 382, 93%
-LFC < 0 (down)   : 30, 7.3%
+LFC > 0 (up)     : 1961, 39%
+LFC < 0 (down)   : 3090, 61%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 0)
 
 alpha <- 0.05
-res= results(dds, alpha=alpha,contrast=c("Group","M9_t1","M9_t2"))
+res= results(dds, alpha=alpha,contrast=c("Group","GD_t2","mycelium_Control"))
 sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
 #Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
@@ -269,41 +270,20 @@ sig.res <- sig.res[order(sig.res$padj),]
 sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
-write.table(sig.res,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/M9_t1_vs_M9_t2.txt",sep="\t",na="",quote=F)
-write.table(sig.res.upregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/M9_t1_vs_M9_t2_up.txt",sep="\t",na="",quote=F)
-write.table(sig.res.downregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/M9_t1_vs_M9_t2_down.txt",sep="\t",na="",quote=F)
+write.table(sig.res,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/GD_t2_vs_mycelium_Control.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/GD_t2_vs_mycelium_Control_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/GD_t2_vs_mycelium_Control_down.txt",sep="\t",na="",quote=F)
 
-out of 5337 with nonzero total read count
+out of 2774 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 4058, 76%
-LFC < 0 (down)   : 1279, 24%
-outliers [1]     : 0, 0%
-low counts [2]   : 0, 0%
-(mean count < 1)
-
-alpha <- 0.05
-res= results(dds, alpha=alpha,contrast=c("Group","M9_t1","M9_t0"))
-sig.res <- subset(res,padj<=alpha)
-sig.res <- sig.res[order(sig.res$padj),]
-#Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
-#               downregulated: min. 0.5x fold change, ie. log2foldchange max -1.
-sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
-sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
-
-write.table(sig.res,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/M9_t1_vs_M9_t0.txt",sep="\t",na="",quote=F)
-write.table(sig.res.upregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/M9_t1_vs_M9_t0_up.txt",sep="\t",na="",quote=F)
-write.table(sig.res.downregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/M9_t1_vs_M9_t0_down.txt",sep="\t",na="",quote=F)
-
-out of 18903 with nonzero total read count
-adjusted p-value < 0.05
-LFC > 0 (up)     : 9706, 51%
-LFC < 0 (down)   : 9197, 49%
+LFC > 0 (up)     : 1151, 41%
+LFC < 0 (down)   : 1623, 59%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 0)
 
 alpha <- 0.05
-res= results(dds, alpha=alpha,contrast=c("Group","GD_t1","GD_t0"))
+res= results(dds, alpha=alpha,contrast=c("Group","M9_t2","mycelium_Control"))
 sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
 #Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
@@ -311,20 +291,20 @@ sig.res <- sig.res[order(sig.res$padj),]
 sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
-write.table(sig.res,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/GD_t1_vs_GD_t0.txt",sep="\t",na="",quote=F)
-write.table(sig.res.upregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/GD_t1_vs_GD_t0_up.txt",sep="\t",na="",quote=F)
-write.table(sig.res.downregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/GD_t1_vs_GD_t0_down.txt",sep="\t",na="",quote=F)
+write.table(sig.res,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/M9_t2_vs_mycelium_Control.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/M9_t2_vs_mycelium_Control_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/M9_t2_vs_mycelium_Control_down.txt",sep="\t",na="",quote=F)
 
-out of 18677 with nonzero total read count
+out of 2128 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 8620, 46%
-LFC < 0 (down)   : 10057, 54%
+LFC > 0 (up)     : 1385, 65%
+LFC < 0 (down)   : 743, 35%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 0)
 
 alpha <- 0.05
-res= results(dds, alpha=alpha,contrast=c("Group","GD_t2","GD_t0"))
+res= results(dds, alpha=alpha,contrast=c("Group","M9_t1","mycelium_Control"))
 sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
 #Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
@@ -332,68 +312,17 @@ sig.res <- sig.res[order(sig.res$padj),]
 sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
-write.table(sig.res,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/GD_t2_vs_GD_t0.txt",sep="\t",na="",quote=F)
-write.table(sig.res.upregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/GD_t2_vs_GD_t0_up.txt",sep="\t",na="",quote=F)
-write.table(sig.res.downregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/GD_t2_vs_GD_t0_down.txt",sep="\t",na="",quote=F)
+write.table(sig.res,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/M9_t1_vs_mycelium_Control.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/M9_t1_vs_mycelium_Control_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/M9_t1_vs_mycelium_Control_down.txt",sep="\t",na="",quote=F)
 
-out of 15916 with nonzero total read count
+out of 5555 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 7590, 48%
-LFC < 0 (down)   : 8326, 52%
+LFC > 0 (up)     : 1621, 29%
+LFC < 0 (down)   : 3934, 71%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 0)
-
-alpha <- 0.05
-res= results(dds, alpha=alpha,contrast=c("Group","M9_t2","M9_t0"))
-sig.res <- subset(res,padj<=alpha)
-sig.res <- sig.res[order(sig.res$padj),]
-#Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
-#               downregulated: min. 0.5x fold change, ie. log2foldchange max -1.
-sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
-sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
-
-write.table(sig.res,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/M9_t2_vs_M9_t0.txt",sep="\t",na="",quote=F)
-write.table(sig.res.upregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/M9_t2_vs_M9_t0_up.txt",sep="\t",na="",quote=F)
-write.table(sig.res.downregulated,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/M9_t2_vs_M9_t0_down.txt",sep="\t",na="",quote=F)
-
-out of 11146 with nonzero total read count
-adjusted p-value < 0.05
-LFC > 0 (up)     : 6156, 55%
-LFC < 0 (down)   : 4990, 45%
-outliers [1]     : 0, 0%
-low counts [2]   : 0, 0%
-(mean count < 1)
-tar xvjf filename.tar.bz2
-
-#Make a table of raw counts, normalised counts and fpkm values:
-
-raw_counts <- data.frame(counts(dds, normalized=FALSE))
-colnames(raw_counts) <- paste(colData$Group)
-write.table(raw_counts,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/raw_counts.txt",sep="\t",na="",quote=F)
-norm_counts <- data.frame(counts(dds, normalized=TRUE))
-colnames(norm_counts) <- paste(colData$Group)
-write.table(norm_counts,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/normalised_counts.txt",sep="\t",na="",quote=F)
-
-library("naturalsort",lib.loc="/home/adamst/R/x86_64-pc-linux-gnu-library/3.2/")
-library(Biostrings)
-library(naturalsort)
-mygenes <- readDNAStringSet("/data/scratch/gomeza/apple_genome/transcripts_modified.fasta")
-t1 <- counts(dds)
-t1 <- mygenes[rownames(t1)]
-rowRanges(dds) <- GRanges(t1@ranges@NAMES,t1@ranges)
-
-
-# robust may be better set at false to normalise based on total counts rather than 'library normalisation factors'
-fpkm_counts <- data.frame(fpkm(dds, robust = TRUE))
-colnames(fpkm_counts) <- paste(colData$Group)
-write.table(fpkm_counts,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/fpkm_norm_counts.txt",sep="\t",na="",quote=F)
-fpkm_counts <- data.frame(fpkm(dds, robust = FALSE))
-colnames(fpkm_counts) <- paste(colData$Group)
-write.table(fpkm_counts,"alignment/star/N.ditissima/Hg199_minion/cultivars/DeSeq/fpkm_counts.txt",sep="\t",na="",quote=F)
-```
-
-
 
 
 
