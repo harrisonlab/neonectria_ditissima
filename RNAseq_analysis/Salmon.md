@@ -29,6 +29,7 @@ echo "$Organism - $Strain"
   done
 done
 ```
+
 Apple transcripts
 
 ```bash
@@ -96,7 +97,7 @@ export R_LIBS=/home/armita/R/x86_64-pc-linux-gnu-library/3.4
 /home/deakig/R3.4/bin/R
 ```
 
-Method 1: Gene expression of Nd.
+#Method 1: Gene expression of Nd.
 
 ```R
 
@@ -143,9 +144,9 @@ txi.genes <- summarizeToGene(txi.reps,tx2gene)
 invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
 
 
-#==========================================================================================
+#===============================================================================
 #       Read sample metadata and annotations
-#=========================================================================================
+#===============================================================================
 
 # Read sample metadata
 
@@ -208,7 +209,7 @@ heatmap( sampleDistMatrix, trace="none", col=colours, margins=c(12,12),srtCol=45
 
 #vst<-varianceStabilizingTransformation(dds)
 pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/PCA_vst.pdf")
-plotPCA(vst,intgroup=c("Cultivar", "Timepoint"))
+plotPCA(vst,intgroup=c("Cultivar", "Group"))
 dev.off()
 
 #Plot using rlog transformation:
@@ -236,6 +237,7 @@ ggsave("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/PCA_sample_names.pdf", 
 
 #Analysis of gene expression
 
+```R
 
 #set the significance level for BH adjustment	    
 alpha <- 0.05
@@ -321,10 +323,9 @@ LFC < 0 (down)   : 3934, 71%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 0)
+```
 
-
-
-Method 2: Host response gene expression.
+#Method 2: Host response gene expression.
 
 ```R
 
@@ -340,7 +341,7 @@ register(MulticoreParam(12))
 library(ggplot2)
 library(Biostrings)
 library(devtools)
-load_all("~/pipelines/RNA-seq/scripts/myfunctions")
+load_all("/home/deakig/pipelines/RNA-seq/scripts/myfunctions")
 library(data.table)
 library(dplyr)
 library(naturalsort)
@@ -355,13 +356,13 @@ library(rjson)
 library(readr)
 
 # import transcript to gene mapping info
-tx2gene <- read.table("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/trans2gene.txt",header=T,sep="\t")
+tx2gene <- read.table("alignment/salmon/N.ditissima/Cultivar/DeSeq2/trans2gene.txt",header=T,sep=" ")
 
 # import quantification files	    
-txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)	   
+txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Cultivar/DeSeq2", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)	   
 
 # get the sample names from the folders	    
-mysamples <- list.dirs("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2",full.names=F,recursive=F)
+mysamples <- list.dirs("alignment/salmon/N.ditissima/Cultivar/DeSeq2",full.names=F,recursive=F)
 
 # summarise to gene level (this can be done in the tximport step, but is easier to understand in two steps)
 txi.genes <- summarizeToGene(txi.reps,tx2gene)
@@ -369,10 +370,9 @@ txi.genes <- summarizeToGene(txi.reps,tx2gene)
 # set the sample names for txi.genes
 invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
 
-
-#==========================================================================================
+#===============================================================================
 #       Read sample metadata and annotations
-#=========================================================================================
+#===============================================================================
 
 # Read sample metadata
 
@@ -385,90 +385,143 @@ colData <- colData[!(colData$Sample=="Hg199_1"),]
 colData <- colData[!(colData$Sample=="Hg199_2"),]      
 colData <- colData[!(colData$Sample=="Hg199_3"),]      
 
+design <- ~Group
 dds <- DESeqDataSetFromTximport(txi.genes,colData,design)
 dds$groupby <- paste(dds$condition,dds$sample,sep="_")
 
-design <- ~Group
 dds <- DESeq(dds,parallel=T)
+```
 
+#Analysis of gene expression
 
+```R
 
+#set the significance level for BH adjustment	    
+alpha <- 0.05
+res= results(dds, alpha=alpha,contrast=c("Group","GD_t1","GD_t0"))
+sig.res <- subset(res,padj<=alpha)
+sig.res <- sig.res[order(sig.res$padj),]
+#Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
+#               downregulated: min. 0.5x fold change, ie. log2foldchange max -1.
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
+write.table(sig.res,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/GD_t1_vs_GD_t0.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/GD_t1_vs_GD_t0_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/GD_t1_vs_GD_t0_down.txt",sep="\t",na="",quote=F)
 
+out of 16171 with nonzero total read count
+adjusted p-value < 0.05
+LFC > 0 (up)     : 7677, 47%
+LFC < 0 (down)   : 8494, 53%
+outliers [1]     : 0, 0%
+low counts [2]   : 0, 0%
+(mean count < 1)
 
+alpha <- 0.05
+res= results(dds, alpha=alpha,contrast=c("Group","GD_t2","GD_t0"))
+sig.res <- subset(res,padj<=alpha)
+sig.res <- sig.res[order(sig.res$padj),]
+#Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
+#               downregulated: min. 0.5x fold change, ie. log2foldchange max -1.
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
+write.table(sig.res,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/GD_t2_vs_GD_t0.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/GD_t2_vs_GD_t0_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/GD_t2_vs_GD_t0_down.txt",sep="\t",na="",quote=F)
 
+out of 13139 with nonzero total read count
+adjusted p-value < 0.05
+LFC > 0 (up)     : 6510, 50%
+LFC < 0 (down)   : 6629, 50%
+outliers [1]     : 0, 0%
+low counts [2]   : 0, 0%
+(mean count < 1)
 
+alpha <- 0.05
+res= results(dds, alpha=alpha,contrast=c("Group","M9_t2","M9_t0"))
+sig.res <- subset(res,padj<=alpha)
+sig.res <- sig.res[order(sig.res$padj),]
+#Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
+#               downregulated: min. 0.5x fold change, ie. log2foldchange max -1.
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
+write.table(sig.res,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t2_vs_M9_t0.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t2_vs_M9_t0_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t2_vs_M9_t0_down.txt",sep="\t",na="",quote=F)
 
+out of 11954 with nonzero total read count
+adjusted p-value < 0.05
+LFC > 0 (up)     : 6763, 57%
+LFC < 0 (down)   : 5191, 43%
+outliers [1]     : 0, 0%
+low counts [2]   : 0, 0%
+(mean count < 1)
 
+alpha <- 0.05
+res= results(dds, alpha=alpha,contrast=c("Group","M9_t1","M9_t0"))
+sig.res <- subset(res,padj<=alpha)
+sig.res <- sig.res[order(sig.res$padj),]
+#Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
+#               downregulated: min. 0.5x fold change, ie. log2foldchange max -1.
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
+write.table(sig.res,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t1_vs_M9_t0.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t1_vs_M9_t0_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t1_vs_M9_t0_down.txt",sep="\t",na="",quote=F)
 
+out of 16536 with nonzero total read count
+adjusted p-value < 0.05
+LFC > 0 (up)     : 8721, 53%
+LFC < 0 (down)   : 7815, 47%
+outliers [1]     : 0, 0%
+low counts [2]   : 0, 0%
+(mean count < 1)
 
+alpha <- 0.05
+res= results(dds, alpha=alpha,contrast=c("Group","M9_t1","GD_t1"))
+sig.res <- subset(res,padj<=alpha)
+sig.res <- sig.res[order(sig.res$padj),]
+#Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
+#               downregulated: min. 0.5x fold change, ie. log2foldchange max -1.
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
+write.table(sig.res,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t1_vs_GD_t1.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t1_vs_GD_t1_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t1_vs_GD_t1_down.txt",sep="\t",na="",quote=F)
 
+out of 6182 with nonzero total read count
+adjusted p-value < 0.05
+LFC > 0 (up)     : 3194, 52%
+LFC < 0 (down)   : 2988, 48%
+outliers [1]     : 0, 0%
+low counts [2]   : 0, 0%
+(mean count < 1)
 
-library("RColorBrewer")
-library("gplots", Sys.getenv("R_LIBS_USER"))
-library("ggplot2")
-library("ggrepel")
+alpha <- 0.05
+res= results(dds, alpha=alpha,contrast=c("Group","M9_t2","GD_t2"))
+sig.res <- subset(res,padj<=alpha)
+sig.res <- sig.res[order(sig.res$padj),]
+#Settings used: upregulated: min. 2x fold change, ie. log2foldchange min 1.
+#               downregulated: min. 0.5x fold change, ie. log2foldchange max -1.
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 
-vst<-varianceStabilizingTransformation(dds)
+write.table(sig.res,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t2_vs_GD_t2.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t2_vs_GD_t2_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/M9_t2_vs_GD_t2_down.txt",sep="\t",na="",quote=F)
 
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/heatmap_vst.pdf", width=12,height=12)
-sampleDists<-dist(t(assay(vst)))
-
-sampleDistMatrix <- as.matrix(sampleDists)
-rownames(sampleDistMatrix) <- paste(vst$Group)
-colnames(sampleDistMatrix) <- paste(vst$Group)
-colours <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-heatmap( sampleDistMatrix,
-trace="none",  # turns off trace lines inside the heat map
-col=colours, # use on color palette defined earlier
-margins=c(12,12), # widens margins around plot
-srtCol=45,
-srtCol=45)
-dev.off()
-
-# Sample distances measured with rlog transformation:
-
-rld <- rlog( dds )
-
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/heatmap_rld.pdf")
-sampleDists <- dist( t( assay(rld) ) )
-library("RColorBrewer")
-sampleDistMatrix <- as.matrix( sampleDists )
-rownames(sampleDistMatrix) <- paste(rld$Group)
-colnames(sampleDistMatrix) <- paste(rld$Group)
-colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-heatmap( sampleDistMatrix, trace="none", col=colours, margins=c(12,12),srtCol=45)
-
-#PCA plotsPl
-
-#vst<-varianceStabilizingTransformation(dds)
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/PCA_vst.pdf")
-plotPCA(vst,intgroup=c("Cultivar", "Timepoint"))
-dev.off()
-
-#Plot using rlog transformation:
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/PCA_rld.pdf")
-plotPCA(rld,intgroup=c("Cultivar", "Timepoint"))
-dev.off()
-
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/PCA_additional.pdf")
-
-dev.off()
-
-#Plot using rlog transformation, showing sample names:
-
-data <- plotPCA(rld, intgroup="Group", returnData=TRUE)
-percentVar <- round(100 * attr(data, "percentVar"))
-
-pca_plot<- ggplot(data, aes(PC1, PC2, color=Group)) +
- geom_point(size=3) +
- xlab(paste0("PC1: ",percentVar[1],"% variance")) +
- ylab(paste0("PC2: ",percentVar[2],"% variance")) + geom_text_repel(aes(label=colnames(rld)))
- coord_fixed()
-
-ggsave("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/PCA_sample_names.pdf", pca_plot, dpi=300, height=10, width=12)
+out of 6661 with nonzero total read count
+adjusted p-value < 0.05
+LFC > 0 (up)     : 3472, 52%
+LFC < 0 (down)   : 3189, 48%
+outliers [1]     : 0, 0%
+low counts [2]   : 0, 0%
+(mean count < 1)
+[1] see 'cooksCutoff' argument of ?results
+[2] see 'independentFiltering' argument of ?results
 ```
