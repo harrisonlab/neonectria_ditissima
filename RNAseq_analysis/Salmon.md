@@ -79,14 +79,14 @@ done
 ```bash
 mkdir -p alignment/salmon/N.ditissima/Cultivar/DeSeq2
 for File in $(ls alignment/salmon/*/Cultivar/*/*/*/quant.sf | head -n1); do
-  cat $File | awk -F"\t" '{c=$1;sub("\..*","",$1);print c,$1}' OFS="\t" > alignment/salmon/N.ditissima/Cultivar/DeSeq2/trans2gene.txt
+  cat $File | awk -F"\t" '{c=$1;sub("\..*","",$1);print c,$1}' OFS="\t" > alignment/salmon/N.ditissima/Cultivar/DeSeq2/trans2gene.txt  
 done
 # Put files in a convenient location for DeSeq. Analysis was not performed on
 # mycelium control samples.
-for File in $(ls alignment/salmon/*/Cultivar/*/*/*/quant.sf | grep -v -e 'Hg199_1' -e 'Hg199_2' -e 'Hg199_3'); do
+for File in $(ls alignment/salmon/N.ditissima/Cultivar/*/*/*/quant.sf | grep -v -e 'Hg199_1' -e 'Hg199_2' -e 'Hg199_3'); do
   Prefix=$(echo $File | cut -f7 -d '/' --output-delimiter '_')
-  mkdir -p alignment/salmon/N.ditissima/Cultivar/DeSeq2/$Prefix
-  cp $PWD/$File alignment/salmon/DeSeq2/$Prefix/quant.sf
+  mkdir -p alignment/salmon/*/Cultivar/DeSeq2/$Prefix
+  cp $PWD/$File alignment/salmon/N.ditissima/Cultivar/DeSeq2/$Prefix/quant.sf
   # rm alignment/salmon/DeSeq2/$Prefix/quant.sf
 done
 ```
@@ -113,7 +113,7 @@ register(MulticoreParam(12))
 library(ggplot2)
 library(Biostrings)
 library(devtools)
-load_all("~/pipelines/RNA-seq/scripts/myfunctions")
+load_all("/home/deakig/pipelines/RNA-seq/scripts/myfunctions")
 library(data.table)
 library(dplyr)
 library(naturalsort)
@@ -128,13 +128,13 @@ library(rjson)
 library(readr)
 
 # import transcript to gene mapping info
-tx2gene <- read.table("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/trans2gene.txt",header=T,sep="\t")
+tx2gene <- read.table("alignment/salmon/N.ditissima/Cultivar/DeSeq2/trans2gene.txt",header=T,sep="\t")
 
 # import quantification files	    
-txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)	   
+txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Cultivar/DeSeq2", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)	   
 
 # get the sample names from the folders	    
-mysamples <- list.dirs("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2",full.names=F,recursive=F)
+mysamples <- list.dirs("alignment/salmon/N.ditissima/Cultivar/DeSeq2",full.names=F,recursive=F)
 
 # summarise to gene level (this can be done in the tximport step, but is easier to understand in two steps)
 txi.genes <- summarizeToGene(txi.reps,tx2gene)
@@ -150,8 +150,6 @@ invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
 # Read sample metadata
 
 unorderedColData <- read.table("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
-colData <- data.frame(unorderedColData[ order(unorderedColData$Sample.name),])
-
 colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
 
 colData <- colData[!(colData$Sample=="M9_C1_3"),]      
@@ -378,25 +376,37 @@ invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
 
 # Read sample metadata
 
-unorderedColData <- read.table("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
+unorderedColData <- read.table("alignment/salmon/N.ditissima/Cultivar/DeSeq2/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
 colData <- data.frame(unorderedColData[ order(unorderedColData$Sample.name),])
 
 colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
 
-colData <- colData[!(colData$Sample=="M9_C1_3"),]      
-colData <- colData[!(colData$Sample=="M9_C2_3"),]      
-colData <- colData[!(colData$Sample=="M9_C3_3"),]      
-colData <- colData[!(colData$Sample=="GD_C1_3"),]      
-colData <- colData[!(colData$Sample=="GD_C2_3"),]      
-colData <- colData[!(colData$Sample=="GD_C3_3"),]      
+colData <- colData[!(colData$Sample=="Hg199_1"),]      
+colData <- colData[!(colData$Sample=="Hg199_2"),]      
+colData <- colData[!(colData$Sample=="Hg199_3"),]      
 
 dds <- DESeqDataSetFromTximport(txi.genes,colData,design)
 dds$groupby <- paste(dds$condition,dds$sample,sep="_")
 
 design <- ~Group
-design(dds) <- design
-
 dds <- DESeq(dds,parallel=T)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 library("RColorBrewer")
 library("gplots", Sys.getenv("R_LIBS_USER"))
