@@ -129,10 +129,10 @@ library(rjson)
 library(readr)
 
 # import transcript to gene mapping info
-tx2gene <- read.table("alignment/salmon/N.ditissima/Cultivar/DeSeq2/trans2gene.txt",header=T,sep="\t")
+tx2gene <- read.table("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/trans2gene.txt",header=T,sep="\t")
 
 # import quantification files	    
-txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Cultivar/DeSeq2", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)	   
+txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)	   
 
 # get the sample names from the folders	    
 mysamples <- list.dirs("alignment/salmon/N.ditissima/Cultivar/DeSeq2",full.names=F,recursive=F)
