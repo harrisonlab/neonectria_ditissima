@@ -4,56 +4,11 @@ Scripts used during analysis of neonectria_ditissima genomes.
 neonectria_ditissima
 ====================
 
-Commands used during analysis of the neonectria_ditissima genome. Note - all this work was performed in the directory: /home/groups/harrisonlab/project_files/neonectria_ditissima
+Commands used during analysis of the neonectria_ditissima genome. Note - all this work was performed in the directory:
+/home/groups/harrisonlab/project_files/neonectria_ditissima
 
-The following is a summary of the work presented in this Readme:
-Data organisation:
-  * Preparing data  
-Draft Genome assembly
-  * Data qc
-  * Genome assembly
-  * Repeatmasking
-  * Gene prediction
-  * Functional annotation
-Genome analysis
-  * Homology between predicted genes & published effectors
-
-
-#Data organisation
-
-Data was copied from the raw_data repository to a local directory for assembly
-and annotation.
-
-```bash
-  cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-  Species=N.ditissima
-  Strain=NG-R0905
-  mkdir -p raw_dna/paired/$Species/$Strain/F
-  mkdir -p raw_dna/paired/$Species/$Strain/R
-  cp /home/groups/harrisonlab/project_files/neonectria/NG-R0905_S4_L001_R1_001.fastq raw_dna/paired/$Species/$Strain/F/.
-  cp /home/groups/harrisonlab/project_files/neonectria/NG-R0905_S4_L001_R2_001.fastq raw_dna/paired/$Species/$Strain/R/.
-  mkdir -p raw_dna/paired/N.ditissima/Hg199/F
-  mkdir -p raw_dna/paired/N.ditissima/Hg199/R
-  RawDat=/home/groups/harrisonlab/raw_data/raw_seq/raw_reads/160725_M04465_0020-AP1N0
-  cp $RawDat/Hg199_S1_L001_R1_001.fastq.gz raw_dna/paired/N.ditissima/Hg199/F/.
-  cp $RawDat/Hg199_S1_L001_R2_001.fastq.gz raw_dna/paired/N.ditissima/Hg199/R/.
-```
-
-RNA data was also copied into the project area:
-
-```bash
-  cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-  mkdir -p raw_rna/paired/N.ditissima/Hg199/F
-  mkdir -p raw_rna/paired/N.ditissima/Hg199/R
-  mkdir -p raw_rna/paired/N.ditissima/R0905/F
-  mkdir -p raw_rna/paired/N.ditissima/R0905/R
-  RawDat=/home/groups/harrisonlab/raw_data/raw_seq/raw_reads/160718_M04465_0018_ANU02
-  cp $RawDat/Hg199_S1_L001_R1_001.fastq.gz raw_rna/paired/N.ditissima/Hg199/F/.
-  cp $RawDat/Hg199_S1_L001_R2_001.fastq.gz raw_rna/paired/N.ditissima/Hg199/R/.
-  cp $RawDat/R09-05_S2_L001_R1_001.fastq.gz raw_rna/paired/N.ditissima/R0905/F/.
-  cp $RawDat/R09-05_S2_L001_R2_001.fastq.gz raw_rna/paired/N.ditissima/R0905/R/.
-```
-
+Data is copied from /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls to
+raw_dna/paired/N.ditissima
 
 #Data qc
 
@@ -62,95 +17,187 @@ programs: fastqc fastq-mcf kmc
 Data quality was visualised using fastqc:
 
 ```bash
-  for RawData in $(ls raw_dna/paired/*/*/*/*.fastq); do
+  for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+    RawData=$(ls raw_dna/paired/*/$Strain/F/*.fastq.gz)
 	  echo $RawData;
 	  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	  qsub $ProgDir/run_fastqc.sh $RawData;
+  done
+
+  for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+    RawData=$(ls raw_dna/paired/*/$Strain/R/*.fastq.gz)
+    echo $RawData;
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
+    qsub $ProgDir/run_fastqc.sh $RawData;
   done
 ```
 
 Trimming was performed on data to trim adapters from sequences and remove poor quality data.
 This was done with fastq-mcf
 
-
 ```bash
-	Read_F=raw_dna/paired/N.ditissima/NG-R0905/F/NG-R0905_S4_L001_R1_001.fastq
-	Read_R=raw_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_S4_L001_R2_001.fastq
-	IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
-	qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
+for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+  Read_F=raw_dna/paired/N.ditissima/$Strain/F/*.fastq.gz
+  Read_R=raw_dna/paired/N.ditissima/$Strain/R/*.fastq.gz
+  echo $Read_F;
+  echo $Read_R;
+  IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+  qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
+done
 ```
 
 Data quality was visualised once again following trimming:
 
 ```bash
-	for RawData in $(ls qc_dna/paired/*/*/*/*.fastq.gz); do
-	echo $RawData;
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
+  for RawData in $(ls qc_dna/paired/*/*/*/*allfiles_trim.fq.gz); do
+  echo $RawData;
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	qsub $ProgDir/run_fastqc.sh $RawData;
   done
 ```
-
 
 kmer counting was performed using kmc.
 This allowed estimation of sequencing depth and total genome size:
 
 ```bash
-	Trim_F=qc_dna/paired/N.ditissima/NG-R0905/F/NG-R0905_qc_F.fastq.gz
-	Trim_R=qc_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_qc_R.fastq.gz
+	Trim_F=qc_dna/paired/N.ditissima/*/ND8/F/*.fq.gz
+	Trim_R=qc_dna/paired/N.ditissima/*/ND8/R/*.fq.gz
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
 	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
 ```
 
-** Estimated Genome Size is: 48490129
+** Estimated Genome Size is: 946768573
 
-** Esimated Coverage is: 42
+** Esimated Coverage is: 5
+
+```bash
+	Trim_F=qc_dna/paired/N.ditissima/*/AgN04/F/*.fq.gz
+	Trim_R=qc_dna/paired/N.ditissima/*/AgN04/R/*.fq.gz
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
+	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
+```
+
+** Estimated Genome Size is: 48203823
+
+** Esimated Coverage is: 30
+
+```bash
+	Trim_F=qc_dna/paired/N.ditissima/*/R45-15/F/*.fq.gz
+	Trim_R=qc_dna/paired/N.ditissima/*/R45-15/R/*.fq.gz
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
+	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
+```
+
+** Estimated Genome Size is: 43409438
+
+** Esimated Coverage is: 86
+
+
+```bash
+  # for Strain in 415 416 A4 SCRP245_v2 Bc23 Nov5 Nov77; do
+  for Strain in Ag02; do
+    echo $Strain
+    Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
+    Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
+    Outdir=qc_dna/kmc/N.ditissima/Ag02/
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+    qsub $ProgDir/kmc_kmer_counting.sh 21 $Outdir $Trim_F $Trim_R
+  done
+
+  for Strain in Ag02; do
+    echo $Strain
+    Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
+    Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
+    Outdir=qc_dna/kmc/N.ditissima/paired/
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+    qsub $ProgDir/kmc_kmer_counting.sh 41 $Outdir $Trim_F $Trim_R
+  done
+```
+
+```bash
+for Strain in Ag05 ND8 R37-15; do
+#for Strain in Ag02; do
+  echo $Strain
+  Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
+  Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
+  Outdir=qc_dna/kmc/N.ditissima/$Strain
+  ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
+  qsub $ProgDir/kmc_kmer_counting.sh 21 $Outdir $Trim_F $Trim_R
+done
+```
 
 #Assembly
-Assembly was performed using: Velvet / Abyss / Spades
+Assembly was performed using: Spades
 
 A range of hash lengths were used and the best assembly selected for subsequent analysis
 
+```bash
+	F_Read=qc_dna/paired/N.ditissima/*/R45-15/F/*.fq.gz
+	R_Read=qc_dna/paired/N.ditissima/*/R45-15/R/*.fq.gz
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
+	Outdir=assembly/spades/N.ditissima/R45-15/
+	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
+```
+
+cat contigs.fasta | grep '>' | wc -l
+1427
+
+cat contigs_min_500bp.fasta | grep '>' | wc -l
+969
 
 ```bash
-	F_Read=qc_dna/paired/N.ditissima/NG-R0905/F/NG-R0905_qc_F.fastq.gz
-	R_Read=qc_dna/paired/N.ditissima/NG-R0905/R/NG-R0905_qc_R.fastq.gz
+	F_Read=qc_dna/paired/N.ditissima/*/AgN04/F/*.fq.gz
+	R_Read=qc_dna/paired/N.ditissima/*/AgN04/R/*.fq.gz
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
-	Outdir=assembly/spades/N.ditissima/NG-R0905/
-	qsub $ProgDir/sumit_SPAdes2.sh $F_Read $R_Read $Outdir correct
+	Outdir=assembly/spades/N.ditissima/AgN04/
+	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
+```
+
+cat contigs.fasta | grep '>' | wc -l
+1106
+
+cat contigs_min_500bp.fasta | grep '>' | wc -l
+728
+
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/R45-15/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/AgN04/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
 ```
 
 ```bash
+  for Strain in Ag02 Ag05 ND8 R37-15; do
+  echo $Strain
+  F_Read=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
+  R_Read=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
-	Outdir=assembly/spades/N.ditissima/NG-R0905/
-	qsub $ProgDir/sumit_SPAdes3.sh $F_Read $R_Read $Outdir correct
+	Outdir=assembly/spades/N.ditissima/$Strain/
+	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
+done
 ```
 
-Assemblies were summarised to allow the best assembly to be determined by eye.
-
-** Assembly stats are:
-  * Assembly size:
-  * N50:126848
-  * N80:
-  * N20:
-  * Longest contig:728907
-  **
-
-# Filter contigs
-
-The assembled contigs were filtered to remove all contigs shorter than 1kb from
-the assembly. This was done using the following commands:
-
 ```bash
-	InDir=assembly/spades/N.ditissima/NG-R0905
-	OutDir=assembly/spades/N.ditissima/NG-R0905_filtered
-	mkdir –p $OutDir
-  	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/abyss
-  	Assembly=$InDir/scaffolds.fasta
-  	AssFiltered=$OutDir/scaffolds_filtered_500.fasta
-  	$ProgDir/filter_abyss_contigs.py $Assembly 500 > $AssFiltered
-  	AssFiltered=$OutDir/scaffolds_filtered_1000.fasta
-  	$ProgDir/filter_abyss_contigs.py $Assembly 1000 > $AssFiltered
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/spades/N.ditissima/Ag02/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
 ```
 
 # Repeatmasking
@@ -160,84 +207,111 @@ Repeat masking was performed and used the following programs: Repeatmasker Repea
 The best assembly was used to perform repeatmasking
 
 ```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-	BestAss=/assembly/spades/N.ditissima/NG-R0905/scaffolds.fasta
-	qsub $ProgDir/rep_modeling.sh $BestAss
-	qsub $ProgDir/transposonPSI.sh $BestAss
- ```
-
-** % bases masked by repeatmasker: 12.53 %
-
-** % bases masked by transposon psi: **
-
-
-# Gene Prediction
-Gene prediction followed two steps:
-Pre-gene prediction - Quality of genome assemblies were assessed using Cegma to see how many core eukaryotic genes can be identified.
-Gene models were used to predict genes in the Neonectria genome. This used results from CEGMA as hints for gene models.
-
-## Pre-gene prediction
-Quality of genome assemblies was assessed by looking for the gene space in the assemblies.
-
-```bash
-  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
-  	Assembly=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
-  	qsub $ProgDir/sub_cegma.sh $Assembly dna
+  NewSpades=$(ls assembly/spades/*/R45-15/filtered_contigs/contigs_min_500bp.fasta)
+  for Assembly in $(ls $NewSpades); do
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
+    OutDir=repeat_masked/N.ditissima/R45-15/
+    qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+    qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
+  done
 ```
 
-** Number of cegma genes present and complete: 95.56
-** Number of cegma genes present and partial: 97.18
+** % bases masked by repeatmasker: 10.73% (bases masked:4941726 bp)
 
-##Gene prediction
-
-Gene prediction was performed for the neonectria genome.
-CEGMA genes were used as Hints for the location of CDS.
+** % bases masked by transposon psi: 9.33% (bases masked:4306052 bp)
 
 ```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/augustus
-  	Assembly=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
-  	GeneModel=fusarium_graminearum
-  	qsub $ProgDir/submit_augustus.sh $GeneModel $Assembly
+  NewSpades2=$(ls assembly/spades/*/AgN04/filtered_contigs/contigs_min_500bp.fasta)
+  for Assembly in $(ls $NewSpades2); do
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
+    OutDir=repeat_masked/N.ditissima/AgN04/
+    qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+    qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
+  done
 ```
 
-** Number of genes predicted: 13589
+** % bases masked by repeatmasker: 12.85% (bases masked:4941726 bp)
 
-#Functional annotation
+** % bases masked by transposon psi: 11.49% (bases masked:4306052 bp)
 
-Interproscan was used to give gene models functional annotations.
+Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan/
-  	Genes=gene_pred/augustus/spades/N.ditissima/N.ditissima_aug_out.aa
-  	$ProgDir/sub_interproscan.sh $Genes
+  for File in $(ls repeat_masked/*/*/*_contigs_softmasked.fa); do
+      OutDir=$(dirname $File)
+      TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+      OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+      bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+      echo "$OutFile"
+      echo "Number of masked bases:"
+      cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+    done
 ```
+repeat_masked/N.ditissima/Ag02/Ag02_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+4667657
+repeat_masked/N.ditissima/Ag04/AgN04_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+6076978
+repeat_masked/N.ditissima/Ag05/Ag05_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+4812553
+repeat_masked/N.ditissima/Hg199/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+5062507
+repeat_masked/N.ditissima/ND8/ND8_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+5608134
+repeat_masked/N.ditissima/R0905_canu_2017_v2/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+5786417
+repeat_masked/N.ditissima/R37-15/R37-15_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+4258109
+repeat_masked/N.ditissima/R45-15/R45-15_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+4967354
+
+# Alignment of raw reads vs the Nd genome
+
+Sequence data for isolates with a data from a single sequencing run was aligned against the Nd genome
 
 ```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	Genes=gene_pred/augustus/spades/N.ditissima/N.ditissima_aug_out.aa
-	InterProRaw=gene_pred/interproscan/spades/N.ditissima/raw
-	ProgDir/append_interpro.sh $Genes $InterProRaw
+for Strain in Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
+  Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
+  for StrainPath in $(ls -d qc_dna/paired/N.ditissima/$Strain); do
+    Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
+    Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
+    echo "$Organism - $Strain"
+    F_Read=$(ls $StrainPath/F/*.fq.gz)
+    R_Read=$(ls $StrainPath/R/*.fq.gz)
+    echo $F_Read
+    echo $R_Read
+    OutDir=/data/scratch/gomeza/analysis/genome_alignment/bowtie/$Organism/$Strain/
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
+    qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
+  done
+done
 ```
-
-#Genomic analysis
-The first analysis was based upon BLAST searches for genes known to be involved in toxin production
-
-
-##Genes with homology to PHIbase
-Predicted gene models were searched against the PHIbase database using tBLASTx.
+Sequence data for isolates with a data from two sequencing runs was aligned against the Fus2 genome
 
 ```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/blast
-	Query=../../phibase/v3.8/PHI_accessions.fa
-	Subject=repeat_masked/spades/N.ditissima/NG-R0905_repmask/N.ditissima_contigs_unmasked.fa
-	qsub $ProgDir/blast_pipe.sh $Query protein $Subject
+  Reference=$(ls repeat_masked/*/*/*/*_contigs_unmasked.fa | grep -w 'Fus2_canu_new')
+  for StrainPath in $(ls -d qc_dna/paired/F.*/* | grep -e 'HB6' -e 'Fus2'); do
+    echo $StrainPath
+    Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
+    Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
+    echo "$Organism - $Strain"
+    F1_Read=$(ls $StrainPath/F/*_trim.fq.gz | head -n1 | tail -n1);
+    R1_Read=$(ls $StrainPath/R/*_trim.fq.gz | head -n1 | tail -n1);
+    F2_Read=$(ls $StrainPath/F/*_trim.fq.gz | head -n2 | tail -n1);
+    R2_Read=$(ls $StrainPath/R/*_trim.fq.gz | head -n2 | tail -n1);
+    echo $F1_Read
+    echo $R1_Read
+    echo $F2_Read
+    echo $R2_Read
+    OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/vs_Fus2_unmasked
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment
+    qsub $ProgDir/bowtie/sub_bowtie_2lib.sh $Reference $F1_Read $R1_Read $F2_Read $R2_Read $OutDir $Strain
+  done
 ```
-
-Top BLAST hits were used to annotate gene models.
-
-```bash
-
-```
-
-** Blast results of note: **
-  * 'Result A'
