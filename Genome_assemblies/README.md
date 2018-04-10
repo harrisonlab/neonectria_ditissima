@@ -50,80 +50,32 @@ done
 Data quality was visualised once again following trimming:
 
 ```bash
-  for RawData in $(ls qc_dna/paired/*/*/*/*allfiles_trim.fq.gz); do
+for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+  RawData=$(ls qc_dna/paired/*/$Strain/F/*.fq.gz)
   echo $RawData;
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	qsub $ProgDir/run_fastqc.sh $RawData;
-  done
+done
+
+for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+  RawData=$(ls qc_dna/paired/*/$Strain/R/*.fq.gz)
+  echo $RawData;
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
+	qsub $ProgDir/run_fastqc.sh $RawData;
+done
 ```
 
 kmer counting was performed using kmc.
 This allowed estimation of sequencing depth and total genome size:
 
 ```bash
-	Trim_F=qc_dna/paired/N.ditissima/*/ND8/F/*.fq.gz
-	Trim_R=qc_dna/paired/N.ditissima/*/ND8/R/*.fq.gz
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
-	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
-```
-
-** Estimated Genome Size is: 946768573
-
-** Esimated Coverage is: 5
-
-```bash
-	Trim_F=qc_dna/paired/N.ditissima/*/AgN04/F/*.fq.gz
-	Trim_R=qc_dna/paired/N.ditissima/*/AgN04/R/*.fq.gz
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
-	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
-```
-
-** Estimated Genome Size is: 48203823
-
-** Esimated Coverage is: 30
-
-```bash
-	Trim_F=qc_dna/paired/N.ditissima/*/R45-15/F/*.fq.gz
-	Trim_R=qc_dna/paired/N.ditissima/*/R45-15/R/*.fq.gz
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc
-	qsub $ProgDir/kmc_kmer_counting.sh $Trim_F $Trim_R
-```
-
-** Estimated Genome Size is: 43409438
-
-** Esimated Coverage is: 86
-
-
-```bash
-  # for Strain in 415 416 A4 SCRP245_v2 Bc23 Nov5 Nov77; do
-  for Strain in Ag02; do
-    echo $Strain
-    Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
-    Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
-    Outdir=qc_dna/kmc/N.ditissima/Ag02/
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-    qsub $ProgDir/kmc_kmer_counting.sh 21 $Outdir $Trim_F $Trim_R
-  done
-
-  for Strain in Ag02; do
-    echo $Strain
-    Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
-    Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
-    Outdir=qc_dna/kmc/N.ditissima/paired/
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-    qsub $ProgDir/kmc_kmer_counting.sh 41 $Outdir $Trim_F $Trim_R
-  done
-```
-
-```bash
-for Strain in Ag05 ND8 R37-15; do
-#for Strain in Ag02; do
+for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   echo $Strain
-  Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
-  Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
-  Outdir=qc_dna/kmc/N.ditissima/$Strain
+  Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*.fq.gz)
+  Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*.fq.gz)
+  Outdir=qc_dna/kmc/N.ditissima/temp/$Strain
   ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-  qsub $ProgDir/kmc_kmer_counting.sh 21 $Outdir $Trim_F $Trim_R
+  qsub $ProgDir/kmc_kmer_counting.sh $Outdir $Trim_F $Trim_R
 done
 ```
 
@@ -133,57 +85,10 @@ Assembly was performed using: Spades
 A range of hash lengths were used and the best assembly selected for subsequent analysis
 
 ```bash
-	F_Read=qc_dna/paired/N.ditissima/*/R45-15/F/*.fq.gz
-	R_Read=qc_dna/paired/N.ditissima/*/R45-15/R/*.fq.gz
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
-	Outdir=assembly/spades/N.ditissima/R45-15/
-	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
-```
-
-cat contigs.fasta | grep '>' | wc -l
-1427
-
-cat contigs_min_500bp.fasta | grep '>' | wc -l
-969
-
-```bash
-	F_Read=qc_dna/paired/N.ditissima/*/AgN04/F/*.fq.gz
-	R_Read=qc_dna/paired/N.ditissima/*/AgN04/R/*.fq.gz
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
-	Outdir=assembly/spades/N.ditissima/AgN04/
-	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
-```
-
-cat contigs.fasta | grep '>' | wc -l
-1106
-
-cat contigs_min_500bp.fasta | grep '>' | wc -l
-728
-
-```bash
-  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  for Assembly in $(ls assembly/spades/N.ditissima/R45-15/filtered_contigs/contigs_min_500bp.fasta); do
-    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
-    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-done
-```
-```bash
-  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  for Assembly in $(ls assembly/spades/N.ditissima/AgN04/filtered_contigs/contigs_min_500bp.fasta); do
-    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
-    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-done
-```
-
-```bash
-  for Strain in Ag02 Ag05 ND8 R37-15; do
+  for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   echo $Strain
-  F_Read=$(ls qc_dna/paired/N.*/$Strain/F/*allfiles_trim.fq.gz)
-  R_Read=$(ls qc_dna/paired/N.*/$Strain/R/*allfiles_trim.fq.gz)
+  F_Read=$(ls qc_dna/paired/N.*/$Strain/F/*.fq.gz)
+  R_Read=$(ls qc_dna/paired/N.*/$Strain/R/*.fq.gz)
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
 	Outdir=assembly/spades/N.ditissima/$Strain/
 	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
