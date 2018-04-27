@@ -17,7 +17,8 @@ programs: fastqc fastq-mcf kmc
 Data quality was visualised using fastqc:
 
 ```bash
-  for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+  for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+  #for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
     RawData=$(ls raw_dna/paired/*/$Strain/F/*.fastq.gz)
 	  echo $RawData;
 	  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
@@ -36,7 +37,8 @@ Trimming was performed on data to trim adapters from sequences and remove poor q
 This was done with fastq-mcf
 
 ```bash
-for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+#for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   Read_F=raw_dna/paired/N.ditissima/$Strain/F/*.fastq.gz
   Read_R=raw_dna/paired/N.ditissima/$Strain/R/*.fastq.gz
   echo $Read_F;
@@ -50,7 +52,8 @@ done
 Data quality was visualised once again following trimming:
 
 ```bash
-for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+#for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   RawData=$(ls qc_dna/paired/*/$Strain/F/*.fq.gz)
   echo $RawData;
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
@@ -69,13 +72,14 @@ kmer counting was performed using kmc.
 This allowed estimation of sequencing depth and total genome size:
 
 ```bash
-for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+#for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   echo $Strain
   Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*.fq.gz)
   Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*.fq.gz)
   Outdir=qc_dna/kmc/N.ditissima/temp/$Strain
   ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-  qsub $ProgDir/kmc_kmer_counting.sh $Outdir $Trim_F $Trim_R
+  qsub $ProgDir/kmc_kmer_counting.sh 21 $Outdir $Trim_F $Trim_R
 done
 ```
 
@@ -85,7 +89,8 @@ Assembly was performed using: Spades
 A range of hash lengths were used and the best assembly selected for subsequent analysis
 
 ```bash
-  for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+  #for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   echo $Strain
   F_Read=$(ls qc_dna/paired/N.*/$Strain/F/*.fq.gz)
   R_Read=$(ls qc_dna/paired/N.*/$Strain/R/*.fq.gz)
