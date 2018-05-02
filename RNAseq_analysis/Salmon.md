@@ -186,7 +186,7 @@ library("RColorBrewer")
 #install.packages("gplots")
 library("gplots", Sys.getenv("R_LIBS_USER"))
 library("ggplot2")
-# install.packages("ggrepel", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu")
+#install.packages("ggrepel", Sys.getenv("R_LIBS_USER"), repos = "http://cran.case.edu")
 library("ggrepel")
 
 vst<-varianceStabilizingTransformation(dds)
@@ -221,43 +221,6 @@ colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
 heatmap( sampleDistMatrix, trace="none", col=colours, margins=c(12,12),srtCol=45)
 dev.off()
 
-# Plots
-
-library("RColorBrewer")
-library("gplots", Sys.getenv("R_LIBS_USER"))
-library("ggplot2")
-library("ggrepel")
-
-vst<-varianceStabilizingTransformation(dds)
-
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/heatmap_vst.pdf", width=12,height=12)
-sampleDists<-dist(t(assay(vst)))
-
-sampleDistMatrix <- as.matrix(sampleDists)
-rownames(sampleDistMatrix) <- paste(vst$Group)
-colnames(sampleDistMatrix) <- paste(vst$Group)
-colours <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-heatmap( sampleDistMatrix,
-trace="none",  # turns off trace lines inside the heat map
-col=colours, # use on color palette defined earlier
-margins=c(12,12), # widens margins around plot
-srtCol=45,
-srtCol=45)
-dev.off()
-
-# Sample distances measured with rlog transformation:
-
-rld <- rlog( dds )
-
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/heatmap_rld.pdf")
-sampleDists <- dist( t( assay(rld) ) )
-library("RColorBrewer")
-sampleDistMatrix <- as.matrix( sampleDists )
-rownames(sampleDistMatrix) <- paste(rld$Group)
-colnames(sampleDistMatrix) <- paste(rld$Group)
-colours = colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-heatmap( sampleDistMatrix, trace="none", col=colours, margins=c(12,12),srtCol=45)
-
 #PCA plotsPl
 
 #vst<-varianceStabilizingTransformation(dds)
@@ -268,10 +231,6 @@ dev.off()
 #Plot using rlog transformation:
 pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/PCA_rld.pdf")
 plotPCA(rld,intgroup=c("Cultivar", "Timepoint"))
-dev.off()
-
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/PCA_additional.pdf")
-
 dev.off()
 
 #Plot using rlog transformation, showing sample names:
@@ -578,7 +537,7 @@ invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
 unorderedColData <- read.table("alignment/salmon/N.ditissima/Cultivar/DeSeq2/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
 colData <- data.frame(unorderedColData[ order(unorderedColData$Sample.name),])
 colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
-    
+
 design <- ~Group
 dds <- DESeqDataSetFromTximport(txi.genes,colData,design)
 dds$groupby <- paste(dds$condition,dds$sample,sep="_")
@@ -806,10 +765,10 @@ write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/
 
 out of 541 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 469, 87% 
-LFC < 0 (down)   : 72, 13% 
-outliers [1]     : 0, 0% 
-low counts [2]   : 0, 0% 
+LFC > 0 (up)     : 469, 87%
+LFC < 0 (down)   : 72, 13%
+outliers [1]     : 0, 0%
+low counts [2]   : 0, 0%
 (mean count < 6)
 [1] see 'cooksCutoff' argument of ?results
 [2] see 'independentFiltering' argument of ?results
@@ -829,10 +788,10 @@ write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Cultivar/DeSeq2/
 
 out of 116 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 111, 96% 
-LFC < 0 (down)   : 5, 4.3% 
-outliers [1]     : 0, 0% 
-low counts [2]   : 0, 0% 
+LFC > 0 (up)     : 111, 96%
+LFC < 0 (down)   : 5, 4.3%
+outliers [1]     : 0, 0%
+low counts [2]   : 0, 0%
 (mean count < 2)
 [1] see 'cooksCutoff' argument of ?results
 [2] see 'independentFiltering' argument of ?results
