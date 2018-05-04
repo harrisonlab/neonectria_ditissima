@@ -482,6 +482,39 @@ alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/M9_t2_vs_mycelium_Control_DEGs.
 2128
 ```
 
+#Inital analysis of tables of DEGs
+
+```bash
+  effector_names=analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_headers.txt
+  CAZY_names=gene_pred/CAZY/N.ditissima/Hg199_minion/Hg199_minion_CAZY_headers.txt
+  for File in $(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/*_vs_*.txt |)
+  do
+      Assessment=$(basename $File | sed "s/.txt//g")
+      echo $Assessment
+      echo "Total number of genes in dataset:"
+      cat $File | grep -v 'baseMean' | wc -l
+      echo "Total number of effectors in dataset:"
+      Effector_File=$(echo $File | sed "s/.txt/_Effector.txt/g")
+      cat $File | head -n 1 > $Effector_File
+      cat $File | grep -w -f $effector_names >> $Effector_File
+      cat $Effector_File | tail -n +2 | wc -l
+      echo "Total number of CAZY in dataset:"
+      CAZY_File=$(echo $File | sed "s/.txt/_CAZY.txt/g")
+      cat $File | head -n 1 > $CAZY_File
+      cat $File | grep -w -f $CAZY_names >> $CAZY_File
+      cat $CAZY_File | tail -n +2 | wc -l
+    done
+done
+```
+
+
+
+
+
+
+
+
+
 
 #Method 2: Host response gene expression.
 
