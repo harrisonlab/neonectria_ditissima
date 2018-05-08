@@ -1,5 +1,5 @@
 =================================
-## Gene  Prediction
+# Gene  Prediction
 =================================
 
 Gene prediction followed three steps:
@@ -10,7 +10,7 @@ Gene prediction followed three steps:
 	Gene prediction
 		- Gene models were used to predict genes in genomes as part of the the Braker1 pipeline. This used RNAseq data as hints for gene models.
 
-# Pre-gene prediction
+## Pre-gene prediction
 
 ```bash
 	for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/Hg199*/*/*unmasked.fa); do
@@ -24,7 +24,7 @@ Gene prediction followed three steps:
 	done
 ```
 
-# Gene model training
+## Gene model training
 
 ```bash
 	for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/Hg199*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
@@ -112,7 +112,7 @@ Then Rnaseq data was aligned to each genome assembly:
 	done
 ```
 
-# Braker prediction
+## Braker prediction
 
 Before braker predictiction was performed, I double checked that I had the genemark key in my user area and copied it over from the genemark install directory:
 
@@ -153,7 +153,7 @@ Fasta and gff files were extracted from Braker1 output.
   done
 ```
 
-# Supplimenting Braker gene models with CodingQuary genes
+## Supplimenting Braker gene models with CodingQuary genes
 
 Additional genes were added to Braker gene predictions, using CodingQuary in
 pathogen mode to predict additional regions.
@@ -289,7 +289,7 @@ corrected using the following commands:
 # Functional annotation
 =================================
 
-# A) Interproscan
+## A) Interproscan
 
 Interproscan was used to give gene models functional annotations.
 Annotation was run using the commands below:
@@ -325,7 +325,7 @@ commands:
 	done
 ```
 
-# B) SwissProt
+## B) SwissProt
 
 ```bash
 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
@@ -354,7 +354,7 @@ commands:
 # Effector genes
 =================================
 
-# A) From Augustus gene models - Identifying secreted proteins
+## A) From Augustus gene models - Identifying secreted proteins
 
  Required programs:
   * SignalP-4.1
@@ -448,7 +448,7 @@ commands:
  N.ditissima - Hg199_minion
 1033
 
-# B) From Augustus gene models - Effector identification using EffectorP
+## B) From Augustus gene models - Effector identification using EffectorP
 
 Required programs:
  * EffectorP.py
@@ -488,7 +488,7 @@ Number of predicted effectors: 2777
   done > tmp.txt
 ```
 
-# C) CAZY proteins
+## C) CAZY proteins
 
 Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
 at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
