@@ -7,8 +7,10 @@ neonectria_ditissima
 Commands used during analysis of the neonectria_ditissima genome. Note - all this work was performed in the directory:
 /home/groups/harrisonlab/project_files/neonectria_ditissima
 
-Data is copied from /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls to
-raw_dna/paired/N.ditissima
+Data is copied from /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000000-B87BN/Data/Intensities/BaseCalls
+/data/seq_data/miseq/2018/ANALYSIS/180501_M04465_0078_000000000-BM867/Data/Intensities/BaseCalls
+
+to raw_dna/paired/N.ditissima
 
 #Data qc
 
@@ -17,7 +19,8 @@ programs: fastqc fastq-mcf kmc
 Data quality was visualised using fastqc:
 
 ```bash
-  for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+  #for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
   #for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
     RawData=$(ls raw_dna/paired/*/$Strain/F/*.fastq.gz)
 	  echo $RawData;
@@ -25,7 +28,9 @@ Data quality was visualised using fastqc:
 	  qsub $ProgDir/run_fastqc.sh $RawData;
   done
 
-  for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+  for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+    #for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+    #for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
     RawData=$(ls raw_dna/paired/*/$Strain/R/*.fastq.gz)
     echo $RawData;
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
@@ -37,22 +42,24 @@ Trimming was performed on data to trim adapters from sequences and remove poor q
 This was done with fastq-mcf
 
 ```bash
-for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
-#for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
-  Read_F=raw_dna/paired/N.ditissima/$Strain/F/*.fastq.gz
-  Read_R=raw_dna/paired/N.ditissima/$Strain/R/*.fastq.gz
-  echo $Read_F;
-  echo $Read_R;
-  IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
-  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
-  qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
-done
+  for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+  #for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+  #for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+    Read_F=raw_dna/paired/N.ditissima/$Strain/F/*.fastq.gz
+    Read_R=raw_dna/paired/N.ditissima/$Strain/R/*.fastq.gz
+    echo $Read_F;
+    echo $Read_R;
+    IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/rna_qc
+    qsub $ProgDir/rna_qc_fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
+  done
 ```
 
 Data quality was visualised once again following trimming:
 
 ```bash
-for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+#for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
 #for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   RawData=$(ls qc_dna/paired/*/$Strain/F/*.fq.gz)
   echo $RawData;
@@ -60,7 +67,8 @@ for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
 	qsub $ProgDir/run_fastqc.sh $RawData;
 done
 
-for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+#for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   RawData=$(ls qc_dna/paired/*/$Strain/R/*.fq.gz)
   echo $RawData;
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
@@ -101,12 +109,14 @@ done
 ```
 
 ```bash
+for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  for Assembly in $(ls assembly/spades/N.ditissima/Ag02/filtered_contigs/contigs_min_500bp.fasta); do
+  for Assembly in $(ls assembly/spades/N.ditissima/$Strain/filtered_contigs/contigs_min_500bp.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
     OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
 done
 ```
 
@@ -117,32 +127,20 @@ Repeat masking was performed and used the following programs: Repeatmasker Repea
 The best assembly was used to perform repeatmasking
 
 ```bash
-  NewSpades=$(ls assembly/spades/*/R45-15/filtered_contigs/contigs_min_500bp.fasta)
+for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+  NewSpades=$(ls assembly/spades/*/$Strain/filtered_contigs/contigs_min_500bp.fasta)
   for Assembly in $(ls $NewSpades); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-    OutDir=repeat_masked/N.ditissima/R45-15/
+    OutDir=repeat_masked/N.ditissima/$Strain/
     qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
     qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
   done
+done
 ```
 
 ** % bases masked by repeatmasker: 10.73% (bases masked:4941726 bp)
 
 ** % bases masked by transposon psi: 9.33% (bases masked:4306052 bp)
-
-```bash
-  NewSpades2=$(ls assembly/spades/*/AgN04/filtered_contigs/contigs_min_500bp.fasta)
-  for Assembly in $(ls $NewSpades2); do
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-    OutDir=repeat_masked/N.ditissima/AgN04/
-    qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
-    qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
-  done
-```
-
-** % bases masked by repeatmasker: 12.85% (bases masked:4941726 bp)
-
-** % bases masked by transposon psi: 11.49% (bases masked:4306052 bp)
 
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
