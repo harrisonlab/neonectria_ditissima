@@ -430,6 +430,7 @@ low counts [2]   : 0, 0%
 
 #Make a table of raw counts, normalised counts and fpkm values:
 
+```R
 raw_counts <- data.frame(counts(dds, normalized=FALSE))
 colnames(raw_counts) <- paste(colData$Group)
 write.table(raw_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/raw_counts.txt",sep="\t",na="",quote=F)
@@ -446,8 +447,7 @@ write.table(fpkm_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/fpkm_n
 fpkm_counts <- data.frame(fpkm(dds, robust = FALSE))
 colnames(fpkm_counts) <- paste(colData$Group)
 write.table(fpkm_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/fpkm_counts.txt",sep="\t",na="",quote=F)
-
-
+```
 
 #Analysis of DeSeq2 output
 
