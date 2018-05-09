@@ -201,11 +201,11 @@ for Strain in Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
   done
 done
 ```
-Sequence data for isolates with a data from two sequencing runs was aligned against the Fus2 genome
+Sequence data for isolates with a data from two sequencing runs
 
 ```bash
-  Reference=$(ls repeat_masked/*/*/*/*_contigs_unmasked.fa | grep -w 'Fus2_canu_new')
-  for StrainPath in $(ls -d qc_dna/paired/F.*/* | grep -e 'HB6' -e 'Fus2'); do
+  Reference=$(ls repeat_masked/*/*/*/*_contigs_unmasked.fa)
+  for StrainPath in $(ls -d qc_dna/paired/N.*/*); do
     echo $StrainPath
     Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
     Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
@@ -218,7 +218,7 @@ Sequence data for isolates with a data from two sequencing runs was aligned agai
     echo $R1_Read
     echo $F2_Read
     echo $R2_Read
-    OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/vs_Fus2_unmasked
+    OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/vs_Nd_unmasked
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment
     qsub $ProgDir/bowtie/sub_bowtie_2lib.sh $Reference $F1_Read $R1_Read $F2_Read $R2_Read $OutDir $Strain
   done
