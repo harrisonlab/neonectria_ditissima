@@ -23,7 +23,7 @@ echo "$Organism - $Strain"
     Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
     echo "$Timepoint"
     OutDir=alignment/salmon/$Organism/$Strain/$Prefix/$Timepoint/$Sample_Name
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/RNAseq
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
     qsub $ProgDir/sub_salmon.sh $Transcriptome $FileF $FileR $OutDir
     done
   done
@@ -51,7 +51,7 @@ echo "$Organism - $Strain"
     Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_trim.fq.gz//g')
     echo "$Timepoint"
     OutDir=alignment/salmon/N.ditissima/Cultivar/$Prefix/$Timepoint/$Sample_Name
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/RNAseq
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
     qsub $ProgDir/sub_salmon.sh $Transcriptome $FileF $FileR $OutDir
     done
   done
@@ -79,7 +79,6 @@ done
 for File in $(ls alignment/salmon/*/Hg199_minion/*/*/*/quant.sf | head -n1); do
   cat $File | awk -F"\t" '{c=$1;sub(".t.*","",$1);print c,$1}' OFS="\t" > alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/trans2gene2.txt
 done
-
 ```
 
 ```bash
