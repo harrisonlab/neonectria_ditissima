@@ -111,13 +111,14 @@ done
 ```
 
 ```bash
-for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
-  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  for Assembly in $(ls assembly/spades/N.ditissima/$Strain/filtered_contigs/contigs_min_500bp.fasta); do
-    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-    OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
-    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+#for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/spades/N.ditissima/$Strain/filtered_contigs/contigs_min_500bp.fasta); do
+  Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+  OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 done
 ```
@@ -129,7 +130,8 @@ Repeat masking was performed and used the following programs: Repeatmasker Repea
 The best assembly was used to perform repeatmasking
 
 ```bash
-for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+#for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
   NewSpades=$(ls assembly/spades/*/$Strain/filtered_contigs/contigs_min_500bp.fasta)
   for Assembly in $(ls $NewSpades); do
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
@@ -139,10 +141,6 @@ for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
   done
 done
 ```
-
-** % bases masked by repeatmasker: 10.73% (bases masked:4941726 bp)
-
-** % bases masked by transposon psi: 9.33% (bases masked:4306052 bp)
 
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
