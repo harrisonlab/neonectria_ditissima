@@ -2,7 +2,7 @@
 
 '''
 This script parses information from fasta files and gff files for the location,
-sequence and functional information for annotated gene models and RxLRs.
+sequence and functional information for annotated gene models.
 '''
 
 # -----------------------------------------------------
@@ -10,11 +10,14 @@ sequence and functional information for annotated gene models and RxLRs.
 # Import variables & load input files
 # -----------------------------------------------------
 
+import sys
+import os
 import argparse
+import re
+import numpy as np
 from sets import Set
 from collections import defaultdict
 from operator import itemgetter
-import numpy as np
 
 ap = argparse.ArgumentParser()
 
@@ -172,9 +175,7 @@ for line in CAZY_total_lines:
          #CAZY_total_set.add(header)
 
 # -----------------------------------------------------
-#
 # Build a dictionary of raw count data
-#
 # -----------------------------------------------------
 
 raw_read_count_dict = defaultdict(list)
@@ -201,9 +202,7 @@ for line in raw_count_lines:
         raw_read_count_dict[dict_key].append(raw_read_count)
 
 # -----------------------------------------------------
-#
 # Build a dictionary of normalised fpkm data
-#
 # -----------------------------------------------------
 
 fpkm_dict = defaultdict(list)
@@ -217,13 +216,14 @@ for line in fpkm_lines:
     line = line.rstrip("\n")
     split_line = line.split("\t")
     transcript_id = split_line.pop(0)
+    # print transcript_id
     for i, treatment in enumerate(fpkm_treatment_list):
         fpkm = float(split_line[i])
         dict_key = "_".join([transcript_id, treatment])
+        # print dict_key
         fpkm_dict[dict_key].append(fpkm)
 
 # -----------------------------------------------------
-#
 # Build a dictionary of interproscan annotations
 # Annotations first need to be filtered to remove
 # redundancy. This is done by first loading anntoations
@@ -282,7 +282,6 @@ for line in antismash_lines:
 
 
 #-----------------------------------------------------
-#
 # Build a dictionary of Swissprot annotations
 #-----------------------------------------------------
 
@@ -299,7 +298,6 @@ for line in swissprot_lines:
 
 
 #-----------------------------------------------------
-#
 # Build a dictionary of TF gene homologs
 #-----------------------------------------------------
 
@@ -335,12 +333,12 @@ for DEG_file in DEG_files:
     file_name = DEG_file.split('/')[-1]
     header_line.append("LFC_" + file_name)
     header_line.append("P-val_" + file_name)
-header_line.append('prot_seq')
-header_line.append('CDS_seq')
-header_line.append('TFs')
-header_line.append('Interpro')
-header_line.append('Antismash')
-header_line.append('Swissprot')
+    header_line.append('prot_seq')
+    header_line.append('CDS_seq')
+    header_line.append('TFs')
+    header_line.append('Interpro')
+    header_line.append('Antismash')
+    header_line.append('Swissprot')
 print ("\t".join(header_line))
 
 transcript_lines = []
@@ -436,9 +434,12 @@ for line in transcript_lines:
             DEG_out.append('0')
 
     # # Add in read count data:
+    gene_id = transcript_id.split('.')[0]
+    # print "\t".join([transcript_id, gene_id])
     mean_count_cols = []
     for treatment in sorted(set(count_treatment_list)):
-        dict_key = "_".join([transcript_id, treatment])
+        dict_key = "_".join([gene_id, treatment])
+        # print dict_key
         expression_values = raw_read_count_dict[dict_key]
         # print expression_values
         mean_count = np.mean(expression_values)
@@ -447,7 +448,7 @@ for line in transcript_lines:
     # print mean_count_cols
     mean_fpkm_cols = []
     for treatment in sorted(set(fpkm_treatment_list)):
-        dict_key = "_".join([transcript_id, treatment])
+        dict_key = "_".join([gene_id, treatment])
         # print dict_key
         expression_values = fpkm_dict[dict_key]
         # print expression_values
