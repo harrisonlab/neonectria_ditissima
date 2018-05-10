@@ -963,17 +963,24 @@ Genes=gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.
 DEGFasta=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_all_DEGs.fa
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
 $ProgDir/extract_DEG_Names_1_timepoint.py --input $DEGFile --output $DEGNames
-
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
 $ProgDir/extract_from_fasta.py --fasta $Genes --headers $DEGNames > $DEGFasta
 
+DEGFile=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_all_DEGs.tsv
+DEGNames=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_all_DEGs_names.txt
+Genes=gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.gene.fasta
+DEGFasta=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_all_DEGs.fa
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+$ProgDir/extract_DEG_Names_1_timepoint.py --input $DEGFile --output $DEGNames
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+$ProgDir/extract_from_fasta.py --fasta $Genes --headers $DEGNames > $DEGFasta
 
 #Investigate enriched functional annotations in DEGs vs all genes
 
 ##Analysis of DEGs vs all genes
 
 ```bash
-  OutDir=analysis/enrichment/N.ditissima/Hg199_minion/first_round
+  OutDir=analysis/enrichment/N.ditissima/Hg199_minion/first_round/GD_all
   mkdir -p $OutDir
   InterProTSV=gene_pred/interproscan/N.ditissima/Hg199_minion/Hg199_minion_interproscan.tsv
   ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Gene_enrichment/
@@ -989,6 +996,30 @@ $ProgDir/extract_from_fasta.py --fasta $Genes --headers $DEGNames > $DEGFasta
   Set1Genes=$OutDir/GD_DEGs.txt
   Set2Genes=$OutDir/GD_all_genes2.txt
   AllGenes=$OutDir/GD_all_genes.txt
+  cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $Set1Genes $Set2Genes > $AllGenes
+
+  $ProgDir/GO_enrichment.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots.tsv --out_dir $OutDir > $OutDir/output.txt
+done
+```
+
+```bash
+  OutDir=analysis/enrichment/N.ditissima/Hg199_minion/first_round/M9_all
+  mkdir -p $OutDir
+  InterProTSV=gene_pred/interproscan/N.ditissima/Hg199_minion/Hg199_minion_interproscan.tsv
+  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Gene_enrichment/
+  $ProgDir/GO_prep_table.py --interpro $InterProTSV > $OutDir/experiment_all_gene_GO_annots.tsv
+
+  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Gene_enrichment/
+  AnnotTable=gene_pred/annotation/salmon2/N.ditissima/Hg199_minion/Hg199_minion_gene_table_incl_exp.tsv
+  DEGs=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_all_DEGs_names.txt
+
+  AllGenes=$OutDir/M9_all_genes.txt
+  cat $AnnotTable | tail -n+2  | cut -f1 > $AllGenes
+  Set1Genes=$OutDir/M9_DEGs.txt
+  Set2Genes=$OutDir/M9_all_genes2.txt
+  AllGenes=$OutDir/M9_all_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
   cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
