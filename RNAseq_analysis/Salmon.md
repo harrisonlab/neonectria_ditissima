@@ -880,30 +880,128 @@ alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_t2_vs_mycelium_Control_DE
 2198
 ```
 
-#Inital analysis of tables of DEGs
+##Produce a more detailed table of analyses
 
 ```bash
-  effector_names=analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_headers.txt
-  CAZY_names=gene_pred/CAZY/N.ditissima/Hg199_minion/Hg199_minion_CAZY_headers.txt
-  for File in $(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2/*_vs_*.txt |)
-  do
-      Assessment=$(basename $File | sed "s/.txt//g")
-      echo $Assessment
-      echo "Total number of genes in dataset:"
-      cat $File | grep -v 'baseMean' | wc -l
-      echo "Total number of effectors in dataset:"
-      Effector_File=$(echo $File | sed "s/.txt/_Effector.txt/g")
-      cat $File | head -n 1 > $Effector_File
-      cat $File | grep -w -f $effector_names >> $Effector_File
-      cat $Effector_File | tail -n +2 | wc -l
-      echo "Total number of CAZY in dataset:"
-      CAZY_File=$(echo $File | sed "s/.txt/_CAZY.txt/g")
-      cat $File | head -n 1 > $CAZY_File
-      cat $File | grep -w -f $CAZY_names >> $CAZY_File
-      cat $CAZY_File | tail -n +2 | wc -l
-    done
+for GeneGff in $(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3) do
+  Strain=Hg199_minion
+  Organism=N.ditissima
+  Assembly=$(ls /data/scratch/gomeza/Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/*_contigs_unmasked.fa)
+  InterPro=$(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199_minion/Hg199_minion_interproscan.tsv)
+  SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/N.ditissima/Hg199_minion/swissprot_vJul2016_tophit_parsed.tbl)
+  OutDir=gene_pred/annotation/salmon2/$Organism/$Strain
+  mkdir -p $OutDir
+  GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta)
+  TFs=$(ls analysis/transcription_factors/N.ditissima/Hg199_minion/Hg199_minion_TF_domains.tsv)
+  Antismash=$(ls /data/scratch/gomeza/analysis/secondary_metabolites/antismash/Hg199_minion/fungi-1af165e7-6921-4c96-b94c-12388204c3ec/geneclusters.txt)
+  SigP4=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/Hg199_minion_final_sp_no_trans_mem.aa)
+  effector_total=$(ls analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_headers.txt)
+  CAZY_total=$(ls gene_pred/CAZY/N.ditissima/Hg199_minion/Hg199_minion_CAZY_headers.txt)
+  TMHMM_headers=$(ls gene_pred/trans_mem/$Organism/$Strain/*_TM_genes_pos_headers.txt)
+  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+  Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2)
+  DEG_Files=$(ls \
+  $Dir1/GD_t1_vs_mycelium_Control.txt \
+  $Dir1/M9_t1_vs_mycelium_Control.txt \
+  $Dir1/GD_t2_vs_mycelium_Control.txt \
+  $Dir1/M9_t2_vs_mycelium_Control.txt \
+  $Dir1/GD_t1_vs_GD_t2.txt \
+  $Dir1/GD_t1_vs_M9_t1.txt \
+  $Dir1/GD_t2_vs_M9_t2.txt \
+  $Dir1/M9_t1_vs_M9_t2.txt \
+  | sed -e "s/$/ /g" | tr -d "\n")
+  RawCount=$(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/raw_counts.txt)
+  FPKM=$(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/fpkm_counts.txt)
+  $ProgDir/Nd_annotation_tables.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --Antismash $Antismash --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
+  done
 done
 ```
+
+#Draw venn diagrams of differentially expressed genes
+
+##All genes
+
+###All DEGs
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_t1_vs_mycelium_Control.txt
+inp2=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_t2_vs_mycelium_Control.txt
+OutDir=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_all_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_t1_vs_mycelium_Control.txt
+inp2=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_t2_vs_mycelium_Control.txt
+OutDir=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_all_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_t1_vs_mycelium_Control.txt
+inp2=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_t1_vs_mycelium_Control.txt
+OutDir=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/t1_all_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+inp1=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_t2_vs_mycelium_Control.txt
+inp2=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/M9_t2_vs_mycelium_Control.txt
+OutDir=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/t2_all_DEGs.tsv
+$ProgDir/parse_RNA-Seq.py --input_1 $inp1 --input_2 $inp2 --out_dir $OutDir
+```
+
+#Extract fasta file of all DEGs for BLAST analysis
+
+DEGFile=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_all_DEGs.tsv
+DEGNames=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_all_DEGs_names.txt
+Genes=gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.gene.fasta
+DEGFasta=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_all_DEGs.fa
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+$ProgDir/extract_DEG_Names_1_timepoint.py --input $DEGFile --output $DEGNames
+
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+$ProgDir/extract_from_fasta.py --fasta $Genes --headers $DEGNames > $DEGFasta
+
+
+#Investigate enriched functional annotations in DEGs vs all genes
+
+##Analysis of DEGs vs all genes
+
+```bash
+  OutDir=analysis/enrichment/N.ditissima/Hg199_minion/first_round
+  mkdir -p $OutDir
+  InterProTSV=gene_pred/interproscan/N.ditissima/Hg199_minion/Hg199_minion_interproscan.tsv
+  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Gene_enrichment/
+  $ProgDir/GO_prep_table.py --interpro $InterProTSV > $OutDir/experiment_all_gene_GO_annots.tsv
+
+  OutDir=analysis/enrichment/N.ditissima/Hg199_minion/first_round
+  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Gene_enrichment/
+  AnnotTable=gene_pred/annotation/salmon2/N.ditissima/Hg199_minion/Hg199_minion_gene_table_incl_exp.tsv
+  DEGs=alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v2/GD_all_DEGs_names.txt
+
+  AllGenes=$OutDir/GD_all_genes.txt
+  cat $AnnotTable | tail -n+2  | cut -f1 > $AllGenes
+  Set1Genes=$OutDir/GD_DEGs.txt
+  Set2Genes=$OutDir/GD_all_genes2.txt
+  AllGenes=$OutDir/GD_all_genes.txt
+  cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $Set1Genes $Set2Genes > $AllGenes
+
+  $ProgDir/GO_enrichment.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots.tsv --out_dir $OutDir > $OutDir/output.txt
+done
+```
+
+
+
+
+
+
 
 #Method 2: Host response gene expression.
 
