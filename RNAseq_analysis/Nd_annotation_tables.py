@@ -261,10 +261,10 @@ for line in antismash_lines:
     split_line = line.split("\t")
     secmet_func = split_line[2]
     cluster_genes = split_line[4].split(";")
-    #for gene in cluster_genes:
-        #gene = re.sub("_\d$", "", gene)
-        #antismash_dict[gene].extend([secmet_func, cluster])
-        # print "\t".join([gene, secmet_func, cluster])
+    for gene in cluster_genes:
+        gene = re.sub("_\d$", "", gene)
+        antismash_dict[gene].extend([secmet_func, cluster])
+        #print "\t".join([gene, secmet_func, cluster])
 
 # -----------------------------------------------------
 # Build a dictionary of Swissprot annotations
@@ -333,12 +333,11 @@ for DEG_file in DEG_files:
     file_name = DEG_file.split('/')[-1]
     header_line.append("LFC_" + file_name)
     header_line.append("P-val_" + file_name)
-    header_line.append('prot_seq')
-    header_line.append('CDS_seq')
-    header_line.append('TFs')
-    header_line.append('Interpro')
-    header_line.append('Antismash')
-    header_line.append('Swissprot')
+header_line.append('prot_seq')
+#header_line.append('CDS_seq')
+header_line.append('TFs')
+header_line.append('Interpro')
+header_line.append('Antismash')
 print ("\t".join(header_line))
 
 transcript_lines = []
@@ -422,10 +421,10 @@ for line in transcript_lines:
     if transcript_id in CAZY_total_set:
         CAZY_total = 'Yes'
 
-#gene_id = transcript_id.split(".")[0]
+    #gene_id = transcript_id.split(".")[0]
     DEG_out = []
     for DEG_file in DEG_files:
-        entryname = "_".join([DEG_file, transcript_id])
+        entryname = "_".join([DEG_file, gene_id])
         if DEG_dict[entryname]:
             DEG_out.append(DEG_dict[entryname][0])
             DEG_out.append(DEG_dict[entryname][1])
