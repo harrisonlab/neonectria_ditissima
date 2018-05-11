@@ -21,7 +21,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument('--input_1', required=True, type=str, help='text file of genes \
 GD_t1')
 ap.add_argument('--input_2', required=True, type=str, help='text file of genes \
-M9_t1')
+GD_t2')
 ap.add_argument('--out_dir', required=True, type=str, help='the tsv file where \
 the count table is output to')
 conf = ap.parse_args()
@@ -58,7 +58,7 @@ genes = set(genes_list)
 # change the number in the numpy.reshape() command
 # -----------------------------------------------------
 
-a = numpy.array(["Gene_Name", "GD_t1", "M9_t1"])
+a = numpy.array(["Gene_Name", "GD_t1", "GD_t2"])
 
 for x in genes:
     to_add = []

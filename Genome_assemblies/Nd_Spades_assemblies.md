@@ -145,7 +145,9 @@ done
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
-  for File in $(ls repeat_masked/*/*/*_contigs_softmasked.fa); do
+for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+#for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+  for File in $(ls repeat_masked/*/$Strain/*_contigs_softmasked.fa); do
       OutDir=$(dirname $File)
       TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
       OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
@@ -154,39 +156,18 @@ Up till now we have been using just the repeatmasker/repeatmodeller fasta file w
       echo "Number of masked bases:"
       cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
     done
+  done
 ```
-repeat_masked/N.ditissima/Ag02/Ag02_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:
-4667657
-repeat_masked/N.ditissima/Ag04/AgN04_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:
-6076978
-repeat_masked/N.ditissima/Ag05/Ag05_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:
-4812553
-repeat_masked/N.ditissima/Hg199/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:
-5062507
-repeat_masked/N.ditissima/ND8/ND8_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:
-5608134
-repeat_masked/N.ditissima/R0905_canu_2017_v2/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:
-5786417
-repeat_masked/N.ditissima/R37-15/R37-15_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:
-4258109
-repeat_masked/N.ditissima/R45-15/R45-15_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:
-4967354
 
 # Alignment of raw reads vs the Nd genome
 
 Sequence data for isolates with a data from a single sequencing run was aligned against the Nd genome
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
-  Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
+for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+#for Strain in Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
+  #Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
+  Reference=$(ls Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/*_contigs_unmasked.fa)
   for StrainPath in $(ls -d qc_dna/paired/N.ditissima/$Strain); do
     Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
     Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
