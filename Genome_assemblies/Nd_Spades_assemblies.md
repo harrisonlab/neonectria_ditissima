@@ -166,21 +166,21 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
 ```bash
 for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
 #for Strain in Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
-  #Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
-  Reference=$(ls Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/*_contigs_unmasked.fa)
-  for StrainPath in $(ls -d qc_dna/paired/N.ditissima/$Strain); do
-    Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
-    Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
-    echo "$Organism - $Strain"
-    F_Read=$(ls $StrainPath/F/*.fq.gz)
-    R_Read=$(ls $StrainPath/R/*.fq.gz)
-    echo $F_Read
-    echo $R_Read
-    OutDir=/data/scratch/gomeza/analysis/genome_alignment/bowtie/$Organism/$Strain/
-    mkdir -p $OutDir
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
-    qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
-  done
+#Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
+Reference=$(ls Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/*_contigs_unmasked.fa)
+for StrainPath in $(ls -d qc_dna/paired/N.ditissima/$Strain); do
+  Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
+  Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
+  echo "$Organism - $Strain"
+  F_Read=$(ls $StrainPath/F/*.fq.gz)
+  R_Read=$(ls $StrainPath/R/*.fq.gz)
+  echo $F_Read
+  echo $R_Read
+  OutDir=/data/scratch/gomeza/analysis/genome_alignment/bowtie/$Organism/$Strain/
+  mkdir -p $OutDir
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
+  qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir
+done
 done
 ```
 Sequence data for isolates with a data from two sequencing runs
