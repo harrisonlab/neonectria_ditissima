@@ -177,6 +177,7 @@ for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68
     echo $F_Read
     echo $R_Read
     OutDir=/data/scratch/gomeza/analysis/genome_alignment/bowtie/$Organism/$Strain/
+    mkdir -p $OutDir
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
     qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
   done
