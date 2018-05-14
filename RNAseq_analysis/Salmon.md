@@ -1643,7 +1643,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/GD_up_genes2.txt
   AllGenes=$OutDir/GD_up_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 
@@ -1659,11 +1659,10 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/GD_down_genes2.txt
   AllGenes=$OutDir/GD_down_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
-```
-```bash
+
   OutDir=analysis/enrichment/N.ditissima/Hg199_minion/EffectorAnalysis/GD/Upregulated_CAZY
   mkdir -p $OutDir
   cp analysis/enrichment/N.ditissima/Hg199_minion/EffectorAnalysis/experiment_all_gene_GO_annots_geneid.tsv $OutDir
@@ -1676,7 +1675,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/GD_up_genes2.txt
   AllGenes=$OutDir/GD_up_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 
@@ -1692,7 +1691,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/GD_down_genes2.txt
   AllGenes=$OutDir/GD_down_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 ```
@@ -1712,7 +1711,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/M9_up_genes2.txt
   AllGenes=$OutDir/M9_up_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 
@@ -1728,11 +1727,10 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/M9_down_genes2.txt
   AllGenes=$OutDir/M9_down_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
-```
-```bash
+
   OutDir=analysis/enrichment/N.ditissima/Hg199_minion/EffectorAnalysis/M9/Upregulated_CAZY
   mkdir -p $OutDir
   cp analysis/enrichment/N.ditissima/Hg199_minion/EffectorAnalysis/experiment_all_gene_GO_annots_geneid.tsv $OutDir
@@ -1745,7 +1743,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/M9_up_genes2.txt
   AllGenes=$OutDir/M9_up_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 
@@ -1761,7 +1759,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/M9_down_genes2.txt
   AllGenes=$OutDir/M9_down_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 ```
@@ -1781,7 +1779,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/t1_up_genes2.txt
   AllGenes=$OutDir/t1_up_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 
@@ -1797,11 +1795,10 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/t1_down_genes2.txt
   AllGenes=$OutDir/t1_down_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
-```
-```bash
+
   OutDir=analysis/enrichment/N.ditissima/Hg199_minion/EffectorAnalysis/t1/Upregulated_CAZY
   mkdir -p $OutDir
   cp analysis/enrichment/N.ditissima/Hg199_minion/EffectorAnalysis/experiment_all_gene_GO_annots_geneid.tsv $OutDir
@@ -1814,7 +1811,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/t1_up_genes2.txt
   AllGenes=$OutDir/t1_up_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 
@@ -1830,7 +1827,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/t1_down_genes2.txt
   AllGenes=$OutDir/t1_down_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 ```
@@ -1850,7 +1847,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/t2_up_genes2.txt
   AllGenes=$OutDir/t2_up_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 
@@ -1866,11 +1863,10 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/t2_down_genes2.txt
   AllGenes=$OutDir/t2_down_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
-```
-```bash
+
   OutDir=analysis/enrichment/N.ditissima/Hg199_minion/EffectorAnalysis/t2/Upregulated_CAZY
   mkdir -p $OutDir
   cp analysis/enrichment/N.ditissima/Hg199_minion/EffectorAnalysis/experiment_all_gene_GO_annots_geneid.tsv $OutDir
@@ -1883,7 +1879,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/t2_up_genes2.txt
   AllGenes=$OutDir/t2_up_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 
@@ -1899,7 +1895,7 @@ rm $OutDir/temp2.tsv
   Set2Genes=$OutDir/t2_down_genes2.txt
   AllGenes=$OutDir/t2_down_genes.txt
   cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
-  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
   cat $Set1Genes $Set2Genes > $AllGenes
   $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots_geneid.tsv --out_dir $OutDir > $OutDir/output.txt
 ```
