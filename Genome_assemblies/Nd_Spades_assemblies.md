@@ -176,10 +176,10 @@ for StrainPath in $(ls -d qc_dna/paired/N.ditissima/$Strain); do
   R_Read=$(ls $StrainPath/R/*.fq.gz)
   echo $F_Read
   echo $R_Read
-  OutDir=/data/scratch/gomeza/analysis/genome_alignment/bowtie/$Organism/$Strain/
-  mkdir -p $OutDir
+  OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/
+  #mkdir -p $OutDir
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
-  qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir
+  qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
 done
 done
 ```
@@ -201,7 +201,7 @@ Sequence data for isolates with a data from two sequencing runs
     echo $F2_Read
     echo $R2_Read
     OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/vs_Nd_unmasked
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/genome_alignment
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
     qsub $ProgDir/bowtie/sub_bowtie_2lib.sh $Reference $F1_Read $R1_Read $F2_Read $R2_Read $OutDir $Strain
   done
 ```
