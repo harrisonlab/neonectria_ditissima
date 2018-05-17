@@ -98,9 +98,9 @@ Assembly was performed using: Spades
 A range of hash lengths were used and the best assembly selected for subsequent analysis
 
 ```bash
-for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+#for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
 #for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
-  #for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   echo $Strain
   F_Read=$(ls qc_dna/paired/N.*/$Strain/F/*.fq.gz)
   R_Read=$(ls qc_dna/paired/N.*/$Strain/R/*.fq.gz)
