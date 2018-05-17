@@ -25,8 +25,8 @@ o = opt$out
 DEGs <-data.frame()
 DEGs <- read.table(f, header = TRUE)
 
-TP1=subset(DEGs, DEGs[,"GD_t1"] == 1 & DEGs[,"M9_t1"] == 0)
-TP2=subset(DEGs, DEGs[,"GD_t1"] == 0 & DEGs[,"M9_t1"] == 1)
+TP1=subset(DEGs, DEGs[,"GD_t1"] == 1 & DEGs[,"GD_t2"] == 0)
+TP2=subset(DEGs, DEGs[,"GD_t1"] == 0 & DEGs[,"GD_t2"] == 1)
 # orthologs=subset(df1, df1[,"A28"] == 1 & df1[,"CB3"] == 1 & df1[,"PG"] == 1 & df1[,"fo47"] == 1 & df1[,"A1_2"] == 1 & df1[,"Fus2"] == 1 & df1[,"125"] == 1 & df1[,"A23"] == 1 & df1[,"4287"] == 1)
 
 # area1=(nrow(nonpath) + nrow(orthologs))
@@ -45,9 +45,9 @@ TP2=subset(DEGs, DEGs[,"GD_t1"] == 0 & DEGs[,"M9_t1"] == 1)
 
 # Set up labels
 label1 <- paste("GD_t1", sep="" )
-label2 <- paste("M9_t1", sep="" )
+label2 <- paste("GD_t2", sep="" )
 
-n123=nrow(subset(DEGs, DEGs[,"GD_t1"] == 1 & DEGs[,"M9_t1"] == 1))
+n123=nrow(subset(DEGs, DEGs[,"GD_t1"] == 1 & DEGs[,"GD_t2"] == 1))
 summary(n123)
 
 
