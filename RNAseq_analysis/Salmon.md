@@ -508,6 +508,8 @@ done
 
 #Method 1.2: Gene expression of Nd.
 
+This analysis was done repeating the salmon alignment with the option --keepduplicates.
+
 ```R
 
 setwd("/data/scratch/gomeza/")
