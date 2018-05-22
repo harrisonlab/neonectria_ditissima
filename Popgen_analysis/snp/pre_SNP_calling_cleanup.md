@@ -5,7 +5,7 @@ input=analysis/genome_alignment/bowtie/N.ditissima
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 ```
 
-###Alignment of raw reads vs the Nd genome
+## Alignment of raw reads vs the Nd genome
 
 Sequence data for isolates with a data from a single sequencing run was aligned against the Nd genome
 
@@ -28,9 +28,9 @@ for StrainPath in $(ls -d qc_dna/paired/N.ditissima/$Strain); do
   qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir
 done
 done
-  ```
+```
 
-###Rename input mapping files in each folder by prefixing with the strain ID
+## Rename input mapping files in each folder by prefixing with the strain ID
 
 ```bash
 for filename in $(ls -d analysis/genome_alignment/bowtie/*/*/vs_Hg199_minion); do
@@ -44,7 +44,7 @@ echo "$Organism - $Strain"
 done
 ```
 
-###Remove multimapping reads, discordant reads. PCR and optical duplicates, and add read group and sample name to each mapped read (preferably, the shortest ID possible)
+## Remove multimapping reads, discordant reads. PCR and optical duplicates, and add read group and sample name to each mapped read (preferably, the shortest ID possible)
 
 Convention used: qsub $scripts/sub_pre_snp_calling.sh <SAMPLE_ID> This needs to use samtools 0.1.18 - hash out 1.5 from profile while this is run
 
@@ -64,7 +64,7 @@ do
 done
 ```
 
-###Copy outputs from cleanup to alignment folder
+## Copy outputs from cleanup to alignment folder
 
 ```bash
 for Strain in Ag08 Ag11_B R41-15 R6-17-2 R6-17-3
