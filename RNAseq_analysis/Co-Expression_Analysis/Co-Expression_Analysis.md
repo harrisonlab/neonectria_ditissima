@@ -46,12 +46,14 @@ but 48 has a value of 0.8040 and is the highest reached before declining.
 ```
 
 Build the coexpression network
+
 Merging threshold value may need tweaking
+
 
 ```bash
 OutDir=analysis/coexpression
 ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae/RNA_Seq_scripts
-qsub $ProgDir/sub_create_network.sh $OutDir 48 60 0.25
+qsub $ProgDir/sub_create_network.sh $OutDir 48 100 0.25
 ```
 
 ```
