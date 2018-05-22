@@ -47,8 +47,7 @@ ls -1 /home/groups/harrisonlab/dbBusco/$BuscoDb/hmms/*hmm | rev | cut -f1 -d '/'
 
 For each busco gene create a folder and move all single copy busco hits from
 each assembly to the folder.
-Then create a fasta file containing all the aligned reads for each busco gene for
-alignment later.
+Then create a fasta file containing all the aligned reads for each busco gene for alignment later.
 
 ```bash
 printf "" > analysis/popgen/busco_phylogeny/single_hits.txt
@@ -56,7 +55,7 @@ printf "" > analysis/popgen/busco_phylogeny/single_hits.txt
   echo $Busco
   OutDir=analysis/popgen/busco_phylogeny/$Busco
   mkdir -p $OutDir
-  for Fasta in $(ls gene_pred/busco/*/*/assembly/*/single_copy_busco_sequences/$Busco*.fna); do
+  for Fasta in $(ls gene_pred/busco/N.ditisima/*/assembly/*/single_copy_busco_sequences/$Busco*.fna); do
   Strain=$(echo $Fasta | rev | cut -f5 -d '/' | rev)
   Organism=$(echo $Fasta | rev | cut -f6 -d '/' | rev)
   FileName=$(basename $Fasta)
@@ -88,15 +87,13 @@ Submit alignment for single copy busco genes with a hit in each organism
 
 
 ```bash
-  AlignDir=analysis/popgen/busco_phylogeny/alignments
-  CurDir=$PWD
-  cd $AlignDir
-  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
-  qsub $ProgDir/sub_mafft_alignment.sh
-  cd $CurDir
+AlignDir=analysis/popgen/busco_phylogeny/alignments
+CurDir=$PWD
+cd $AlignDir
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
+qsub $ProgDir/sub_mafft_alignment.sh
+cd $CurDir
 ```
-
-
 
 ```bash
 # For closely related organisms (same species etc.): identify genes with high nucleotide diversity (Pi) and average number of pairwise differences, medium number of segregating sites
