@@ -20,6 +20,19 @@ done
 
 # 1 Find single copy busco genes in N.ditisima assemblies
 
+```bash
+  for Strain in Ag08 Ag11_B R41-15 R6-17-2 R6-17-3; do
+    for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*unmasked.fa); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=gene_pred/busco/$Organism/$Strain/assembly
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
+  done
+```
 Create a list of all BUSCO IDs
 
 ```bash
@@ -39,20 +52,20 @@ alignment later.
 
 ```bash
 printf "" > analysis/popgen/busco_phylogeny/single_hits.txt
-for Busco in $(cat analysis/popgen/busco_phylogeny/all_buscos_*.txt); do
-echo $Busco
-OutDir=analysis/popgen/busco_phylogeny/$Busco
-mkdir -p $OutDir
-for Fasta in $(ls gene_pred/busco/*/*/assembly/*/single_copy_busco_sequences/$Busco*.fna); do
-Strain=$(echo $Fasta | rev | cut -f5 -d '/' | rev)
-Organism=$(echo $Fasta | rev | cut -f6 -d '/' | rev)
-FileName=$(basename $Fasta)
-cat $Fasta | sed "s/:.*.fasta:/:"$Organism"_"$Strain":/g" > $OutDir/"$Organism"_"$Strain"_"$Busco".fasta
+  for Busco in $(cat analysis/popgen/busco_phylogeny/all_buscos_*.txt); do
+  echo $Busco
+  OutDir=analysis/popgen/busco_phylogeny/$Busco
+  mkdir -p $OutDir
+  for Fasta in $(ls gene_pred/busco/*/*/assembly/*/single_copy_busco_sequences/$Busco*.fna); do
+  Strain=$(echo $Fasta | rev | cut -f5 -d '/' | rev)
+  Organism=$(echo $Fasta | rev | cut -f6 -d '/' | rev)
+  FileName=$(basename $Fasta)
+  cat $Fasta | sed "s/:.*.fasta:/:"$Organism"_"$Strain":/g" > $OutDir/"$Organism"_"$Strain"_"$Busco".fasta
+  done
+  cat $OutDir/*_*_"$Busco".fasta > $OutDir/"$Busco"_appended.fasta
+  SingleBuscoNum=$(cat $OutDir/"$Busco"_appended.fasta | grep '>' | wc -l)
+  printf "$Busco\t$SingleBuscoNum\n" >> analysis/popgen/busco_phylogeny/single_hits.txt
 done
-cat $OutDir/*_*_"$Busco".fasta > $OutDir/"$Busco"_appended.fasta
-SingleBuscoNum=$(cat $OutDir/"$Busco"_appended.fasta | grep '>' | wc -l)
-printf "$Busco\t$SingleBuscoNum\n" >> analysis/popgen/busco_phylogeny/single_hits.txt
-one
 ```
 
 If all isolates have a single copy of a busco gene, move the appended fasta to
