@@ -130,7 +130,8 @@ Repeat masking was performed and used the following programs: Repeatmasker Repea
 The best assembly was used to perform repeatmasking
 
 ```bash
-for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+#for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+for Strain in Ag08 Ag11_B R41-15 R6-17-2 R6-17-3; do  
 #for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
   NewSpades=$(ls assembly/spades/*/$Strain/filtered_contigs/contigs_min_500bp.fasta)
   for Assembly in $(ls $NewSpades); do
@@ -145,7 +146,8 @@ done
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
-for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
+for Strain in Ag11_B R41-15 R6-17-2 R6-17-3; do
+#for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
 #for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
   for File in $(ls repeat_masked/*/$Strain/*_contigs_softmasked.fa); do
       OutDir=$(dirname $File)
@@ -165,6 +167,7 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
 
 ```bash
 for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+#for Strain in Ag11_B R41-15 R6-17-2 R6-17-3; do
 #for Strain in Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
 #Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
 Reference=$(ls Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/*_contigs_unmasked.fa)
