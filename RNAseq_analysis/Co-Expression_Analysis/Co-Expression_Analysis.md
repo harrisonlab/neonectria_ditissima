@@ -33,10 +33,10 @@ Listed in analysis/coexpression/removed_genes.txt
 Test various values of soft thresholding for building the network
 
 ```bash
-OutDir=analysis/coexpression
+OutDir=analysis/coexpression2
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Co-Expression_Analysis
-max_SFT=60
-qsub $ProgDir/sub_choose_softthreshold.sh $OutDir 60
+max_SFT=40
+qsub $ProgDir/sub_choose_softthreshold.sh $OutDir 40
 ```
 
 ```
@@ -53,7 +53,7 @@ Merging threshold value may need tweaking
 ```bash
 OutDir=analysis/coexpression
 ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae/RNA_Seq_scripts
-qsub $ProgDir/sub_create_network.sh $OutDir 48 100 0.25
+qsub $ProgDir/sub_create_network.sh $OutDir 48 60 0.05
 ```
 
 ```
@@ -76,7 +76,7 @@ Y or N denotes whether unmerged modules will be exported too
 
 ```bash
 OutDir=analysis/coexpression
-ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae/RNA_Seq_scripts
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Co-Expression_Analysis
 qsub $ProgDir/sub_Export_Gene_Lists.sh $OutDir Y
 ```
 

@@ -55,7 +55,7 @@ printf "" > analysis/popgen/busco_phylogeny/single_hits.txt
   echo $Busco
   OutDir=analysis/popgen/busco_phylogeny/$Busco
   mkdir -p $OutDir
-  for Fasta in $(ls gene_pred/busco/N.ditisima/*/assembly/*/single_copy_busco_sequences/$Busco*.fna); do
+  for Fasta in $(ls gene_pred/busco/N.ditissima/*/assembly/*/single_copy_busco_sequences/$Busco*.fna); do
   Strain=$(echo $Fasta | rev | cut -f5 -d '/' | rev)
   Organism=$(echo $Fasta | rev | cut -f6 -d '/' | rev)
   FileName=$(basename $Fasta)
