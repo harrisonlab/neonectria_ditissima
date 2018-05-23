@@ -76,7 +76,7 @@ do
   Bai="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam.bai
   Txt="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup.txt
   Directory=analysis/genome_alignment/bowtie/*/$Strain/vs_Hg199_minion/
-  mv $Bam $Directory
+  #mv $Bam $Directory
   mv $rgBam $Directory
   mv $Bai $Directory
   mv $Txt $Directory
