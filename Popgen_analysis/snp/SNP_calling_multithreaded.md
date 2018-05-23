@@ -2,12 +2,10 @@
 To change in each analysis:
 
 ```bash
-
 reference=Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa
 input=Hg199_genome/repeat_masked/N.ditissima/Hg199_minion
 #input=repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/filtered_contigs
 #reference=repeat_masked/N.ditissima/Ref_Genomes/Hg199_minion/filtered_contigs/N.ditissima_contigs_unmasked.fa
-
 filename=$(basename "$reference")
 output="${filename%.*}.dict"
 ```
@@ -22,14 +20,13 @@ samtools faidx $reference
 ###Copy index file to same folder as BAM alignments
 
 ```bash
-for Strain in Ag02 Ag04 Ag05 Ag06 ND8 ND9 R0905 R37-15 R39-15 R41-15 R42-15 R45-15
-R68-17 Ag08 P112 BGV344 OPC304 Ag09_A Ag11_A Ag11_B Ag11_C Hg199 R6-17-2 R6-17-3
+for Strain in Ag02 Ag04 Ag05 Ag06 ND8 ND9 R0905 R37-15 R39-15 R41-15 R42-15 R45-15 R68-17 Ag08 P112 BGV344 OPC304 Ag09_A Ag11_A Ag11_B Ag11_C Hg199 R6-17-2 R6-17-3
 do
-    Index=Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa.fai
-    Directory=analysis/genome_alignment/bowtie/*/$Strain/vs_Hg199_minion
-    cp $Index $Directory
+  Index=Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa.fai
+  Directory=analysis/genome_alignment/bowtie/N.ditissima/$Strain/vs_Hg199_minion
+  cp $Index $Directory
 done
-``
+```
 
 ##Move to the directory where the output of SNP calling should be placed
 
