@@ -7,21 +7,21 @@ cat LDPK01.1.fsa_nt | sed 's/ Neo.*//g' > LDPK01.1.fsa_nt.fasta
 cat LDPL01.1.fsa_nt | sed 's/ Neo.*//g' > LDPL01.1.fsa_nt.fasta
 ```
 ```bash
-for Assembly in $(ls assembly/Nz_genomes/*/*_nt.fasta); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=N.ditissima
-echo "$Organism - $Strain"
-ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
+  for Assembly in $(ls repeat_masked/Nz_genomes/*/*_nt.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=N.ditissima
+    echo "$Organism - $Strain"
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=gene_pred/busco_new/$Organism/$Strain/assembly
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+  done
 ```
 
 # 1 Find single copy busco genes in N.ditisima assemblies
 
 ```bash
-  for Strain in Ag08 Ag11_B R41-15 R6-17-2 R6-17-3; do
+  for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 P112 OPC304 R0905_canu_2017_v2 R37-15 R39-15 R41-15 R42-15 R45-15 R68-17 R6-17-2 R6-17-3; do
     for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*unmasked.fa); do
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
