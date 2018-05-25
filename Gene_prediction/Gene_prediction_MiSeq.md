@@ -12,33 +12,21 @@ Gene prediction followed three steps:
 # Pre-gene prediction
 
 Quality of genome assemblies was assessed by looking for the gene space in the assemblies.
-```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
-	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-	for Genome in $(ls repeat_masked/*/R45-15/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Genome | rev | cut -f2 -d '/' | rev)
-    Organism=$(echo $Genome | rev | cut -f3 -d '/' | rev)
-    echo $Genome;
-		qsub $ProgDir/sub_cegma.sh $Genome dna;
-	done
-```
-** Number of cegma genes present and complete: 95.56%
-** Number of cegma genes present and partial: 96.77%
 
 ```bash
+	for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
-	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-	for Genome in $(ls repeat_masked/*/AgN04/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Genome | rev | cut -f2 -d '/' | rev)
-    Organism=$(echo $Genome | rev | cut -f3 -d '/' | rev)
-    echo $Genome;
+		for Genome in $(ls repeat_masked/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		Strain=$(echo $Genome | rev | cut -f2 -d '/' | rev)
+		Organism=$(echo $Genome | rev | cut -f3 -d '/' | rev)
+		echo $Genome;
 		qsub $ProgDir/sub_cegma.sh $Genome dna;
+		done
 	done
 ```
-** Number of cegma genes present and complete: 95.16%
-** Number of cegma genes present and partial: 96.77%
 
 Outputs were summarised using the commands:
+
 ```bash
 	for File in $(ls gene_pred/cegma/N.*/*/*_dna_cegma.completeness_report); do
 		Strain=$(echo $File | rev | cut -f2 -d '/' | rev);
@@ -50,131 +38,26 @@ Outputs were summarised using the commands:
 	less gene_pred/cegma/cegma_results_dna_summary.txt
 ```
 
-
 Busco has replaced CEGMA and was run to check gene space in assemblies
 
-
-Previous isolates
-
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
-for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*unmasked.fa); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-echo "$Organism - $Strain"
-ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly
-# OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
-done
-
-for Assembly in $(ls repeat_masked/N.ditissima/*/*/*unmasked.fa); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-echo "$Organism - $Strain"
-ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly
-# OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
-
-for Assembly in $(ls repeat_masked/N.ditissima/Ref_Genomes/*/*/*unmasked.fa); do
-Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
-echo "$Organism - $Strain"
-ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
+	for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
+		for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*unmasked.fa); do
+		Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+		Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+		echo "$Organism - $Strain"
+		ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
+		BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+		OutDir=gene_pred/busco/$Organism/$Strain/assembly
+		qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+		done
+	done
 ```
-
-
-short_summary_AgN04_contigs_unmasked.txt
-				3663    Complete BUSCOs (C)
-        3646    Complete and single-copy BUSCOs (S)
-        17      Complete and duplicated BUSCOs (D)
-        23      Fragmented BUSCOs (F)
-        39      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_R45-15_contigs_unmasked.txt	3674	15	22	29	3725
-				3674    Complete BUSCOs (C)
-        3659    Complete and single-copy BUSCOs (S)
-        15      Complete and duplicated BUSCOs (D)
-        22      Fragmented BUSCOs (F)
-        29      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_Hg199_contigs_unmasked.txt
-				3670    Complete BUSCOs (C)
-        3655    Complete and single-copy BUSCOs (S)
-        15      Complete and duplicated BUSCOs (D)
-        25      Fragmented BUSCOs (F)
-        30      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_contigs_min_500bp.txt Hg199
-				3673    Complete BUSCOs (C)
-        3658    Complete and single-copy BUSCOs (S)
-        15      Complete and duplicated BUSCOs (D)
-        24      Fragmented BUSCOs (F)
-        28      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_R0905_contigs_unmasked.txt R0905_merged_assembly
-				3510    Complete BUSCOs (C)
-        3417    Complete and single-copy BUSCOs (S)
-        93      Complete and duplicated BUSCOs (D)
-        26      Fragmented BUSCOs (F)
-        189     Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_R0905_contigs_unmasked.txt R0905 R0905_merged_2017
-				3651    Complete BUSCOs (C)
-        3635    Complete and single-copy BUSCOs (S)
-        16      Complete and duplicated BUSCOs (D)
-        20      Fragmented BUSCOs (F)
-        54      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_R0905_contigs_unmasked.txt R0905_canu_2017_v2
-				3668    Complete BUSCOs (C)
-        3652    Complete and single-copy BUSCOs (S)
-        16      Complete and duplicated BUSCOs (D)
-        21      Fragmented BUSCOs (F)
-        36      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_Ag02_contigs_unmasked.txt
-				3669    Complete BUSCOs (C)
-				3655    Complete and single-copy BUSCOs (S)
-        14      Complete and duplicated BUSCOs (D)
-        26      Fragmented BUSCOs (F)
-        30      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_Ag05_contigs_unmasked.txt
-				3669    Complete BUSCOs (C)
-        3653    Complete and single-copy BUSCOs (S)
-        16      Complete and duplicated BUSCOs (D)
-        25      Fragmented BUSCOs (F)
-        31      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_ND8_contigs_unmasked.txt
-				3669    Complete BUSCOs (C)
-        3654    Complete and single-copy BUSCOs (S)
-        15      Complete and duplicated BUSCOs (D)
-        25      Fragmented BUSCOs (F)
-        31      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
-short_summary_R37-15_contigs_unmasked.txt
-				3673    Complete BUSCOs (C)
-        3656    Complete and single-copy BUSCOs (S)
-        17      Complete and duplicated BUSCOs (D)
-        24      Fragmented BUSCOs (F)
-        28      Missing BUSCOs (M)
-        3725    Total BUSCO groups searched
 
 # Gene model training
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
+for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 P112 OPC304 R0905_canu_2017_v2 R37-15 R39-15 R41-15 R42-15 R45-15 R68-17 R6-17-2 R6-17-3; do
 	for Assembly in $(ls repeat_masked/*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 	  Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
 	  Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
@@ -887,7 +770,7 @@ done
   719
   number of Secreted CAZY genes identified:
   286
-	
+
 	N.ditissima - Ag02
 	number of CAZY genes identified:
 	720
