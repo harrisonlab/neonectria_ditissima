@@ -13,31 +13,6 @@ Gene prediction followed three steps:
 
 Quality of genome assemblies was assessed by looking for the gene space in the assemblies.
 
-```bash
-	for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/cegma
-		for Genome in $(ls repeat_masked/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-		Strain=$(echo $Genome | rev | cut -f2 -d '/' | rev)
-		Organism=$(echo $Genome | rev | cut -f3 -d '/' | rev)
-		echo $Genome;
-		qsub $ProgDir/sub_cegma.sh $Genome dna;
-		done
-	done
-```
-
-Outputs were summarised using the commands:
-
-```bash
-	for File in $(ls gene_pred/cegma/N.*/*/*_dna_cegma.completeness_report); do
-		Strain=$(echo $File | rev | cut -f2 -d '/' | rev);
-		Species=$(echo $File | rev | cut -f3 -d '/' | rev);
-		printf "$Species\t$Strain\n";
-		cat $File | head -n18 | tail -n+4;printf "\n";
-	done > gene_pred/cegma/cegma_results_dna_summary.txt
-
-	less gene_pred/cegma/cegma_results_dna_summary.txt
-```
-
 Busco has replaced CEGMA and was run to check gene space in assemblies
 
 ```bash
