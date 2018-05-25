@@ -146,7 +146,8 @@ done
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
-for Strain in Ag11_B R41-15 R6-17-2 R6-17-3; do
+for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+#for Strain in Ag11_B R41-15 R6-17-2 R6-17-3; do
 #for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
 #for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
   for File in $(ls repeat_masked/*/$Strain/*_contigs_softmasked.fa); do
