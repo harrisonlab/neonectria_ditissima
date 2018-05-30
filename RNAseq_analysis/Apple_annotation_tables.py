@@ -146,7 +146,7 @@ for line in InterPro_lines:
     line = line.rstrip("\n")
     split_line = line.split("\t")
     interpro_columns = []
-    index_list = [0, 4, 5, 11, 12]
+    index_list = [0, 2, 8]
     for x in index_list:
         if len(split_line) > x:
             interpro_columns.append(split_line[x])
@@ -180,7 +180,7 @@ for DEG_file in DEG_files:
     header_line.append("LFC_" + file_name)
     header_line.append("P-val_" + file_name)
 header_line.append('prot_seq')
-#header_line.append('CDS_seq')
+header_line.append('Interproscan')
 print ("\t".join(header_line))
 
 transcript_lines = []
@@ -231,7 +231,7 @@ if conf.gff_format == 'gtf':
             # print transcript_id
     del transcript_lines[0]
 
-print "\n".join(transcript_lines)
+#print "\n".join(transcript_lines)
 
 for line in transcript_lines:
     split_line = line.split("\t")
@@ -240,10 +240,11 @@ for line in transcript_lines:
 
 
 # Identify gene id
-    if 'ID' in split_line[8]:
+# Change 'Name' for 'ID' if is needed
+    if 'Name' in split_line[8]:
         split_col9 = split_line[8].split(';')
-        transcript_id = "".join([ x for x in split_col9 if 'ID' in x ])
-        transcript_id = transcript_id.replace('ID=', '').replace('transcript:', '')
+        transcript_id = "".join([ x for x in split_col9 if 'Name' in x ])
+        transcript_id = transcript_id.replace('Name=', '').replace('transcript:', '')
     else:
         transcript_id = split_line[8]
 
