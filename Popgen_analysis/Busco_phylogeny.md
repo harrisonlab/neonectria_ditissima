@@ -13,7 +13,7 @@ cat LDPL01.1.fsa_nt | sed 's/ Neo.*//g' > LDPL01.1.fsa_nt.fasta
     echo "$Organism - $Strain"
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=gene_pred/busco_new/$Organism/$Strain/assembly
+    OutDir=gene_pred/busco/$Organism/$Strain/assembly
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
   done
 ```
@@ -26,19 +26,25 @@ cat LDPL01.1.fsa_nt | sed 's/ Neo.*//g' > LDPL01.1.fsa_nt.fasta
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     echo "$Organism - $Strain"
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
+    #ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=gene_pred/busco/$Organism/$Strain/assembly
+    OutDir=gene_pred/busco_armita/$Organism/$Strain/assembly
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
   done
 ```
+
+Three busco genes gave me unexpected multiple hits. Therefore I removed them for my analysis
+
+```bash
+    rm gene_pred/busco/N.ditissima/*/assembly/*/single_copy_busco_sequences/EOG093314TJ*
+    rm gene_pred/busco/N.ditissima/*/assembly/*/single_copy_busco_sequences/EOG09330AIP*
+    rm gene_pred/busco/N.ditissima/*/assembly/*/single_copy_busco_sequences/EOG09330VPU*
+```
 Create a list of all BUSCO IDs
 
 ```bash
-cd /home/groups/harrisonlab/project_files/neonectria_ditissima
-
-# pushd /home/sobczm/bin/BUSCO_v1.22/fungi/hmms
 OutDir=analysis/popgen/busco_phylogeny
 mkdir -p $OutDir
 BuscoDb="sordariomyceta_odb9"
@@ -182,7 +188,7 @@ your local computer
 
 ```bash
 cd Users/armita/Downloads
-scp -r cluster:/home/groups/harrisonlab/project_files/idris/analysis/popgen/busco_phylogeny/phylogeny .
+scp -r cluster:/data/scratch/gomeza/analysis/popgen/busco_phylogeny/phylogeny .
 ```
 
 Alignments were loaded into Geneious where they were visualised and manually sorted into
