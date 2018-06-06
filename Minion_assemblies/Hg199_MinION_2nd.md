@@ -167,9 +167,9 @@ Allfiles MinION coverage was: 94.14
 
 ## Read correction and assembly
 
-Read correction using Canu
+Hg199 - Assembly using CANU
 
-Hg199
+Read correction using Canu
 
 ```bash
   for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
@@ -180,7 +180,6 @@ Hg199
     qsub $ProgDir/sub_canu_correction.sh $TrimReads 45m $Strain $OutDir
   done
 ```
-
 ```bash
   for CorrectedReads in $(ls assembly/canu_minion/N.d*/Hg199/*.trimmedReads.fasta.gz); do
     Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
@@ -190,8 +189,52 @@ Hg199
     qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 45m $Strain $OutDir
   done
 ```
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/canu_minion/N.ditissima/Hg199/Hg199.contigs.fasta); do
+  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+```
+165 contigs
+```
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
 
-Assembbly using SMARTdenovo
+Hg199 - Assembly using CANU 1 step
+
+```bash
+	for Reads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
+  	GenomeSz="45m"
+  	Strain=$(echo $Reads | rev | cut -f2 -d '/' | rev)
+  	Organism=$(echo $Reads | rev | cut -f3 -d '/' | rev)
+  	Prefix="$Strain"_canu
+  	OutDir=assembly/canu_minion_1step/$Organism/"$Strain"
+  	ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
+  	qsub $ProgDir/submit_canu.sh $Reads $GenomeSz $Prefix $OutDir
+  done    
+```
+
+Running
+
+
+
+
+
+
+Hg199 - Assembly using SMARTdenovo
 
 ```bash
   for CorrectedReads in $(ls assembly/canu_minion/N.d*/Hg199/*.trimmedReads.fasta.gz); do
@@ -204,8 +247,6 @@ Assembbly using SMARTdenovo
     qsub $ProgDir/sub_SMARTdenovo.sh $CorrectedReads $Prefix $OutDir
   done
 ```
-Quast for the SMARTdenovo assembly:
-
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
@@ -218,9 +259,6 @@ done
 ```
 137 contigs
 ```
-
-Busco has replaced CEGMA and was run to check gene space in assemblies
-
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
@@ -236,9 +274,10 @@ done
 
 R09/05 - I will test different assembly methods. Canu in 2 steps and in 1 step.
 
+R09/05 - Assembbly using CANU
 
 ```bash
-  for TrimReads in $(ls /home/groups/harrisonlab/project_files/neonectria_ditissima/raw_dna/pacbio/N.ditissima/R0905/extracted/*fastq); do
+  for TrimReads in $(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
     Organism=$(echo $TrimReads | rev | cut -f4 -d '/' | rev)
     Strain=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
     OutDir=assembly/canu_pacbio/N.ditissima/"$Strain"
@@ -246,19 +285,32 @@ R09/05 - I will test different assembly methods. Canu in 2 steps and in 1 step.
     qsub $ProgDir/sub_canu_correction.sh $TrimReads 45m $Strain $OutDir
   done
 ```
-
 ```bash
   for CorrectedReads in $(ls assembly/canu_minion/N.d*/Hg199/*.trimmedReads.fasta.gz); do
     Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
     Strain=$(echo $CorrectedReads | rev | cut -f2 -d '/' | rev)
-    OutDir=assembly/canu_minion/N.ditissima/"$Strain"
+    OutDir=assembly/canu_pacbio/N.ditissima/"$Strain"
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
     qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 45m $Strain $OutDir
   done
 ```
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/R0905.contigs.fasta); do
+  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+```
+541 contigs. BAD, no Busco done.
+```
+
+R0905 - Assembly using CANU 1 step
 
 ```bash
-	for Reads in $(ls /home/groups/harrisonlab/project_files/neonectria_ditissima/raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
+	for Reads in $(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
   	GenomeSz="45m"
   	Strain=$(echo $Reads | rev | cut -f3 -d '/' | rev)
   	Organism=$(echo $Reads | rev | cut -f4 -d '/' | rev)
@@ -268,65 +320,158 @@ R09/05 - I will test different assembly methods. Canu in 2 steps and in 1 step.
   	qsub $ProgDir/submit_canu.sh $Reads $GenomeSz $Prefix $OutDir
   done    
 ```
-
-Assembbly using SMARTdenovo
-
-```bash
-  for CorrectedReads in $(ls /home/groups/harrisonlab/project_files/neonectria_ditissima/raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
-    Organism=$(echo $CorrectedReads | rev | cut -f4 -d '/' | rev)
-    Strain=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
-    Prefix="$Strain"_smartdenovo
-    OutDir=assembly/SMARTdenovo/N.ditissima/"$Strain"
-    mkdir -p $OutDir
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/SMARTdenovo
-    qsub $ProgDir/sub_SMARTdenovo.sh $CorrectedReads $Prefix $OutDir
-  done
-```
-
-Assembbly using SMARTdenovo and corrected reads
-
-```bash
-  for CorrectedReads in $(ls /home/groups/harrisonlab/project_files/neonectria_ditissima/raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
-    Organism=$(echo $CorrectedReads | rev | cut -f4 -d '/' | rev)
-    Strain=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
-    Prefix="$Strain"_smartdenovo
-    OutDir=assembly/SMARTdenovo/N.ditissima/"$Strain"
-    mkdir -p $OutDir
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/SMARTdenovo
-    qsub $ProgDir/sub_SMARTdenovo.sh $CorrectedReads $Prefix $OutDir
-  done
-```
-
-
-
-
-
-
-Quast for the R09-05 assemblies:
-
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
+for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/R0905_canu.contigs.fasta); do
   Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $Assembly)
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
+```
+50 contigs
+```
+```bash
+for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/R0905_canu.contigs.fasta); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
 
+R09/05 - Assembbly using SMARTdenovo
 
-
-
+```bash
+  for CorrectedReads in $(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
+    Organism=$(echo $CorrectedReads | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
+    Prefix="$Strain"_smartdenovo
+    OutDir=assembly/SMARTdenovo/N.ditissima/"$Strain"
+    mkdir -p $OutDir
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/SMARTdenovo
+    qsub $ProgDir/sub_SMARTdenovo.sh $CorrectedReads $Prefix $OutDir
+  done
+```
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/R0905/R0905_smartdenovo.dmo.lay.utg); do
+  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+```
+135 contigs
+```
 Busco has replaced CEGMA and was run to check gene space in assemblies
+
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/R0905/R0905_smartdenovo.dmo.lay.utg); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+```
+Bad prediction
+```
+
+## Error correction using racon:
+
+Hg199
 
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 echo "$Organism - $Strain"
+ReadsFq=$(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz)
+Iterations=10
+OutDir=$(dirname $Assembly)"/racon_$Iterations"
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
+qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
+done
+```
+```bash
+for Assembly in $(ls assembly/canu_minion/N.ditissima/Hg199/Hg199.contigs.fasta); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ReadsFq=$(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz)
+Iterations=10
+OutDir=$(dirname $Assembly)"/racon_$Iterations"
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
+qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
+done
+```
+
+Quast and busco were run to assess the effects of racon on assembly quality:
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/*/N.ditissima/Hg199/racon_10/*10.fasta); do
+  Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/*10.fasta); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly
+OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_SMARTdenovo/racon_10
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+
+for Assembly in $(ls assembly/canu_minion/N.ditissima/Hg199/racon_10/*10.fasta); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_canu_minion/racon_10
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+
+R09/05
+
+```bash
+for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/R0905/R0905_smartdenovo.dmo.lay.utg); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ReadsFq=$(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq)
+Iterations=10
+OutDir=$(dirname $Assembly)"/racon_$Iterations"
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
+qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
+done
+```
+```bash
+for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/R0905_canu.contigs.fasta); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+ReadsFq=$(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq)
+Iterations=10
+OutDir=$(dirname $Assembly)"/racon_$Iterations"
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
+qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
 done
 ```
