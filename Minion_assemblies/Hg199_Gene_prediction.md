@@ -365,52 +365,56 @@ commands:
 
  ```bash
   screen -a
- 	SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
- 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
- 	CurPath=$PWD
- 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
- 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
- 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
- 		SplitDir=gene_pred/final_genes_split/$Organism/$Strain
- 		mkdir -p $SplitDir
- 		BaseName="$Organism""_$Strain"_final_preds
- 		$SplitfileDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName
- 		for File in $(ls $SplitDir/*_final_preds_*); do
- 			Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
- 			while [ $Jobs -gt 1 ]; do
- 				sleep 10
- 				printf "."
- 				Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
- 			done
- 			printf "\n"
- 			echo $File
- 			qsub $ProgDir/pred_sigP.sh $File signalp-4.1
- 		done
- 	done
- ```
-
+	for Strain in Hg199_minion; do
+  SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+  CurPath=$PWD
+  for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
+  Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+  Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+  SplitDir=gene_pred/final_genes_split/$Organism/$Strain
+  mkdir -p $SplitDir
+  BaseName="$Organism""_$Strain"_final_preds
+  $SplitfileDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName
+  for File in $(ls $SplitDir/*_final_preds_*); do
+  Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
+  while [ $Jobs -gt 1 ]; do
+  sleep 10
+  printf "."
+  Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
+  done
+  printf "\n"
+  echo $File
+  qsub $ProgDir/pred_sigP.sh $File
+  qsub $ProgDir/pred_sigP.sh $File signalp-3.0
+  qsub $ProgDir/pred_sigP.sh $File signalp-4.1
+  done
+  done
+  done
+```
  The batch files of predicted secreted proteins needed to be combined into a
  single file for each strain. This was done with the following commands:
  ```bash
- 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/*); do
- 		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
- 		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
- 		InStringAA=''
- 		InStringNeg=''
- 		InStringTab=''
- 		InStringTxt=''
- 		SigpDir=final_genes_signalp-4.1
- 		for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
- 			InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
- 			InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
- 			InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
- 			InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
- 		done
- 		cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
- 		cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
- 		tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
- 		cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
- 	done
+for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/Hg199_minion); do
+Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
+Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
+for SigpDir in $(ls -d gene_pred/final_genes_sig* | cut -f2 -d'/')
+do
+InStringAA=''
+InStringNeg=''
+InStringTab=''
+InStringTxt=''
+for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
+InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
+InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
+InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
+InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
+done
+cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
+cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
+tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
+cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
+done
  ```
 
  Some proteins that are incorporated into the cell membrane require secretion.
