@@ -521,29 +521,34 @@ gene models using a number of approaches:
 screen -a
 
  ```bash
-	for Strain in Ag02 Ag05 ND8 R37-15; do
- 	SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
- 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
- 	CurPath=$PWD
- 	for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
- 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
- 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
- 		SplitDir=gene_pred/final_genes_split/$Organism/$Strain
- 		mkdir -p $SplitDir
- 		BaseName="$Organism""_$Strain"_final_preds
- 		$SplitfileDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName
- 		for File in $(ls $SplitDir/*_final_preds_*); do
- 			Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
- 			while [ $Jobs -gt 1 ]; do
- 				sleep 10
- 				printf "."
- 				Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
- 			done
- 			printf "\n"
- 			echo $File
- 			qsub $ProgDir/pred_sigP.sh $File signalp-4.1
- 		done
- 	done
+for Strain in Ag11_C BGV344 ND9 OPC304; do
+#for Strain in P112 Ag06 Ag09_A Ag11_A; do
+#for Strain in R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
+#for Strain in Hg199_minion; do
+SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+CurPath=$PWD
+for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
+Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+SplitDir=gene_pred/final_genes_split/$Organism/$Strain
+mkdir -p $SplitDir
+BaseName="$Organism""_$Strain"_final_preds
+$SplitfileDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName
+for File in $(ls $SplitDir/*_final_preds_*); do
+Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
+while [ $Jobs -gt 1 ]; do
+sleep 10
+printf "."
+Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
+done
+printf "\n"
+echo $File
+qsub $ProgDir/pred_sigP.sh $File
+qsub $ProgDir/pred_sigP.sh $File signalp-3.0
+qsub $ProgDir/pred_sigP.sh $File signalp-4.1
+done
+done
 done
  ```
 
