@@ -50,13 +50,32 @@ for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 
 done
 ```
 
+```bash
+for Strain in RS305p RS324p; do
+	for Assembly in $(ls repeat_masked/Nz_genomes/$Strain/*.fasta); do
+	  Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
+	  Organism=N.ditissima
+	  echo "$Organism - $Strain"
+	  for RNADir in $(ls -d qc_rna/paired/N.ditissima/Hg199); do
+	    Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
+	    echo "$Timepoint"
+	    FileF=$(ls $RNADir/F/*_trim.fq.gz)
+	    FileR=$(ls $RNADir/R/*_trim.fq.gz)
+	    OutDir=alignment/$Organism/$Strain/$Timepoint
+	    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+	    qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir
+		done
+	done
+done
+```
+
 Alignments were concatenated prior to running cufflinks:
 Cufflinks was run to produce the fragment length and stdev statistics:
 
 screen -a
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
+for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 P112 OPC304 R0905_canu_2017_v2 R37-15 R39-15 R41-15 R42-15 R45-15 R68-17 R6-17-2 R6-17-3; do
 for Assembly in $(ls repeat_masked/*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
 Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
