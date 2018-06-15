@@ -385,8 +385,8 @@ commands:
   done
   printf "\n"
   echo $File
-  qsub $ProgDir/pred_sigP.sh $File
-  qsub $ProgDir/pred_sigP.sh $File signalp-3.0
+  #qsub $ProgDir/pred_sigP.sh $File
+  #qsub $ProgDir/pred_sigP.sh $File signalp-3.0
   qsub $ProgDir/pred_sigP.sh $File signalp-4.1
   done
   done
@@ -394,11 +394,12 @@ commands:
 ```
  The batch files of predicted secreted proteins needed to be combined into a
  single file for each strain. This was done with the following commands:
+
  ```bash
 for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/Hg199_minion); do
 Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
 Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
-for SigpDir in $(ls -d gene_pred/final_genes_sig* | cut -f2 -d'/')
+for SigpDir in $(ls -d gene_pred/final_genes_sigP | cut -f2 -d'/')
 do
 InStringAA=''
 InStringNeg=''
@@ -415,7 +416,8 @@ cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.a
 tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
 cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
 done
- ```
+done
+```
 
  Some proteins that are incorporated into the cell membrane require secretion.
  Therefore proteins with a transmembrane domain are not likely to represent
@@ -435,22 +437,22 @@ done
  Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
 
  ```bash
-   for File in $(ls gene_pred/trans_mem/*/*/*_TM_genes_neg.txt); do
-     Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
-     Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
-     echo "$Organism - $Strain"
-     TmHeaders=$(echo "$File" | sed 's/neg.txt/neg_headers.txt/g')
-     cat $File | cut -f1 > $TmHeaders
-     SigP=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
-     OutDir=$(dirname $SigP)
-     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-     $ProgDir/extract_from_fasta.py --fasta $SigP --headers $TmHeaders > $OutDir/"$Strain"_final_sp_no_trans_mem.aa
-     cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
-   done
+for File in $(ls gene_pred/trans_mem/*/*/*_TM_genes_neg.txt); do
+ Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+ Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+ echo "$Organism - $Strain"
+ TmHeaders=$(echo "$File" | sed 's/neg.txt/neg_headers.txt/g')
+ cat $File | cut -f1 > $TmHeaders
+ SigP=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
+ OutDir=$(dirname $SigP)
+ ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+ $ProgDir/extract_from_fasta.py --fasta $SigP --headers $TmHeaders > $OutDir/"$Strain"_final_sp_no_trans_mem.aa
+ cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
+done
  ```
 
  N.ditissima - Hg199_minion
-1033
+1033 549 625
 
 ## B) From Augustus gene models - Effector identification using EffectorP
 
