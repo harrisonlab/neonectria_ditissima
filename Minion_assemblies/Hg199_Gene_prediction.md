@@ -385,8 +385,8 @@ commands:
   done
   printf "\n"
   echo $File
-  #qsub $ProgDir/pred_sigP.sh $File
-  #qsub $ProgDir/pred_sigP.sh $File signalp-3.0
+  qsub $ProgDir/pred_sigP.sh $File
+  qsub $ProgDir/pred_sigP.sh $File signalp-3.0
   qsub $ProgDir/pred_sigP.sh $File signalp-4.1
   done
   done
@@ -399,7 +399,7 @@ commands:
 for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/Hg199_minion); do
 Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
 Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
-for SigpDir in $(ls -d gene_pred/final_genes_sigP | cut -f2 -d'/')
+for SigpDir in $(ls -d gene_pred/final_genes_signalp-4.1 | cut -f2 -d'/')
 do
 InStringAA=''
 InStringNeg=''
@@ -426,7 +426,7 @@ done
  Proteins containing a transmembrane domain were identified:
 
  ```bash
- 	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+ 	for Proteome in $(ls gene_pred/codingquary/N.*/Hg199_minion/*/final_genes_combined.pep.fasta); do
  		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
  		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
  		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
@@ -437,7 +437,7 @@ done
  Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
 
  ```bash
-for File in $(ls gene_pred/trans_mem/*/*/*_TM_genes_neg.txt); do
+for File in $(ls gene_pred/trans_mem/*/Hg199_minion/*_TM_genes_neg.txt); do
  Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
  Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
  echo "$Organism - $Strain"
@@ -452,7 +452,7 @@ done
  ```
 
  N.ditissima - Hg199_minion
-1033 549 625
+1033
 
 ## B) From Augustus gene models - Effector identification using EffectorP
 
