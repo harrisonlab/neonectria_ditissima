@@ -88,6 +88,23 @@ cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 
 done
 done
 ```
+
+screen -a
+
+```bash
+for Strain in RS305p RS324p; do
+for Assembly in $(ls repeat_masked/Nz_genomes/$Strain/*.fasta); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
+Organism=N.ditissima
+AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
+OutDir=gene_pred/cufflinks/$Organism/$Strain/vs_Hg199reads/concatenated_prelim
+echo "$Organism - $Strain"
+mkdir -p $OutDir
+cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
+done
+done
+```
+
 I have aligned every isolate with the Hg199 RNA reads.
 
 Output from stdout included:
@@ -234,7 +251,33 @@ done
 done
 done
 ```
-
+```bash
+for Strain in RS305p RS324p; do
+for Assembly in $(ls repeat_masked/Nz_genomes/$Strain/*.fasta); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
+Organism=N.ditissima
+echo "$Organism - $Strain"
+for RNADir in $(ls -d qc_rna/paired/N.ditissima/Hg199 | grep -v -e '_rep'); do
+Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
+echo "$Timepoint"
+FileF=$(ls $RNADir/F/*_trim.fq.gz)
+FileR=$(ls $RNADir/R/*_trim.fq.gz)
+OutDir=alignment/$Organism/$Strain/$Timepoint
+InsertGap='-140'
+InsertStdDev='43'
+Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
+while [ $Jobs -gt 1 ]; do
+sleep 10
+printf "."
+Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
+done
+printf "\n"
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
+done
+done
+done
+```
 #### Braker prediction
 
 Before braker predictiction was performed, I double checked that I had the genemark key in my user area and copied it over from the genemark install directory:
@@ -264,6 +307,27 @@ for Strain in Ag02 Ag05 ND8 R37-15; do
     GeneModelName="$Organism"_"$Strain"_braker_Jan2018
 		#GeneModelName="$Organism"_"$Strain"_braker_Nov2017
     rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_Jan2018
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
+    qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
+  done
+done
+
+for Strain in RS305p RS324p; do
+for Assembly in $(ls repeat_masked/Nz_genomes/$Strain/*.fasta); do
+    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+    while [ $Jobs -gt 1 ]; do
+    sleep 10
+    printf "."
+    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
+    done
+    printf "\n"
+    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
+    Organism=N.ditissima
+    echo "$Organism - $Strain"
+    OutDir=gene_pred/braker/$Organism/$Strain
+    AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
+    GeneModelName="$Organism"_"$Strain"_braker
+    #rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
     qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
   done
