@@ -368,6 +368,19 @@ for Strain in Ag02 Ag05 ND8 R37-15; do
     qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
     done
 	done
+
+	for Strain in RS305p RS324p; do
+	for Assembly in $(ls repeat_masked/Nz_genomes/$Strain/*.fasta); do
+	    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
+	    Organism=N.ditissima
+	    echo "$Organism - $Strain"
+	    OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
+	    mkdir -p $OutDir
+	    AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
+	    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+	    qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
+	    done
+		done
 ```
 
 Secondly, genes were predicted using CodingQuary:
@@ -384,6 +397,18 @@ for Strain in Ag02 Ag05 ND8 R37-15; do
     qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
     done
 	done
+
+	for Strain in RS305p RS324p; do
+	for Assembly in $(ls repeat_masked/Nz_genomes/$Strain/*.fasta); do
+	    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
+	    Organism=N.ditissima
+	    echo "$Organism - $Strain"
+	    OutDir=gene_pred/codingquary/$Organism/$Strain/
+	    CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
+	    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
+	    qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
+	    done
+		done
 ```
 
 Then, additional transcripts were added to Braker gene models, when CodingQuary
