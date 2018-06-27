@@ -27,7 +27,7 @@ ap.add_argument('--Module_Genes', required=True, type=str, help='Complete list \
 of genes in a coexpression module')
 ap.add_argument('--Module_Name', required=True, type=str, help='Name of the \
 module being analysed')
-ap.add_argument('--Genome_Effectors', required=True, type=float, help='Number of \
+ap.add_argument('--Genome_Effector', required=True, type=float, help='Number of \
 total Effectors in the genome')
 ap.add_argument('--Genome_CAZY', required=True, type=float, help='Number of \
 total CAZY in the genome')
@@ -46,12 +46,12 @@ conf = ap.parse_args()
 # Load inputs into python variables
 # -----------------------------------------------------
 
-Effectors = []
+Effector = []
 with open(conf.Module_Effector) as f:
     for line in f.readlines():
-        Effectors.append(line)
+        Effector.append(line)
 
-Effectors_Set = set(Effectors)
+Effector_Set = set(Effector)
 
 CAZY = []
 with open(conf.Module_CAZY) as f:
@@ -63,7 +63,7 @@ CAZY_Set = set(CAZY)
 Effectors_Combined = []
 with open(conf.Module_Effectors_Combined) as f:
     for line in f.readlines():
-        Effectors.append(line)
+        Effectors_Combined.append(line)
 
 Effector_Combined_Set = set(Effectors_Combined)
 
@@ -82,7 +82,7 @@ with open(conf.Module_Genes) as f:
 Gene_Set = set(Genes)
 
 Module_Name = conf.Module_Name
-Genome_Effectors = conf.Genome_Effectors
+Genome_Effector = conf.Genome_Effector
 Genome_CAZY = conf.Genome_CAZY
 Genome_Effectors_Combined = conf.Genome_Effectors_Combined
 Genome_Secreted = conf.Genome_Secreted
@@ -105,7 +105,7 @@ Mod_Gene_Num = len(Gene_Set)
 
 # Genome
 
-Gen_Effector_Num = Genome_Effectors - Mod_Effector_Num
+Gen_Effector_Num = Genome_Effector - Mod_Effector_Num
 Gen_CAZY_Num = Genome_CAZY - Mod_CAZY_Num
 Gen_Effector_Combined_Num = Genome_Effectors_Combined - Mod_Effector_Combined_Num
 Gen_Secreted_Num = Genome_Secreted - Mod_Secreted_Num
@@ -133,7 +133,7 @@ CAZY_Out = "/".join([cwd, OutDir, CAZY_File])
 with open(CAZY_Out, "w") as o:
     Line1 = "\t".join(["CAZY", str(Mod_CAZY_Num), str(Gen_CAZY_Num)]) + "\n"
     Mod_Genes = Mod_Gene_Num - Mod_CAZY_Num
-    Gen_Genes = Gen_Gene_Num - Mod_Gene_Num - Gen_CRN_Num
+    Gen_Genes = Gen_Gene_Num - Mod_Gene_Num - Gen_CAZY_Num
     Line2 = "\t".join(["Other Genes", str(Mod_Genes), str(Gen_Genes)]) + "\n"
     o.write("".join([Line1, Line2]))
     o.close()
