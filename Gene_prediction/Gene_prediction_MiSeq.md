@@ -455,6 +455,47 @@ cat $GffBraker $GffQuary > $GffAppended
 
 done
 done
+
+for Strain in RS305p RS324p; do
+	for BrakerGff in $(ls gene_pred/braker/N.dit*/$Strain/*/augustus.gff3); do
+	#Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
+	Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
+	echo "$Organism - $Strain"
+	Assembly=$(ls repeat_masked/Nz_genomes/$Strain/*.fasta)
+	CodingQuaryGff=gene_pred/codingquary/$Organism/$Strain/out/PredictedPass.gff3
+	PGNGff=gene_pred/codingquary/$Organism/$Strain/out/PGN_predictedPass.gff3
+	AddDir=gene_pred/codingquary/$Organism/$Strain/additional
+	FinalDir=gene_pred/codingquary/$Organism/$Strain/final
+	AddGenesList=$AddDir/additional_genes.txt
+	AddGenesGff=$AddDir/additional_genes.gff
+	FinalGff=$AddDir/combined_genes.gff
+	mkdir -p $AddDir
+	mkdir -p $FinalDir
+
+	bedtools intersect -v -a $CodingQuaryGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' > $AddGenesList
+	bedtools intersect -v -a $PGNGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' >> $AddGenesList
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation
+	$ProgDir/gene_list_to_gff.pl $AddGenesList $CodingQuaryGff CodingQuarry_v2.0 ID CodingQuary > $AddGenesGff
+	$ProgDir/gene_list_to_gff.pl $AddGenesList $PGNGff PGNCodingQuarry_v2.0 ID CodingQuary >> $AddGenesGff
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
+
+	$ProgDir/add_CodingQuary_features.pl $AddGenesGff $Assembly > $FinalDir/final_genes_CodingQuary.gff3
+	$ProgDir/gff2fasta.pl $Assembly $FinalDir/final_genes_CodingQuary.gff3 $FinalDir/final_genes_CodingQuary
+	cp $BrakerGff $FinalDir/final_genes_Braker.gff3
+	$ProgDir/gff2fasta.pl $Assembly $FinalDir/final_genes_Braker.gff3 $FinalDir/final_genes_Braker
+	cat $FinalDir/final_genes_Braker.pep.fasta $FinalDir/final_genes_CodingQuary.pep.fasta | sed -r 's/\*/X/g' > $FinalDir/final_genes_combined.pep.fasta
+	cat $FinalDir/final_genes_Braker.cdna.fasta $FinalDir/final_genes_CodingQuary.cdna.fasta > $FinalDir/final_genes_combined.cdna.fasta
+	cat $FinalDir/final_genes_Braker.gene.fasta $FinalDir/final_genes_CodingQuary.gene.fasta > $FinalDir/final_genes_combined.gene.fasta
+	cat $FinalDir/final_genes_Braker.upstream3000.fasta $FinalDir/final_genes_CodingQuary.upstream3000.fasta > $FinalDir/final_genes_combined.upstream3000.fasta
+
+	GffBraker=$FinalDir/final_genes_CodingQuary.gff3
+	GffQuary=$FinalDir/final_genes_Braker.gff3
+	GffAppended=$FinalDir/final_genes_appended.gff3
+	cat $GffBraker $GffQuary > $GffAppended
+
+	done
+	done
+
 ```
 
 The final number of genes per isolate was observed using:
@@ -467,47 +508,144 @@ cat $DirPath/final_genes_combined.pep.fasta | grep '>' | wc -l;
 echo "";
 done
 ```
+
+```
 gene_pred/codingquary/N.ditissima/Ag02/final
-13282
-761
-14043
+13294
+754
+14048
 
 gene_pred/codingquary/N.ditissima/Ag04/final
-12805
-854
-13659
-
-gene_pred/codingquary/N.ditissima/Ag05/final
-13269
-758
-14027
-
-gene_pred/codingquary/N.ditissima/Hg199/final
-12818
-905
-13723
-
-gene_pred/codingquary/N.ditissima/ND8/final
-13257
-745
-14002
-
-gene_pred/codingquary/N.ditissima/R0905_canu_2017_v2/final
-12848
-898
-13746
-
-gene_pred/codingquary/N.ditissima/R37-15/final
-13283
-737
+13272
+748
 14020
 
+gene_pred/codingquary/N.ditissima/Ag05/final
+13251
+760
+14011
+
+gene_pred/codingquary/N.ditissima/Ag06/final
+13179
+847
+14026
+
+gene_pred/codingquary/N.ditissima/Ag08/final
+14341
+801
+15142
+
+gene_pred/codingquary/N.ditissima/Ag09_A/final
+13968
+753
+14721
+
+gene_pred/codingquary/N.ditissima/Ag11_A/final
+14278
+759
+15037
+
+gene_pred/codingquary/N.ditissima/Ag11_B/final
+13451
+774
+14225
+
+gene_pred/codingquary/N.ditissima/Ag11_C/final
+15757
+883
+16640
+
+gene_pred/codingquary/N.ditissima/BGV344/final
+13413
+771
+14184
+
+gene_pred/codingquary/N.ditissima/Hg199/final
+13354
+828
+14182
+
+gene_pred/codingquary/N.ditissima/Hg199_minion/final
+13674
+1245
+14919
+
+gene_pred/codingquary/N.ditissima/ND8/final
+13216
+799
+14015
+
+gene_pred/codingquary/N.ditissima/ND9/final
+13247
+795
+14042
+
+gene_pred/codingquary/N.ditissima/OPC304/final
+13200
+822
+14022
+
+gene_pred/codingquary/N.ditissima/P112/final
+15414
+833
+16247
+
+gene_pred/codingquary/N.ditissima/R0905_canu_2017_v2/final
+13245
+864
+14109
+
+gene_pred/codingquary/N.ditissima/R37-15/final
+13268
+735
+14003
+
+gene_pred/codingquary/N.ditissima/R39-15/final
+13260
+739
+13999
+
+gene_pred/codingquary/N.ditissima/R41-15/final
+13239
+756
+13995
+
+gene_pred/codingquary/N.ditissima/R42-15/final
+13325
+749
+14074
+
 gene_pred/codingquary/N.ditissima/R45-15/final
-12635
-989
-13624
+13257
+775
+14032
 
+gene_pred/codingquary/N.ditissima/R6-17-2/final
+13277
+800
+14077
 
+gene_pred/codingquary/N.ditissima/R6-17-3/final
+13429
+772
+14201
+
+gene_pred/codingquary/N.ditissima/R68-17/final
+14232
+745
+14977
+
+gene_pred/codingquary/N.ditissima/RS305p/final
+13429
+957
+14386
+
+gene_pred/codingquary/N.ditissima/RS324p/final
+13392
+1132
+14524
+
+```
 
 ## ORF finder
 
@@ -521,6 +659,11 @@ also printing ORFs in .gff format.
 ```bash
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
 for Genome in $(ls repeat_masked/*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+qsub $ProgDir/run_ORF_finder.sh $Genome
+done
+
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+for Genome in $(ls repeat_masked/Nz_genomes/*/*.fasta); do
 qsub $ProgDir/run_ORF_finder.sh $Genome
 done
 ```
@@ -557,12 +700,13 @@ was redirected to a temporary output file named interproscan_submission.log .
 
 ```bash
 	screen -a
-	cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+	for Strain in RS305p RS324p; do
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Genes in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
+done
 ```
 
 Following interproscan annotation split files were combined using the following
@@ -570,7 +714,8 @@ commands:
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Strain in RS305p RS324p; do
+	for Proteins in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -578,20 +723,23 @@ commands:
 		InterProRaw=gene_pred/interproscan/$Organism/$Strain/raw
 		$ProgDir/append_interpro.sh $Proteins $InterProRaw
 	done
+done
 ```
 
 ## B) SwissProt
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+for Strain in RS305p RS324p; do
+	for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		OutDir=gene_pred/swissprot/$Organism/$Strain
-		SwissDbDir=../../uniprot/swissprot
+		SwissDbDir=../../../home/groups/harrisonlab/uniprot/swissprot
 		SwissDbName=uniprot_sprot
 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
 		qsub $ProgDir/sub_swissprot.sh $Proteome $OutDir $SwissDbDir $SwissDbName
 	done
+done
 ```
 
 ```bash
@@ -629,7 +777,8 @@ gene models using a number of approaches:
 screen -a
 
  ```bash
-for Strain in Ag11_C BGV344 ND9 OPC304; do
+for Strain in RS305p RS324p; do
+#for Strain in Ag11_C BGV344 ND9 OPC304; do
 #for Strain in P112 Ag06 Ag09_A Ag11_A; do
 #for Strain in R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
 #for Strain in Hg199_minion; do
@@ -652,8 +801,8 @@ Jobs=$(qstat | grep 'pred_sigP' | grep 'qw' | wc -l)
 done
 printf "\n"
 echo $File
-qsub $ProgDir/pred_sigP.sh $File
-qsub $ProgDir/pred_sigP.sh $File signalp-3.0
+#qsub $ProgDir/pred_sigP.sh $File
+#qsub $ProgDir/pred_sigP.sh $File signalp-3.0
 qsub $ProgDir/pred_sigP.sh $File signalp-4.1
 done
 done
@@ -663,26 +812,27 @@ done
  The batch files of predicted secreted proteins needed to be combined into a
  single file for each strain. This was done with the following commands:
  ```bash
- for Strain in Ag02 Ag05 ND8 R37-15; do
- 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/$Strain); do
- 		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
- 		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
- 		InStringAA=''
- 		InStringNeg=''
- 		InStringTab=''
- 		InStringTxt=''
- 		SigpDir=final_genes_signalp-4.1
- 		for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
- 			InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
- 			InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
- 			InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
- 			InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
- 		done
- 		cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
- 		cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
- 		tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
- 		cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
- 	done
+ #for Strain in Ag02 Ag05 ND8 R37-15; do
+ for Strain in RS305p RS324p; do
+	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/$Strain); do
+		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
+		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
+		InStringAA=''
+		InStringNeg=''
+		InStringTab=''
+		InStringTxt=''
+		SigpDir=final_genes_signalp-4.1
+		for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
+			InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
+			InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
+			InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
+			InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
+		done
+		cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
+		cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
+		tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
+		cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
+	done
 done
  ```
 
@@ -693,7 +843,8 @@ done
  Proteins containing a transmembrane domain were identified:
 
  ```bash
- for Strain in Ag02 Ag05 ND8 R37-15; do
+ #for Strain in Ag02 Ag05 ND8 R37-15; do
+	for Strain in RS305p RS324p; do
  	for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
  		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
  		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
