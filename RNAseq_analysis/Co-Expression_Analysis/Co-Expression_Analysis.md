@@ -216,7 +216,7 @@ done
 
 ```bash
 Effector_Headers=analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_headers.txt
-Genome_Effectors=$(cat $Effector_Headers | sort | uniq | wc -l)
+Genome_Effector=$(cat $Effector_Headers | sort | uniq | wc -l)
 CAZY_Headers=gene_pred/CAZY/N.ditissima/Hg199_minion/Hg199_minion_CAZY_headers.txt
 Genome_CAZY=$(cat $CAZY_Headers | sort | uniq | wc -l)
 Genome_Effectors_Combined=$(cat $CAZY_Headers $Effector_Headers | sort | uniq | wc -l)
@@ -233,9 +233,9 @@ do
     Module_Effectors_Combined=$Module_Dir/Effectors_Combined_IDs.txt
     Module_Secreted=$Module_Dir/Secreted_IDs.txt
     Module_Genes=$Module_Dir/Gene_Set.txt
-    ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis
+    ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Co-Expression_Analysis
     echo "Processing $Module_Name"
-    python $ProgDir/Fisher_table_prep.py --Module_Effector $Module_Effector --Module_CAZY $Module_CAZY  --Module_Effectors_Combined $Module_Effectors_Combined --Module_Secreted $Module_Secreted --Module_Genes $Module_Genes --Module_Name $Module_Name --Genome_Effectors $Genome_Effectors --Genome_CAZY $Genome_CAZY --Genome_Effectors_Combined $Genome_Effectors_Combined --Genome_Secreted $Genome_Secreted --Genome_Genes $Genome_Genes --OutDir $Module_Dir
+    python $ProgDir/Fisher_table_prep.py --Module_Effector $Module_Effector --Module_CAZY $Module_CAZY  --Module_Effectors_Combined $Module_Effectors_Combined --Module_Secreted $Module_Secreted --Module_Genes $Module_Genes --Module_Name $Module_Name --Genome_Effector $Genome_Effector --Genome_CAZY $Genome_CAZY --Genome_Effectors_Combined $Genome_Effectors_Combined --Genome_Secreted $Genome_Secreted --Genome_Genes $Genome_Genes --OutDir $Module_Dir
     echo "$Module_Name done"
 done
 ```
@@ -247,7 +247,7 @@ I recommend running in screen due to large numbers of items in loop
 
 ```bash
 qlogin
-cd /home/groups/harrisonlab/project_files/phytophthora_fragariae
+cd /data/scratch/gomeza
 
 for Table in $(ls analysis/coexpression/enrichment/*/*Fishertable.txt)
 do
@@ -256,7 +256,7 @@ do
     Gene_Type=$(echo $Filename | cut -f2 -d "_")
     OutDir=analysis/coexpression/enrichment/$Module_ID/Fisher_Results
     mkdir -p $OutDir
-    ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae/RNA_Seq_scripts
+    ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Co-Expression_Analysis
     echo "Running $Module_ID" "$Gene_Type"
     /home/adamst/prog/R/R-3.2.5/bin/Rscript --vanilla $ProgDir/fisherstest.R --Input_Table $Table --Output_Directory $OutDir --Module_ID $Module_ID --Gene_Type $Gene_Type
     echo "$Module_ID" "$Gene_Type done"
@@ -271,8 +271,8 @@ do
     Files=$(ls analysis/coexpression/enrichment/*/Fisher_Results/enriched_"$Type".txt)
     OutDir=analysis/coexpression/enrichment/Parsed_Fisher_Results/$Type
     mkdir -p $OutDir
-    ProgDir=/home/adamst/git_repos/scripts/phytophthora_fragariae/RNA_Seq_scripts
-    python $ProgDir/parse_fisher_results.py --inputs $Files --outdir $OutDir --FDR 0.05 --Types RxLR CRN ApoP Effector Secreted --Threshold 0.05
+    ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Co-Expression_Analysis
+    python $ProgDir/parse_fisher_results.py --inputs $Files --outdir $OutDir --FDR 0.05 --Types Effector CAZY Effectors_Combined Secreted --Threshold 0.05
 done
 ```
 
