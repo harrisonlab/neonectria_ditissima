@@ -777,10 +777,9 @@ gene models using a number of approaches:
 screen -a
 
  ```bash
-for Strain in RS305p RS324p; do
-#for Strain in Ag11_C BGV344 ND9 OPC304; do
-#for Strain in P112 Ag06 Ag09_A Ag11_A; do
-#for Strain in R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
+#for Strain in RS305p RS324p; do
+for Strain in P112 Ag06 Ag09_A Ag11_A Ag11_C BGV344 ND9 OPC304 R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8; do
+#for Strain in R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
 #for Strain in Hg199_minion; do
 SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
@@ -857,19 +856,42 @@ done
  Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
 
  ```bash
-   for File in $(ls gene_pred/trans_mem/*/*/*_TM_genes_neg.txt); do
-     Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
-     Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
-     echo "$Organism - $Strain"
-     TmHeaders=$(echo "$File" | sed 's/neg.txt/neg_headers.txt/g')
-     cat $File | cut -f1 > $TmHeaders
-     SigP=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
-     OutDir=$(dirname $SigP)
-     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-     $ProgDir/extract_from_fasta.py --fasta $SigP --headers $TmHeaders > $OutDir/"$Strain"_final_sp_no_trans_mem.aa
-     cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
-   done
+ for File in $(ls gene_pred/trans_mem/*/*/*_TM_genes_neg.txt); do
+   Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+   Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+   echo "$Organism - $Strain"
+   TmHeaders=$(echo "$File" | sed 's/neg.txt/neg_headers.txt/g')
+   cat $File | cut -f1 > $TmHeaders
+   SigP=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
+   OutDir=$(dirname $SigP)
+   ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
+   $ProgDir/extract_from_fasta.py --fasta $SigP --headers $TmHeaders > $OutDir/"$Strain"_final_sp_no_trans_mem.aa
+   cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
+ done
  ```
+N.ditissima - Ag02
+983
+N.ditissima - Ag04
+986
+N.ditissima - Ag05
+907
+N.ditissima - R45-15
+988
+N.ditissima - Hg199
+991
+N.ditissima - Hg199_minion
+1033
+N.ditissima - ND8
+917
+N.ditissima - R0905_canu_2017_v2
+965
+N.ditissima - R37-15
+940
+N.ditissima - RS305p
+1024
+N.ditissima - RS324p
+1007
+
 
 N.ditissima - Ag02
 992
@@ -893,6 +915,10 @@ N.ditissima - R37-15
 989
 N.ditissima - R45-15
 1005
+N.ditissima - RS305p
+1024
+N.ditissima - RS324p
+1007
 
 ### B) From Augustus gene models - Effector identification using EffectorP
 
