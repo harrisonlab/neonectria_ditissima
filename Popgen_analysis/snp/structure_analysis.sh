@@ -41,6 +41,7 @@ dos2unix $outfile
 #N.ditissima_contigs_unmasked_filtered.recode_annotated.struc in project file so had to copy to SNP_calling folder
 cp N.ditissima_contigs_unmasked_filtered.recode_annotated.struc analysis/popgen/SNP_calling
 
+#Note - Iteractions can be changed in the mainparams file. I use 1000 for the first time.
 
 #Run replicate STRUCTURE runs, with K from 1 to 10
 qsub $scripts/execute_structure.sh $input/N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 1 5

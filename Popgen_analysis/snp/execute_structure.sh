@@ -20,7 +20,7 @@ temp_dir="$TMPDIR"
 cdir=$PWD
 
 #Copies the structure folder to the current directory to allow parallel runs
-struct=/home/sobczm/bin/structure
+struct=/home/gomeza/bin/structure
 
 filename=$(basename "$input")
 outfile="${filename%.*}"
