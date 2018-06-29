@@ -20,6 +20,7 @@ do
     ProgDir=/home/gomeza/git_repos/tools/seq_tools/genome_alignment/bwa
     qsub $ProgDir/sub_bwa.sh $Strain $Reference $FRead $RRead $OutDir
 done
+done
 ```
 
 ####Run svaba
@@ -44,7 +45,7 @@ This file contains smaller indels
 
 ```bash
 scripts=/home/sobczm/bin/popgen/summary_stats
-input=/home/groups/harrisonlab/project_files/phytophthora_fragariae/sv_calling
+input=/data/scratch/gomeza/analysis/sv_calling
 ```
 
 ##### Create a cut-down VCF and filter it
@@ -53,10 +54,14 @@ input=/home/groups/harrisonlab/project_files/phytophthora_fragariae/sv_calling
 cd $input
 
 vcflib=/home/sobczm/bin/vcflib/bin
-$vcflib/vcfremovesamples Pfrag_svaba_sv.svaba.indel.vcf SCRP245_sorted.bam ONT3_sorted.bam Nov77_sorted.bam Bc23_sorted.bam > Pfrag_svaba_sv.svaba.indel_cut.vcf
+$vcflib/vcfremovesamples Nd_svaba_sv.svaba.indel.vcf Ag02_sorted.bam Ag04_sorted.bam Ag05_sorted.bam Ag06_sorted.bam Ag08_sorted.bam Ag09_A_sorted.bam Ag11_A_sorted.bam Ag11_B_sorted.bam Ag11_C_sorted.bam BGV344_sorted.bam Hg199_sorted.bam ND8_sorted.bam ND9_sorted.bam OPC304_sorted.bam P112_sorted.bam R0905_sorted.bam R37-15_sorted.bam R39-15_sorted.bam R41-15_sorted.bam R42-15_sorted.bam R45-15_sorted.bam R6-17-2_sorted.bam R6-17-3_sorted.bam R68-17_sorted.bam > Nd_svaba_sv.svaba.indel_cut.vcf
+
+
+vcflib=/home/sobczm/bin/vcflib/bin
+$vcflib/vcfremovesamples Nd_svaba_sv.svaba.indel.vcf BGV344_sorted.bam OPC304_sorted.bam P112_sorted.bam > Nd_svaba_sv.svaba.indel_cut_E.vcf
 
 vcftools=/home/sobczm/bin/vcftools/bin
-$vcftools/vcftools --vcf Pfrag_svaba_sv.svaba.indel_cut.vcf  --max-missing 0.95 --recode --out Pfrag_svaba_sv.svaba.indel_cut_filtered
+$vcftools/vcftools --vcf Nd_svaba_sv.svaba.indel_cut.vcf  --max-missing 0.95 --recode --out Nd_svaba_sv.svaba.indel_cut_filtered
 ```
 
 No sites removed by filtering

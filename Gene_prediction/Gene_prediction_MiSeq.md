@@ -778,7 +778,7 @@ screen -a
 
  ```bash
 #for Strain in RS305p RS324p; do
-for Strain in P112 Ag06 Ag09_A Ag11_A Ag11_C BGV344 ND9 OPC304 R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8; do
+for Strain in Ag08 P112 Ag06 Ag09_A Ag11_A Ag11_C BGV344 ND9 OPC304 R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8; do
 #for Strain in R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
 #for Strain in Hg199_minion; do
 SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
@@ -812,7 +812,8 @@ done
  single file for each strain. This was done with the following commands:
  ```bash
  #for Strain in Ag02 Ag05 ND8 R37-15; do
- for Strain in RS305p RS324p; do
+ for Strain in Ag08 P112 Ag06 Ag09_A Ag11_A Ag11_C BGV344 ND9 OPC304 R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8; do
+ #for Strain in RS305p RS324p; do
 	for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/$Strain); do
 		Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
 		Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
@@ -869,56 +870,62 @@ done
    cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
  done
  ```
-N.ditissima - Ag02
-983
-N.ditissima - Ag04
-986
-N.ditissima - Ag05
-907
-N.ditissima - R45-15
-988
-N.ditissima - Hg199
-991
-N.ditissima - Hg199_minion
-1033
-N.ditissima - ND8
-917
-N.ditissima - R0905_canu_2017_v2
-965
-N.ditissima - R37-15
-940
-N.ditissima - RS305p
-1024
-N.ditissima - RS324p
-1007
-
-
-N.ditissima - Ag02
-992
-N.ditissima - Ag04
-1006
-N.ditissima - Ag05
-966
-N.ditissima - Hg199
-1009
-N.ditissima - ND8
-951
-N.ditissima - R0905_canu_2017_v2
-1022
-N.ditissima - R0905_merged_2017
-991
-N.ditissima - R0905_merged_assembly
-1002
-N.ditissima - R0905_pacbio_canu
-1021
-N.ditissima - R37-15
-989
-N.ditissima - R45-15
-1005
-N.ditissima - RS305p
-1024
-N.ditissima - RS324p
-1007
+ ```
+	N.ditissima - Ag02
+	994
+	N.ditissima - Ag04
+	986
+	N.ditissima - Ag05
+	996
+	N.ditissima - Ag06
+	997
+	N.ditissima - Ag08
+	1058
+	N.ditissima - Ag09_A
+	1013
+	N.ditissima - Ag11_A
+	1050
+	N.ditissima - Ag11_B
+	1019
+	N.ditissima - Ag11_C
+	1096
+	N.ditissima - BGV344
+	1000
+	N.ditissima - Hg199
+	991
+	N.ditissima - Hg199_minion
+	1033
+	N.ditissima - ND8
+	996
+	N.ditissima - ND9
+	1005
+	N.ditissima - OPC304
+	1016
+	N.ditissima - P112
+	1029
+	N.ditissima - R0905_canu_2017_v2
+	965
+	N.ditissima - R37-15
+	940
+	N.ditissima - R39-15
+	1019
+	N.ditissima - R41-15
+	1001
+	N.ditissima - R42-15
+	1009
+	N.ditissima - R45-15
+	988
+	N.ditissima - R6-17-2
+	1005
+	N.ditissima - R6-17-3
+	989
+	N.ditissima - R68-17
+	1030
+	N.ditissima - RS305p
+	1024
+	N.ditissima - RS324p
+	1007
+```
 
 ### B) From Augustus gene models - Effector identification using EffectorP
 
@@ -968,14 +975,15 @@ Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
 at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
+#for Strain in Ag02 Ag05 ND8 R37-15; do
+	for Strain in RS305p RS324p; do
   for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
     Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
     OutDir=gene_pred/CAZY/$Organism/$Strain
     mkdir -p $OutDir
     Prefix="$Strain"_CAZY
-    CazyHmm=../../dbCAN/dbCAN-fam-HMMs.txt
+    CazyHmm=dbCAN/dbCAN-fam-HMMs.txt
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/HMMER
     qsub $ProgDir/sub_hmmscan.sh $CazyHmm $Proteome $Prefix $OutDir
   done
@@ -988,7 +996,8 @@ Those proteins with a signal peptide were extracted from the list and gff files
 representing these proteins made.
 
   ```bash
-	for Strain in Ag02 Ag05 ND8 R37-15; do
+	#for Strain in Ag02 Ag05 ND8 R37-15; do
+	for Strain in RS305p RS324p; do
   for File in $(ls gene_pred/CAZY/N.*/$Strain/*CAZY.out.dm); do
   Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
@@ -1056,7 +1065,16 @@ done
 	713
 	number of Secreted CAZY genes identified:
 	272
-
+	N.ditissima - RS305p
+	number of CAZY genes identified:
+	721
+	number of Secreted CAZY genes identified:
+	287
+	N.ditissima - RS324p
+	number of CAZY genes identified:
+	721
+	number of Secreted CAZY genes identified:
+	279
 
 Note - the CAZY genes identified may need further filtering based on e value and
 cuttoff length - see below:
