@@ -116,7 +116,7 @@ def weightTree(tree, taxa, taxonNames, taxonDict=None, nIts=None, topos=None, ge
             for pair in itertools.combinations(range(nTaxa), 2):
                 currentDists[pair[0],pair[1]] = currentDists[pair[1],pair[0]] = pruned.get_distance(taxonNames[pair[0]], taxonNames[pair[1]])
             dists[:,:,x] += currentDists
-        #if getting average lengths, add branch lengths to average topos 
+        #if getting average lengths, add branch lengths to average topos
         if getLengths:
             addNodeNames(pruned)
             lengthDict = dict([(n.name,n.dist,) for n in pruned.traverse()])
@@ -159,7 +159,7 @@ def weightTreeThreshold(tree, taxa, taxonNames, thresholdDict, taxonDict=None, t
         for leaf in pruned.iter_leaves(): leaf.name = taxonDict[leaf.name]
         #get pairwise dists if necessary
         pruned.set_outgroup(taxonNames[-1])
-        if getDists: 
+        if getDists:
             currentDists = np.zeros([nTaxa,nTaxa])
             for pair in itertools.combinations(range(nTaxa), 2):
                 currentDists[pair[0],pair[1]] = currentDists[pair[1],pair[0]] = pruned.get_distance(taxonNames[pair[0]], taxonNames[pair[1]])
@@ -168,7 +168,7 @@ def weightTreeThreshold(tree, taxa, taxonNames, thresholdDict, taxonDict=None, t
         x = topoIDs.index(prunedID)
         counts[x] += 1
         if getDists: dists[:,:,x] += currentDists
-        #if getting average lengths, add branch lengths to average topos 
+        #if getting average lengths, add branch lengths to average topos
         if getLengths:
             addNodeNames(pruned)
             lengthDict = dict([(n.name,n.dist,) for n in pruned.traverse()])
@@ -278,19 +278,19 @@ We can remove one (along with it's children) after transfering the weights and a
 '''I COULD NOT GET THIS STEP TO GIVE CORRECT DISTS - SO I GAVE UP'''
 
 def simplifyTwins(nodeAB, nodeA, nodeB, leafA0, leafA1, leafB0, leafB1):
-    
+
     WA0=leafA0.weight
     WA1=leafA1.weight
     WB0=leafB0.weight
     WB1=leafB1.weight
-    
+
     leafB0.delete()
     leafB1.delete()
     nodeB.delete()
     nodeAB.delete()
 
     leafA0.weight = WA0+WB0
-    leafA1.weight = WA1+WB1    
+    leafA1.weight = WA1+WB1
 
 '''An EXPERIMENTAL even more drastic simplicifcation can be achieved by simplifying any clade that has
 only two taxa represented. Function takes the node and two sets of decendent leaves.
@@ -303,24 +303,24 @@ only two taxa represented. Function takes the node and two sets of decendent lea
     #DA = np.mean([1.*node.get_distance(leaf) for leaf in leavesA])
     #DB = np.mean([1.*node.get_distance(leaf) for leaf in leavesB])
     #DAB = np.mean([1.*leafA.get_distance(leafB) for leafA,leafB in itertools.product(leavesA,leavesB)])
-    
+
     ##compute new distances for the new nodes
     #newAdist = (DAB - DB + DA)/2
     #newBdist = DB - (DA - newAdist)
     #newNdist = DA - newAdist
-    
+
     ##now remove the children from this node
     #for child in node.get_children(): node.remove_child(child)
-    
+
     ##add the first leaf in each set as a child (arbitrary)
     #node.add_child(leavesA[0])
     #node.add_child(leavesB[0])
-    
+
     ##set new distances
     #node.dist = newNdist
     #leavesA[0].dist = newAdist
     #leavesB[0].dist = newBdist
-    
+
     ##add weights
     #leavesA[0].add_feature("weight", len(leavesA))
     #leavesB[0].add_feature("weight", len(leavesB))
@@ -354,7 +354,7 @@ only two taxa represented. Function takes the node and two sets of decendent lea
                 #simplifyCladeTo2Leaves(node, leavesA, leavesB)
         #elif node.is_leaf():
             #node.add_feature("weight", 1)
-    
+
     #return simpTree
 
 
@@ -430,14 +430,14 @@ def simplifyTree(tree,taxonDict,preserve_branch_length=True):
                         taxaA = [taxonDict[lf.name] for lf in lvsA]
                         taxaB = [taxonDict[lf.name] for lf in lvsB]
                         if taxaA == taxaB:
-                            #print "removing", lvsB[0].name, "and", lvsB[1].name 
+                            #print "removing", lvsB[0].name, "and", lvsB[1].name
                             simplifyTwins(nodeAB=node,nodeA=cdn0[0],nodeB=cdn0[1],leafA0=lvsA[0],leafA1=lvsA[1],leafB0=lvsB[0],leafB1=lvsB[1])
                             changed = True
                         elif taxaA[0] == taxaB[1] and taxaA[1] == taxaB[0]:
-                            #print "removing", lvsB[1].name, "and", lvsB[0].name 
+                            #print "removing", lvsB[1].name, "and", lvsB[0].name
                             simplifyTwins(nodeAB=node,nodeA=cdn0[0],nodeB=cdn0[1],leafA0=lvsA[0],leafA1=lvsA[1],leafB0=lvsB[1],leafB1=lvsB[0])
                             changed = True
-    
+
     return simpTree
 
 
@@ -448,7 +448,7 @@ def simplifyTree(tree,taxonDict,preserve_branch_length=True):
     #for node in simpTree.traverse("levelorder"):
         #if node.is_leaf():
             #node.add_feature("weight", 1)
-    
+
     #return simpTree
 
 
@@ -513,31 +513,31 @@ def weightTreeSimp(tree, taxa, taxonNames, taxonDict=None, topos = None,
         prunedID = pruned.get_topology_id()
         x = topoIDs.index(prunedID)
         counts[x] += comboWeight
-                
+
         #if getting dists
         if getDists:
             currentDists = np.zeros([nTaxa,nTaxa])
             for pair in itertools.combinations(range(nTaxa), 2):
                 currentDists[pair[0],pair[1]] = currentDists[pair[1],pair[0]] = pruned.get_distance(taxonNames[pair[0]], taxonNames[pair[1]])
             dists[:,:,x] += currentDists*comboWeight
-        
-        #if getting average lengths, add branch lengths to average topos 
+
+        #if getting average lengths, add branch lengths to average topos
         if getLengths:
             addNodeNames(pruned)
             lengthDict = dict([(n.name,n.dist,) for n in pruned.traverse()])
             lengths[x] += [lengthDict[name]*comboWeight for name in children[x]]
-    
+
     #add to dict if present
     if simpTreeWeightsDict != None and not getDists and not getLengths:
         simpTreeGeneric = simpTree.copy("newick")
         for leaf in simpTreeGeneric.iter_leaves(): leaf.name = taxonDict[leaf.name]
         simpTreeID = simpTreeGeneric.get_topology_id()
         simpTreeWeightsDict[simpTreeID] = counts
-        if verbose: print >> sys.stderr, simpTreeID, "recorded" 
-    
+        if verbose: print >> sys.stderr, simpTreeID, "recorded"
+
     meanDists = dists/counts if getDists else np.NaN
     meanLengths = [lengths[x]/counts[x] for x in range(nTopos)] if getLengths else np.NaN
-    
+
     return {"topos":topos,"weights":counts,"dists":meanDists,"parents":parents,"children":children,"lengths":meanLengths}
 
 
@@ -557,7 +557,7 @@ def allTopos(branches, _topos=None, _topo_IDs=None):
         _topo_IDs = set([])
     assert 4 <= len(branches) <= 8, "Please specify between 4 and 8 unique taxon names."
     #print "topos contains", len(_topos), "topologies."
-    #print "current tree is:", branches 
+    #print "current tree is:", branches
     for x in range(len(branches)-1):
         for y in range(x+1,len(branches)):
             #print "Joining branch", x, branches[x], "with branch", y, branches[y]
@@ -624,32 +624,32 @@ if __name__ == "__main__":
         taxonNames.append(g[0])
         if len(g) > 1: taxa.append(g[1].split(","))
         else: taxa.append([])
-    
+
     if args.groupsFile:
         with open(args.groupsFile, "r") as gf: groupDict = dict([ln.split() for ln in gf.readlines()])
         for sample in groupDict.keys():
             try: taxa[taxonNames.index(groupDict[sample])].append(sample)
             except: pass
-    
+
     nTaxa=len(taxa)
-    
+
     assert min([len(t) for t in taxa]) >= 1, "Please specify at least one sample name per group."
-    
+
     names = [t for taxon in taxa for t in taxon]
     namesSet = set(names)
     assert len(names) == len(namesSet), "Each sample should only be in one group."
-    
+
     taxonDict = {}
     for x in range(nTaxa):
         for y in taxa[x]: taxonDict[y] = taxonNames[x]
-    
+
     #get all topologies
     if args.inputTopos:
         with open(args.inputTopos, "r") as tf: topos = [ete3.Tree(ln) for ln in tf.readlines()]
     else: topos = allTopos(taxonNames, [])
-    
+
     nTopos = len(topos)
-    
+
     for topo in topos: topo.set_outgroup(taxonNames[-1])
 
     sys.stderr.write(asciiTrees(topos,5) + "\n")
@@ -657,9 +657,9 @@ if __name__ == "__main__":
     if args.outputTopos:
         with open(args.outputTopos, "w") as tf:
             tf.write("\n".join([t.write(format = 9) for t in topos]) + "\n")
-    
+
     #################################################################################################################################
-    
+
     # check method
 
     if method == "fixed" or (method == "complete" and backupMethod == "fixed"):
@@ -668,26 +668,26 @@ if __name__ == "__main__":
             print >> sys.stderr, "Warning: number of iterations is equal or greater than possible combinations.\n"
             nIts = np.prod([len(t) for t in taxa])
             print >> sys.stderr, "This could be very slow. Use method 'complete' for fast(er) exhaustive sampling."
-    
+
     elif method == "threshold" or (method == "complete" and backupMethod == "threshold"):
         assert args.thresholdTable, "A threshold table must be provided using argument --thresholdTable."
         thresholdTableFileName = args.thresholdTable
         with open(thresholdTableFileName) as ttf:
             thresholdDict = dict([(int(tries),int(threshold)) for line in ttf.readlines() for tries,threshold in (line.split(),)])
-    
-    
+
+
     if method == "complete" and not getDists and not getLengths and not args.noRecord:
         simpTreeWeightsDict = {}
     else: simpTreeWeightsDict = None
-    
+
     #################################################################################################################################
     ### file for weights
 
     if args.weightsFile:
        weightsFile = gzip.open(args.weightsFile, "w") if args.weightsFile.endswith(".gz") else open(args.weightsFile, "w")
     else: weightsFile = sys.stdout
-    
-    for x in range(nTopos): weightsFile.write("#topo" + str(x+1) + " " + topos[x].write(format = 9) + "\n") 
+
+    for x in range(nTopos): weightsFile.write("#topo" + str(x+1) + " " + topos[x].write(format = 9) + "\n")
 
     weightsFile.write("\t".join(["topo" + str(x+1) for x in range(nTopos)]) + "\n")
 
@@ -708,18 +708,18 @@ if __name__ == "__main__":
         children = [[pc[1] for pc in parentsAndChildren[x]] for x in range(nTopos)]
         for x in range(nTopos): lengthsFile.write("#" + "topo" + str(x+1) + "\t" + " ".join(["--".join(pair) for pair in parentsAndChildren[x]]) + "\n")
         #lengthsFile.write("\t".join(["\t".join(["topo" + str(x+1) + "_" + nodeName for nodeName in children[x]]) for x in range(nTopos)]) + "\n")
-        
-    
+
+
     ################################################################################################################################
 
     #open tree file
-    
+
     if args.treeFile:
         treeFile = gzip.open(args.treeFile, "r") if args.treeFile.endswith(".gz") else open(args.treeFile, "r")
     else: treeFile = sys.stdin
 
     line = treeFile.readline()
-    
+
     ################################################################################################################################
 
     nTrees = 0
@@ -727,50 +727,50 @@ if __name__ == "__main__":
     while len(line) >= 1:
 
         tree = readTree(line)
-        
+
         if tree:
             #remove unneccesary leaves (speeds up downstream steps)
             leafNamesSet = set([leaf.name for leaf in tree.get_leaves()])
             if namesSet != leafNamesSet:
                 assert namesSet.issubset(leafNamesSet), "Named samples not present in tree."
                 tree = getPrunedCopy(tree, leavesToKeep=names, preserve_branch_length=True)
-            
+
             #root if necessary
             if args.outgroup: tree.set_outgroup(args.outgroup)
-            
+
             weightsData = None
-            
+
             if method == "complete":
                 weightsData = weightTreeSimp(tree=tree, taxa=taxa, taxonNames=taxonNames, taxonDict=taxonDict,
                                             topos=topos, getLengths=getLengths, getDists=getDists, abortCutoff=args.abortCutoff,
                                             simpTreeWeightsDict=simpTreeWeightsDict)
-            
+
             if method == "fixed" or (method == "complete" and backupMethod == "fixed" and weightsData == None):
                 weightsData = weightTree(tree=tree, taxa=taxa, taxonNames=taxonNames, taxonDict=taxonDict,
                                          nIts=nIts, topos=topos, getLengths=getLengths, getDists=getDists)
-            
+
             if method == "threshold" or (method == "complete" and backupMethod == "threshold" and weightsData == None):
                 weightsData = weightTreeThreshold(tree=tree, taxa=taxa, taxonNames=taxonNames, thresholdDict=thresholdDict, taxonDict=taxonDict,
                                                   topos=topos, getLengths=getLengths, getDists=getDists)
-                    
+
             weightsLine = "\t".join([str(x) for x in weightsData["weights"]])
-        
+
             if getDists:
                 distsByTopo = []
                 for x in range(nTopos):
                     distsByTopo.append("\t".join([str(round(weightsData["dists"][pair[0],pair[1],x], 4)) for pair in itertools.combinations(range(nTaxa), 2)]))
-                distsLine = "\t".join(distsByTopo)    
+                distsLine = "\t".join(distsByTopo)
             if getLengths:
                 lengthsLine = "\t".join(["\t".join([str(round(l,4)) for l in weightsData["lengths"][x]]) for x in range(nTopos)])
         else:
             weightsLine = "\t".join(["nan"]*nTopos)
             if getDists: distsLine = "\t".join(["nan"]*nTopos*len(list(itertools.combinations(range(nTaxa), 2))))
             if getLengths: lengthsLine = "\t".join(["nan"]*sum(map(len,children)))
-        
+
         weightsFile.write(weightsLine + "\n")
         if getDists: distsFile.write(distsLine + "\n")
         if getLengths: lengthsFile.write(lengthsLine + "\n")
-        
+
         if not args.silent: sys.stderr.write(str(nTrees)+"\n")
         nTrees += 1
         line = treeFile.readline()
@@ -786,6 +786,3 @@ if __name__ == "__main__":
 
 
 #############################################################################################################################################
-
-
-
