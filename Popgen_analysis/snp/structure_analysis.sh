@@ -41,7 +41,7 @@ dos2unix $outfile
 #N.ditissima_contigs_unmasked_filtered.recode_annotated.struc in project file so had to copy to SNP_calling folder
 cp N.ditissima_contigs_unmasked_filtered.recode_annotated.struc analysis/popgen/SNP_calling
 
-#Note - Iteractions can be changed in the mainparams file. I use 1000 for the first time.
+#Note - Iteractions can be changed in the mainparams file. I use 10000 for the first time.
 
 #Run replicate STRUCTURE runs, with K from 1 to 10
 qsub $scripts/execute_structure.sh $input/N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 1 5
@@ -70,7 +70,10 @@ mv structure_* SNP_calling
 
 # structureHarvester - summarise the results
 harvester=/home/sobczm/bin/structureHarvester/structureHarvester.py
+
 $harvester --dir=$input/structureHarvester --out=$input/structureHarvester --evanno --clumpp
+$harvester --dir=$input/structure_1000reps --out=$input/structure_1000reps --evanno --clumpp
+
 # CLUMPP - permute the results
 cd SNP_calling/structureHarvester
 clumpp=/home/sobczm/bin/CLUMPP_Linux64.1.1.2
@@ -87,7 +90,7 @@ mv paramfile_ind paramfile
 #r: number of replicate runs
 #s: minimum number of population clusters (K) tested
 #f: maximum number of population clusters (K) tested
-c=23
+c=24
 r=5
 s=1
 f=10
@@ -106,8 +109,8 @@ done
 ###!!!! Options to be changed in each analysis manually
 #-M number of populations assigned in the Structure input file
 #-N number of individuals
-m=23
-n=23
+m=24
+n=24
 #-K K value
 #-p input file (population q's)
 #-i input file (individual q's)
