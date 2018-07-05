@@ -56,184 +56,55 @@ cd $input
 vcflib=/home/sobczm/bin/vcflib/bin
 $vcflib/vcfremovesamples Nd_svaba_sv.svaba.indel.vcf Ag02_sorted.bam Ag04_sorted.bam Ag05_sorted.bam Ag06_sorted.bam Ag08_sorted.bam Ag09_A_sorted.bam Ag11_A_sorted.bam Ag11_B_sorted.bam Ag11_C_sorted.bam BGV344_sorted.bam Hg199_sorted.bam ND8_sorted.bam ND9_sorted.bam OPC304_sorted.bam P112_sorted.bam R0905_sorted.bam R37-15_sorted.bam R39-15_sorted.bam R41-15_sorted.bam R42-15_sorted.bam R45-15_sorted.bam R6-17-2_sorted.bam R6-17-3_sorted.bam R68-17_sorted.bam > Nd_svaba_sv.svaba.indel_cut.vcf
 
-
 vcflib=/home/sobczm/bin/vcflib/bin
 $vcflib/vcfremovesamples Nd_svaba_sv.svaba.indel.vcf BGV344_sorted.bam OPC304_sorted.bam P112_sorted.bam > Nd_svaba_sv.svaba.indel_cut_E.vcf
 
+
+
 vcftools=/home/sobczm/bin/vcftools/bin
 $vcftools/vcftools --vcf Nd_svaba_sv.svaba.indel_cut.vcf  --max-missing 0.95 --recode --out Nd_svaba_sv.svaba.indel_cut_filtered
+
+vcftools=/home/sobczm/bin/vcftools/bin
+$vcftools/vcftools --vcf Nd_svaba_sv.svaba.indel.vcf  --max-missing 0.95 --recode --out Nd_svaba_sv.svaba.indel_filtered
 ```
 
 No sites removed by filtering
 
 #### Ancestral variants
 
-##### For UK2, set UK2 isolates and P. rubi isolates as pop1
+##### Set UK isolates as pop1
 
 ```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.indel_cut_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.indel_cut_filtered_fixed_UK2.vcf --ply 2 --pop1 Bc16,,A4,,SCRP249,,SCRP324,,SCRP333 --pop2 Nov5,,Bc1,,Nov9,,Nov27,,Nov71 --thr 0.95
+python $scripts/vcf_find_difference_pop.py --vcf Nd_svaba_sv.svaba.indel_filtered.recode.vcf --out Nd_svaba_sv.svaba.indel_filtered_UKvsES.vcf --ply 1 --pop1 Ag02_sorted.bam,,Ag04_sorted.bam,,Ag05_sorted.bam,,Ag06_sorted.bam,,Hg199_sorted.bam,,R0905_sorted.bam,,R6-17-2_sorted.bam,,R6-17-3_sorted.bam --pop2 BG344_sorted.bam,,OPC304_sorted.bam,,P112_sorted.bam --thr 0.95
 ```
-
-```
-Nothing found
-```
-
-##### UK1 based analysis, set UK1 isolates and P. rubi isolates as pop1
 
 ```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.indel_cut_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.indel_cut_filtered_fixed_UK1.vcf --ply 2 --pop1 Bc1,,Nov5,,SCRP249,,SCRP324,,SCRP333 --pop2 A4,,Bc16,,Nov9,,Nov27,,Nov71 --thr 0.95
+python $scripts/vcf_find_difference_pop.py --vcf Nd_svaba_sv.svaba.indel_filtered.recode.vcf --out Nd_svaba_sv.svaba.indel_filtered_BRvsES.vcf --ply 1 --pop1 ND8_sorted.bam,,ND9_sorted.bam --pop2 BG344_sorted.bam,,OPC304_sorted.bam,,P112_sorted.bam --thr 0.95
 ```
 
-```
-Nothing found
-```
 
-##### UK3 based analysis, set UK3 isolates and P. rubi isolates as pop1
+## lumpy: a general probabilistic framework for structural variant discovery
 
 ```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.indel_cut_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.indel_cut_filtered_fixed_UK3.vcf --ply 2 --pop1 Nov9,,Nov27,,Nov71,,SCRP249,,SCRP324,,SCRP333 --pop2 A4,,Bc16,,Nov5,,Bc1 --thr 0.95
+input_hap=/home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.ditissima
+input_hap_assembly=../../../Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa
+
+scripts=/home/sobczm/bin/popgen/snp
+input=/data/scratch/gomeza/analysis/sv_calling/lumpy
+
+##Warning!!!!. In some cases, the forward and reverse read files are corrupted (reads do not match in the two files)
+#and bwa-mem will complain about it, and exit prematurely. For those samples, one needs to first fix the input reads with
+#$scripts/sub_pairfq.sh  
+
+cd $input/
+for sample in $input_hap/Ag04
+do
+reads_forward=$sample/F/*trim.fq.gz
+#Sample name is the first part of the filename with reads, until the first underscore (_) encountered.
+sname=$(echo $(basename "$reads_forward") | cut -d"_" -f1)
+qsub $scripts/sub_bwa_mem.sh Illumina $sname $input_dip_assembly $reads_forward $reads_reverse
+done
+
+#Warning: the last step in the script - genotype calling - takes days.
+qsub $scripts/sub_lumpy.sh Nditissima_struc_variants
 ```
-
-```
-Nothing found
-```
-
-#### Just private variants, without addressing ancestral state
-
-##### Create cut down VCF and filter it
-
-```bash
-vcflib=/home/sobczm/bin/vcflib/bin
-$vcflib/vcfremovesamples Pfrag_svaba_sv.svaba.indel.vcf SCRP245_sorted.bam ONT3_sorted.bam Nov77_sorted.bam Bc23_sorted.bam SCRP249_sorted.bam SCRP324_sorted.bam SCRP333_sorted.bam > Pfrag_svaba_sv.svaba.indel_cut_UK123.vcf
-
-vcftools=/home/sobczm/bin/vcftools/bin
-$vcftools/vcftools --vcf Pfrag_svaba_sv.svaba.indel_cut_UK123.vcf  --max-missing 0.95 --recode --out Pfrag_svaba_sv.svaba.indel_cut_UK123_filtered
-```
-
-##### For UK2, set UK2 isolates and P. rubi isolates as pop1
-
-```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.indel_cut_UK123_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.indel_cut_filtered_fixed_UK2.vcf --ply 2 --pop1 Bc16,,A4 --pop2 Nov5,,Bc1,,Nov9,,Nov27,,Nov71 --thr 0.95
-```
-
-```
-Nothing found
-```
-
-##### UK1 based analysis, set UK1 isolates and P. rubi isolates as pop1
-
-```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.indel_cut_UK123_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.indel_cut_filtered_fixed_UK1.vcf --ply 2 --pop1 Bc1,,Nov5 --pop2 A4,,Bc16,,Nov9,,Nov27,,Nov71 --thr 0.95
-```
-
-```
-Nothing found
-```
-
-##### UK3 based analysis, set UK3 isolates and P. rubi isolates as pop1
-
-```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.indel_cut_UK123_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.indel_cut_filtered_fixed_UK3.vcf --ply 2 --pop1 Nov9,,Nov27,,Nov71 --pop2 A4,,Bc16,,Nov5,,Bc1 --thr 0.95
-```
-
-```
-Nothing found
-```
-
-### Analysis of files produced by svaba
-
-#### Analysis of sv file
-
-This file contains larger indels
-
-##### Set initial variables
-
-```bash
-scripts=/home/sobczm/bin/popgen/summary_stats
-input=/home/groups/harrisonlab/project_files/phytophthora_fragariae/sv_calling
-```
-
-##### Create a cut-down VCF and filter it
-
-```bash
-cd $input
-
-vcflib=/home/sobczm/bin/vcflib/bin
-$vcflib/vcfremovesamples Pfrag_svaba_sv.svaba.sv.vcf SCRP245_sorted.bam ONT3_sorted.bam Nov77_sorted.bam Bc23_sorted.bam > Pfrag_svaba_sv.svaba.sv_cut.vcf
-
-vcftools=/home/sobczm/bin/vcftools/bin
-$vcftools/vcftools --vcf Pfrag_svaba_sv.svaba.sv_cut.vcf  --max-missing 0.95 --recode --out Pfrag_svaba_sv.svaba.sv_cut_filtered
-```
-
-#### Ancestral variants
-
-##### For UK2, set UK2 isolates and P. rubi isolates as pop1
-
-```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.sv_cut_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.sv_cut_filtered_fixed_UK2.vcf --ply 2 --pop1 Bc16,,A4,,SCRP249,,SCRP324,,SCRP333 --pop2 Nov5,,Bc1,,Nov9,,Nov27,,Nov71 --thr 0.95
-```
-
-```
-Nothing found
-```
-
-##### UK1 based analysis, set UK1 isolates and P. rubi isolates as pop1
-
-```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.sv_cut_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.sv_cut_filtered_fixed_UK1.vcf --ply 2 --pop1 Bc1,,Nov5,,SCRP249,,SCRP324,,SCRP333 --pop2 A4,,Bc16,,Nov9,,Nov27,,Nov71 --thr 0.95
-```
-
-```
-Nothing found
-```
-
-##### UK3 based analysis, set UK3 isolates and P. rubi isolates as pop1
-
-```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.sv_cut_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.sv_cut_filtered_fixed_UK3.vcf --ply 2 --pop1 Nov9,,Nov27,,Nov71,,SCRP249,,SCRP324,,SCRP333 --pop2 A4,,Bc16,,Nov5,,Bc1 --thr 0.95
-```
-
-```
-Nothing found
-```
-
-#### Just private variants, without assessing ancestral state
-
-##### Create cut down VCF and filter it
-
-```bash
-vcflib=/home/sobczm/bin/vcflib/bin
-$vcflib/vcfremovesamples Pfrag_svaba_sv.svaba.sv.vcf SCRP245_sorted.bam ONT3_sorted.bam Nov77_sorted.bam Bc23_sorted.bam SCRP249_sorted.bam SCRP324_sorted.bam SCRP333_sorted.bam > Pfrag_svaba_sv.svaba.sv_cut_UK123.vcf
-
-vcftools=/home/sobczm/bin/vcftools/bin
-$vcftools/vcftools --vcf Pfrag_svaba_sv.svaba.sv_cut_UK123.vcf  --max-missing 0.95 --recode --out Pfrag_svaba_sv.svaba.sv_cut_UK123_filtered
-```
-
-##### For UK2, set UK2 isolates and P. rubi isolates as pop1
-
-```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.sv_cut_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.sv_cut_filtered_fixed_UK2.vcf --ply 2 --pop1 Bc16,,A4 --pop2 Nov5,,Bc1,,Nov9,,Nov27,,Nov71 --thr 0.95
-```
-
-```
-Nothing found
-```
-
-##### UK1 based analysis, set UK1 isolates and P. rubi isolates as pop1
-
-```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.sv_cut_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.sv_cut_filtered_fixed_UK1.vcf --ply 2 --pop1 Bc1,,Nov5 --pop2 A4,,Bc16,,Nov9,,Nov27,,Nov71 --thr 0.95
-```
-
-```
-Nothing found
-```
-
-##### UK3 based analysis, set UK3 isolates and P. rubi isolates as pop1
-
-```bash
-python $scripts/vcf_find_difference_pop.py --vcf Pfrag_svaba_sv.svaba.sv_cut_filtered.recode.vcf --out Pfrag_svaba_sv.svaba.sv_cut_filtered_fixed_UK3.vcf --ply 2 --pop1 Nov9,,Nov27,,Nov71 --pop2 A4,,Bc16,,Nov5,,Bc1 --thr 0.95
-```
-
-```
-Nothing found
