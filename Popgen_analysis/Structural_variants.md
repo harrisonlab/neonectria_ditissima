@@ -82,7 +82,6 @@ python $scripts/vcf_find_difference_pop.py --vcf Nd_svaba_sv.svaba.indel_filtere
 python $scripts/vcf_find_difference_pop.py --vcf Nd_svaba_sv.svaba.indel_filtered.recode.vcf --out Nd_svaba_sv.svaba.indel_filtered_BRvsES.vcf --ply 1 --pop1 ND8_sorted.bam,,ND9_sorted.bam --pop2 BG344_sorted.bam,,OPC304_sorted.bam,,P112_sorted.bam --thr 0.95
 ```
 
-
 ## lumpy: a general probabilistic framework for structural variant discovery
 
 ```bash
@@ -101,7 +100,7 @@ for sample in $input_hap/Ag04
 do
 reads_forward=$sample/F/*trim.fq.gz
 #Sample name is the first part of the filename with reads, until the first underscore (_) encountered.
-sname=$(echo $(basename "$reads_forward") | cut -d"_" -f1)
+sname=$(echo $(basename "$reads_forward") | cut -d "_" -f1)
 qsub $scripts/sub_bwa_mem.sh Illumina $sname $input_dip_assembly $reads_forward $reads_reverse
 done
 
