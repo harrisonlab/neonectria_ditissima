@@ -215,6 +215,9 @@ orthofinder -f ./ -t 3 -a 3
 ## 3.1) Perform an all-vs-all blast of the proteins
 
 ```bash
+
+IsolateAbrv=Nd_all_isolates
+WorkDir=analysis/orthology/Orthomcl/$IsolateAbrv
 BlastDB=$WorkDir/blastall/$IsolateAbrv.db
 
 makeblastdb -in $Good_proteins_file -dbtype prot -out $BlastDB
@@ -224,8 +227,9 @@ mkdir -p $WorkDir/splitfiles
 SplitDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
 $SplitDir/splitfile_500.py --inp_fasta $Good_proteins_file --out_dir $WorkDir/splitfiles --out_base goodProteins
 
-ProgDir=/home/armita/git_repos/emr_repos/scripts/phytophthora/pathogen/orthology  
-for File in $(find $WorkDir/splitfiles); do
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Pathogen/Orthology
+for File in $(find $WorkDir/splitfiles)
+do
 Jobs=$(qstat | grep 'blast_500' | grep 'qw' | wc -l)
 while [ $Jobs -gt 1 ]; do
 sleep 10
@@ -235,24 +239,71 @@ done
 printf "\n"
 echo $File
 BlastOut=$(echo $File | sed 's/.fa/.tab/g')
-qsub $ProgDir/blast_500.sh $BlastDB $File $BlastOut
+qsub -h $ProgDir/blast_500.sh $BlastDB $File $BlastOut
+
+JobID=$(qstat | grep 'blast_500' | tail -n 1 | cut -d ' ' -f1)
+Queue_Status=$(qstat | grep 'blast_500' | grep 'hqw' | wc -l)
+while (($Queue_Status > 0))
+do
+    Queue_Status=$(qstat | grep 'blast_500' | grep 'hqw' | wc -l)
+    load02=$(qstat -u "*" | grep 'blacklace02'| grep 'blast_500' | wc -l)
+    load05=$(qstat -u "*" | grep 'blacklace05'| grep 'blast_500' | wc -l)
+    load06=$(qstat -u "*" | grep 'blacklace06'| grep 'blast_500' | wc -l)
+    load07=$(qstat -u "*" | grep 'blacklace07'| grep 'blast_500' | wc -l)
+    load08=$(qstat -u "*" | grep 'blacklace08'| grep 'blast_500' | wc -l)
+    load09=$(qstat -u "*" | grep 'blacklace09'| grep 'blast_500' | wc -l)
+    load10=$(qstat -u "*" | grep 'blacklace10'| grep 'blast_500' | wc -l)
+    if (($load02 < 3))
+    then
+        qalter $JobID -l h=blacklace02.blacklace
+        sleep 5s
+        qalter $JobID -h U
+        sleep 5s
+        echo "Submitted to node 2"
+    elif (($load05 < 3))
+    then
+        qalter $JobID -l h=blacklace05.blacklace
+        sleep 5s
+        qalter $JobID -h U
+        sleep 5s
+        echo "Submitted to node 5"
+    elif (($load06 < 3))
+    then
+        qalter $JobID -l h=blacklace06.blacklace
+        sleep 5s
+        qalter $JobID -h U
+        sleep 5s
+        echo "Submitted to node 6"
+      elif (($load07 < 3))
+      then
+          qalter $JobID -l h=blacklace04.blacklace
+          sleep 5s
+          qalter $JobID -h U
+          sleep 5s
+          echo "Submitted to node 5"
+    elif (($load10 < 3))
+    then
+        qalter $JobID -l h=blacklace10.blacklace
+        sleep 5s
+        qalter $JobID -h U
+        sleep 5s
+        echo "Submitted to node 10"
+    else
+        echo "all nodes full, waiting ten minutes"
+        sleep 10m
+    fi
+done    
+done
+done
 done
 ```
-
-
-
-
-
-
-
-
 
 
 ## 3.2) Merge the all-vs-all blast results  
 ```bash  
   MergeHits="$IsolateAbrv"_blast.tab
   printf "" > $MergeHits
-  for Num in $(ls $WorkDir/splitfiles/*.tab | rev | cut -f1 -d '_' | rev | sort -n); do
+  for Num in $(ls $WorkDir/splitfiles/*.fa | rev | cut -f1 -d '_' | rev | sort -n); do
     File=$(ls $WorkDir/splitfiles/*_$Num)
     cat $File
   done > $MergeHits
