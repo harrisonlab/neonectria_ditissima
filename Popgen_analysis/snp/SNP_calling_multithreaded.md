@@ -45,3 +45,8 @@ See inside the submission script below:
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 qsub $scripts/sub_SNP_calling_multithreaded.sh
 ```
+Removing R68-17 and Ag11_B
+```bash
+scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
+qsub $scripts/sub_SNP_calling_multithreaded2.sh
+```
