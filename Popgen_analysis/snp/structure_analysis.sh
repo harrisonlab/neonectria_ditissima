@@ -65,17 +65,14 @@ mv $d/*_f $PWD/structureHarvester
 done
 
 #Tidy working directory
-mv structure_* SNP_calling
-
+mv structure_* analysis/popgen/SNP_calling/structure
 
 # structureHarvester - summarise the results
-harvester=/home/sobczm/bin/structureHarvester/structureHarvester.py
-
-$harvester --dir=$input/structureHarvester --out=$input/structureHarvester --evanno --clumpp
-$harvester --dir=$input/structure_1000reps --out=$input/structure_1000reps --evanno --clumpp
+harvester=/home/gomeza/bin/structureHarvester/structureHarvester.py
+$harvester --dir=$input/analysis/popgen/SNP_calling/structure/structureHarvester --out=$input/analysis/popgen/SNP_calling/structure/structureHarvester --evanno --clumpp
 
 # CLUMPP - permute the results
-cd SNP_calling/structureHarvester
+cd analysis/popgen/SNP_calling/structure/structureHarvester
 clumpp=/home/sobczm/bin/CLUMPP_Linux64.1.1.2
 cp $clumpp/paramfile_ind ./
 mv paramfile_ind paramfile
