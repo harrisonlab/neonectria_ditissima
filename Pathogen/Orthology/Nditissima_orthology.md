@@ -5,7 +5,6 @@ scripts=/home/sobczm/bin/popgen/clock/motif_discovery
 
 ##DATASET A)
 #Get whole-genome protein sequences and rename the files
-cd $input/pep_genomes
 
 ```bash
 
@@ -306,7 +305,10 @@ done
 
 
 ## 3.2) Merge the all-vs-all blast results  
-```bash  
+```bash
+IsolateAbrv=Nd_all_isolates
+WorkDir=analysis/orthology/Orthomcl/$IsolateAbrv
+
   MergeHits="$IsolateAbrv"_blast.tab
   printf "" > $MergeHits
   for Num in $(ls $WorkDir/splitfiles/*.fa | rev | cut -f1 -d '_' | rev | sort -n); do
@@ -318,27 +320,16 @@ done
 ## 4) Perform ortholog identification
 
 ```bash
-  ProgDir=~/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
+
+# Need to create a mysql database before run orthomcl. It seems better results are shown in OrthoFinder.
+
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
   MergeHits="$IsolateAbrv"_blast.tab
   GoodProts=$WorkDir/goodProteins/goodProteins.fasta
   qsub $ProgDir/qsub_orthomcl.sh $MergeHits $GoodProts 5
 ```
 
-
-Also try using orthofinder
-
-```bash
-qlogin -pe smp 16
-
-#16 threads used
-ProjDir=/data/scratch/armita/alternaria
-cd $ProjDir
-IsolateAbrv=At_Aa_Ag_all_isolates
-WorkDir=analysis/orthology/orthomcl/$IsolateAbrv
-orthofinder -f $WorkDir/formatted -t 3 -a 3
-```
-
-orthofinder results:
+## Orthofinder results:
 
 ```
 OrthoFinder assigned 157358 genes (99.2% of total) to 14200 orthogroups. Fifty percent of all genes were in orthogroups
