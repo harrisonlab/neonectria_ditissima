@@ -1,5 +1,7 @@
 #!/bin/bash
 input=/data/scratch/gomeza
+
+input=/data/scratch/gomeza/last_structure
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 pgdspid=/home/sobczm/bin/PGDSpider_2.1.0.3
 #Downsample SNPs for Structure analysis as enough information in 10% of the loci
@@ -15,6 +17,7 @@ pgdspid=/home/sobczm/bin/PGDSpider_2.1.0.3
 #!!!! Need to change the path to file with population definitions !!!
 ##Part of the path is missing here: should it be
 input_file=$input/N.ditissima_contigs_unmasked_filtered.recode_annotated.vcf
+input_file=$input/N.ditissima_contigs_unmasked_filtered.vcf
 #Prepare population definition file. Each individual = new population
 grep "#CHROM" $input_file | head -1 | awk '{for(i=10;i<=NF;++i)print $i " " $i "_pop"}' >"${input_file%.vcf}.lst"
 #Copy the configuration file and change the path to the population definition file.
@@ -41,9 +44,11 @@ dos2unix $outfile
 #N.ditissima_contigs_unmasked_filtered.recode_annotated.struc in project file so had to copy to SNP_calling folder
 cp N.ditissima_contigs_unmasked_filtered.recode_annotated.struc analysis/popgen/SNP_calling
 
-#Note - Iteractions can be changed in the mainparams file. I use 10000 for the first time.
-
+#Note - Iteractions can be changed in the mainparams file.
+#Important note - I used BURNIN 1000 NUMREPS 10000 for the first time. This gives large variance in lnPD, inconclusive run
+# Minimum Burnin reps must be 100000. Number of reps must be between 10000 and 1000000. This will require days.
 #Run replicate STRUCTURE runs, with K from 1 to 10
+# BURNIN 100000 NUMREPS 1000
 qsub $scripts/execute_structure.sh $input/N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 1 5
 qsub $scripts/execute_structure.sh $input/N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 2 5
 qsub $scripts/execute_structure.sh $input/N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 3 5
@@ -55,6 +60,12 @@ qsub $scripts/execute_structure.sh $input/N.ditissima_contigs_unmasked_filtered.
 qsub $scripts/execute_structure.sh $input/N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 9 5
 qsub $scripts/execute_structure.sh $input/N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 10 5
 
+# BURNIN 100000 NUMREPS 10000, with K from 1 to 5
+qsub $scripts/execute_structure2.sh N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 1 5
+qsub $scripts/execute_structure2.sh N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 2 5
+qsub $scripts/execute_structure2.sh N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 3 5
+qsub $scripts/execute_structure2.sh N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 4 5
+qsub $scripts/execute_structure2.sh N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 5 5
 
 #Analyze STRUCTURE output
 # Generate a folder containing all STRUCTURE output files for all K analyzed
