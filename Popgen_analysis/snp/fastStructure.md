@@ -54,13 +54,13 @@ cut -f2 ${input_file%.vcf}.fam | cut -d " " -f2 > ${input_file%.vcf}.lab
 #Draw output
 # X11 forwarding is required, set up on an OSX local machine running OSX v10.13.4 using:
 # https://stackoverflow.com/questions/39622173/cant-run-ssh-x-on-macos-sierra
-# -X option needed for ssh to allow X11 forwarding
+# -X option needed for ssh to allow X11 forwarding. -Y option work for me.
 
 input_file=N.ditissima_contigs_unmasked_filtered.recode_annotated.vcf
 input_vcf_file=${input_file%.vcf}
 Popfile=${input_file%.vcf}.lab
 s=1
-f=5
+f=10
 structure=/home/sobczm/bin/fastStructure
 for i in $(seq $s $f)
 do
