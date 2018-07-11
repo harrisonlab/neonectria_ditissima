@@ -96,12 +96,12 @@ input=/data/scratch/gomeza/analysis/sv_calling/lumpy
 #$scripts/sub_pairfq.sh  
 
 cd $input/
-for sample in $input_hap/Ag04
+for sample in $input_hap/*
 do
 reads_forward=$sample/F/*trim.fq.gz
 #Sample name is the first part of the filename with reads, until the first underscore (_) encountered.
 sname=$(echo $(basename "$reads_forward") | cut -d "_" -f1)
-qsub $scripts/sub_bwa_mem.sh Illumina $sname $input_dip_assembly $reads_forward $reads_reverse
+qsub $scripts/sub_bwa_mem.sh Illumina $sname $input_hap_assembly $reads_forward $reads_reverse
 done
 
 #Warning: the last step in the script - genotype calling - takes days.
