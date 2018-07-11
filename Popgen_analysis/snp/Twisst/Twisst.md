@@ -32,5 +32,5 @@ Run Twisst
 
 ```bash
 screen -a
-python twisst.py -t output.phyml_bionj.w50.trees.gz -w output.weights2.csv.gz -g ENG Ag02,Ag04,Ag05,Ag06,Hg199,R0905,R6-17-2,R6-17-3 -g NI Ag11_A,Ag11_B,Ag11_C -g IRL Ag08,Ag09_A -g BR ND8,ND9 -g BE R37-15,R39-15 -g NL R41-15,R42-15,R45-15 -g ES P112,OPC304,BGV344 -g IT R68-17 --method complete
+python twisst.py -t output.phyml_bionj.w50.trees.gz -w output.weights2.csv.gz -o topologies.trees -g ENG Ag02,Ag04,Ag05,Ag06,Hg199,R0905,R6-17-2,R6-17-3 -g NI Ag11_A,Ag11_B,Ag11_C -g IRL Ag08,Ag09_A -g BR ND8,ND9 -g BE R37-15,R39-15 -g NL R41-15,R42-15,R45-15 -g ES P112,OPC304,BGV344 -g IT R68-17 --method complete
 ```
