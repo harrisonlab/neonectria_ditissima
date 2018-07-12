@@ -6,4 +6,4 @@
 
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/summary_stats
 
-Rscript --vanilla $scripts/calculate_haplotype_based_stats.R
+/home/adamst/prog/R/R-3.2.5/bin/Rscript --vanilla $scripts/calculate_haplotype_based_stats.R
