@@ -51,8 +51,10 @@ $vcftools/vcftools --vcf N.ditissima_contigs_unmasked_nopatho_filtered.vcf --mac
 ```
 
 ##Create custom SnpEff genome database
-$scripts/summary_stats/build_genome_database.sh N.ditissima_contigs_unmasked.fa final_genes_appended.gff3 Hg199_minion
 
+```bash
+$scripts/summary_stats/build_genome_database.sh N.ditissima_contigs_unmasked.fa final_genes_appended.gff3 Hg199_minion
+```
 
 #Annotate VCF files
 
@@ -61,116 +63,25 @@ for a in *recode.vcf
 do
 $scripts/summary_stats/annotate_snps_genome.sh $a Hg199_minion
 done
-
-
-
-
+```
+```bash
 ###Create FASTA alignment files containing only select subsets of SNPs. Required
 ### for analyses in the fus_popgenome_analysis.sh script. Here, using option 1 as haploid organism, but for diploid organisms use
 ### typically option 2 (for Popgenome analysis) or 3.
-### From now onwards, analysing the dataset without A13.
-cd $input/noA13
-ref_genome=/home/sobczm/popgen/summary_stats/Fus2_canu_contigs_unmasked.fa
-##all
-python $scripts/summary_stats/vcf_to_fasta.py Fus2_canu_contigs_unmasked_noA13_filtered.recode_annotated.vcf $ref_genome 1
+### From now onwards, analysing the dataset without R68.
+cd $input/NoR68
+ref_genome=/data/scratch/gomeza/analysis/summary_stats/N.ditissima_contigs_unmasked.fa
+#All
+python $scripts/summary_stats/vcf_to_fasta.py N.ditissima_contigs_unmasked_noR68_filtered.recode_annotated.vcf $ref_genome 1
 #Moving each subset of FASTA files into a separate dir.
 mkdir all
 mv *.fasta ./all
 ##coding
-python $scripts/summary_stats/vcf_to_fasta.py Fus2_canu_contigs_unmasked_noA13_filtered.recode_annotated_coding.vcf $ref_genome 1
+python $scripts/summary_stats/vcf_to_fasta.py N.ditissima_contigs_unmasked_noR68_filtered.recode_coding.vcf $ref_genome 1
 mkdir coding
 mv *.fasta ./coding
 ##silent(four-fold degenerate)
-python $scripts/summary_stats/vcf_to_fasta.py Fus2_canu_contigs_unmasked_noA13_filtered.recode_annotated_syn_silent.vcf $ref_genome 1
+python $scripts/summary_stats/vcf_to_fasta.py N.ditissima_contigs_unmasked_noR68_filtered.recode_syn_4fd.vcf $ref_genome 1
 mkdir silent
 mv *.fasta ./silent
-
-
-
-
-
-
-
-
-
-
-##Create FASTA alignment files containing only select subsets of SNPs. Required for analyses in Pf_popgenome_analysis.md. From now onwards, analysing only UK123.
-
-```bash
-cd $input
-ref_genome=$input/polished_contigs_unmasked.fa
-```
-
-###all
-
-```bash
-python $scripts/summary_stats/vcf_to_fasta.py polished_contigs_unmasked_UK123_filtered.recode_annotated.vcf $ref_genome 2
-```
-
-###Moving each subset of FASTA files into a separate dir.
-
-```bash
-mkdir all
-mv *.fasta ./all
-```
-
-##coding
-
-```bash
-python $scripts/summary_stats/vcf_to_fasta.py polished_contigs_unmasked_UK123_filtered.recode_coding.vcf $ref_genome 2
-mkdir coding
-mv *.fasta ./coding
-```
-
-##silent(four-fold degenerate)
-
-```bash
-python $scripts/summary_stats/vcf_to_fasta.py polished_contigs_unmasked_UK123_filtered.recode_syn_4fd.vcf $ref_genome 2
-mkdir silent
-mv *.fasta ./silent
-```
-
-###Split the GFF file into one contig --> one GFF file. Required for analyses in Pf_popgenome_analysis.md
-
-```bash
-cd $input
-mkdir -p gff
-$scripts/summary_stats/split_gff_contig.sh Bc16_genes_incl_ORFeffectors.gff3
-mv *.gff ./gff
-```
-
-##Create FASTA alignment files containing only select subsets of SNPs. Required for analyses in Pf_popgenome_analysis.md From now onwards, analysing only Pf.
-
-```bash
-cd $input
-ref_genome=$input/polished_contigs_unmasked.fa
-```
-
-###all
-
-```bash
-python $scripts/summary_stats/vcf_to_fasta.py polished_contigs_unmasked_Pf_filtered.recode_annotated.vcf $ref_genome 2
-```
-
-###Moving each subset of FASTA files into a separate dir.
-
-```bash
-mkdir all_Pf
-mv *.fasta ./all_Pf
-```
-
-##coding
-
-```bash
-python $scripts/summary_stats/vcf_to_fasta.py polished_contigs_unmasked_Pf_filtered.recode_coding.vcf $ref_genome 2
-mkdir coding_Pf
-mv *.fasta ./coding_Pf
-```
-
-##silent(four-fold degenerate)
-
-```bash
-python $scripts/summary_stats/vcf_to_fasta.py polished_contigs_unmasked_Pf_filtered.recode_syn_4fd.vcf $ref_genome 2
-mkdir silent_Pf
-mv *.fasta ./silent_Pf
 ```
