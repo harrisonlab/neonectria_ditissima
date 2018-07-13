@@ -101,10 +101,6 @@ mv $f $folder
 done
 cd $input/NoR68/silent
 
-
-
-
-
 To run
 qsub $scripts/summary_stats/sub_calculate_nucleotide_diversity.sh
 qsub $scripts/summary_stats/sub_calculate_neutrality_stats.sh
@@ -160,13 +156,10 @@ do
     fi
 done
 
-
-
-To run
 cd $input/NoR68/syn
-qsub $scripts/sub_calculate_nucleotide_diversity.sh
-qsub $scripts/sub_calculate_neutrality_stats.sh
-qsub $scripts/sub_calculate_fst.sh
+qsub $scripts/summary_stats/sub_calculate_nucleotide_diversity.sh
+qsub $scripts/summary_stats/sub_calculate_neutrality_stats.sh
+qsub $scripts/summary_stats/sub_calculate_fst.sh
 #qsub $scripts/sub_calculate_haplotype_based_stats.sh
 ```
 ```bash
@@ -193,13 +186,10 @@ do
     fi
 done
 
-
-
-
-to run
+Need to run
 cd $input/NoR68/nonsyn
-qsub $scripts/sub_calculate_nucleotide_diversity.sh
-qsub $scripts/sub_calculate_neutrality_stats.sh
-qsub $scripts/sub_calculate_fst.sh
+qsub $scripts/summary_stats/sub_calculate_nucleotide_diversity.sh
+qsub $scripts/summary_stats/sub_calculate_neutrality_stats.sh
+qsub $scripts/summary_stats/sub_calculate_fst.sh
 #qsub $scripts/sub_calculate_haplotype_based_stats.sh
 ```
