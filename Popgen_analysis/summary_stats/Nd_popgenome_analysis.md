@@ -80,7 +80,8 @@ Other scripts (sub_calculate_neutrality_stats.sh) are used in analogous manner.
 qsub $scripts/summary_stats/sub_calculate_nucleotide_diversity.sh
 qsub $scripts/summary_stats/sub_calculate_neutrality_stats.sh
 qsub $scripts/summary_stats/sub_calculate_fst.sh
-#qsub $scripts/sub_calculate_haplotype_based_stats.sh
+qsub $scripts/summary_stats/sub_calculate_haplotype_based_stats.sh
+qsub $scripts/summary_stats/sub_calculate_4gt.sh
 ```
 
 This calculation was done over all sites. Now going to proceed for site subsets: synonymous, non-synonymous and four-fold degenerate (silent), in the respective folders
