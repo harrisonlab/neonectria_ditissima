@@ -12,7 +12,7 @@ library(ggplot2)
 ##split into two sequences (<sample_name> + prefix (_1 or _2), for example FOC5_1, FOC5_2), each representing
 ##one haplotype. Both need to be input below.
 ENG <- c("Ag02", "Ag04", "Ag05", "Ag06", "Hg199", "R0905", "R6-17-2","R6-17-3")
-NI <- c("Ag11_A", "Ag11_B", "Ag11")
+NI <- c("Ag11_A", "Ag11_B", "Ag11_C")
 IRL <- c("Ag08", "Ag09_A")
 BRA <- c("ND8", "ND9")
 ESP <- c("BGV344", "P112","OPC304")
