@@ -102,11 +102,12 @@ mv $f $folder
 done
 cd $input/NoR68/silent
 
-To run
 qsub $scripts/summary_stats/sub_calculate_nucleotide_diversity.sh
+failed
 qsub $scripts/summary_stats/sub_calculate_neutrality_stats.sh
 qsub $scripts/summary_stats/sub_calculate_fst.sh
-#qsub $scripts/sub_calculate_haplotype_based_stats.sh
+qsub $scripts/summary_stats/sub_calculate_haplotype_based_stats.sh
+qsub $scripts/summary_stats/sub_calculate_4gt.sh
 ```
 
 ###synonymous
@@ -159,9 +160,11 @@ done
 
 cd $input/NoR68/syn
 qsub $scripts/summary_stats/sub_calculate_nucleotide_diversity.sh
+failed
 qsub $scripts/summary_stats/sub_calculate_neutrality_stats.sh
 qsub $scripts/summary_stats/sub_calculate_fst.sh
-#qsub $scripts/sub_calculate_haplotype_based_stats.sh
+qsub $scripts/summary_stats/sub_calculate_haplotype_based_stats.sh
+qsub $scripts/summary_stats/sub_calculate_4gt.sh
 ```
 ```bash
 cd $input/NoR68/nonsyn
@@ -192,5 +195,6 @@ cd $input/NoR68/nonsyn
 qsub $scripts/summary_stats/sub_calculate_nucleotide_diversity.sh
 qsub $scripts/summary_stats/sub_calculate_neutrality_stats.sh
 qsub $scripts/summary_stats/sub_calculate_fst.sh
-#qsub $scripts/sub_calculate_haplotype_based_stats.sh
+qsub $scripts/summary_stats/sub_calculate_haplotype_based_stats.sh
+qsub $scripts/summary_stats/sub_calculate_4gt.sh
 ```
