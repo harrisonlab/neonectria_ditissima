@@ -1,32 +1,6 @@
 #!/bin/bash
 scripts=/home/sobczm/bin/popgen/clock/motif_discovery
 
-#Identification of orthologs amongst selected genomes using the OrthoFinder.
-
-##DATASET A)
-#Get whole-genome protein sequences and rename the files
-
-```bash
-
-#Create a directory for OrthoFinder run, copy input FASTA files and run orthofinder
-
-for Strain in Ag02 Ag08 Ag11_C ND8 R0905_canu_2017_v2 R42-15 R68-17 Ag04 Ag09_A BGV344 ND9 R37-15 R45-15 RS305p Ag05 Ag11_A Hg199 OPC304 R39-15 R6-17-2 RS324p Ag06 Ag11_B Hg199_minion P112 R41-15 R6-17-3; do
-cp gene_pred/codingquary/N.ditissima/$Strain/final/final_genes_combined.pep.fasta analysis/orthology/OrthoFinder/"$Strain".pep.fa
-done
-
-cd analysis/orthology/OrthoFinder
-qsub $scripts/sub_orthofinder.sh OrthoFinder
-
-#It turns out that the pipeline terminates for no reason at different random
-#points when executing through SGE. Therefore, will run it on a worker node in a screen.
-
-qlogin -pe smp 16
-
-#16 threads used
-
-orthofinder -f ./ -t 3 -a 3
-```
-
 # Orthology analysis between Neonectria ditissima isolates using Orthomcl
 
 ```bash
@@ -303,7 +277,6 @@ done
 done
 ```
 
-
 ## 3.2) Merge the all-vs-all blast results  
 ```bash
 IsolateAbrv=Nd_all_isolates
@@ -320,8 +293,8 @@ WorkDir=analysis/orthology/Orthomcl/$IsolateAbrv
 ## 4) Perform ortholog identification
 
 ```bash
-
-# Need to create a mysql database before run orthomcl. It seems better results are shown in OrthoFinder.
+# Need to create a mysql database before run orthomcl.
+# It seems better results are shown in OrthoFinder, therefore I am running this now.
 
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
   MergeHits="$IsolateAbrv"_blast.tab
@@ -329,36 +302,81 @@ WorkDir=analysis/orthology/Orthomcl/$IsolateAbrv
   qsub $ProgDir/qsub_orthomcl.sh $MergeHits $GoodProts 5
 ```
 
+# Identification of orthologs amongst selected genomes using the OrthoFinder.
+
+## Get whole-genome protein sequences and rename the files
+
+scripts=/home/sobczm/bin/popgen/clock/motif_discovery
+
+```bash
+
+#Create a directory for OrthoFinder run, copy input FASTA files and run orthofinder
+
+for Strain in Ag02 Ag08 Ag11_C ND8 R0905_canu_2017_v2 R42-15 R68-17 Ag04 Ag09_A BGV344 ND9 R37-15 R45-15 RS305p Ag05 Ag11_A Hg199 OPC304 R39-15 R6-17-2 RS324p Ag06 Ag11_B Hg199_minion P112 R41-15 R6-17-3; do
+cp gene_pred/codingquary/N.ditissima/$Strain/final/final_genes_combined.pep.fasta analysis/orthology/OrthoFinder/"$Strain".pep.fa
+done
+
+cd analysis/orthology/OrthoFinder
+qsub $scripts/sub_orthofinder.sh OrthoFinder
+
+#It turns out that the pipeline terminates for no reason at different random
+#points when executing through SGE. Therefore, will run it on a worker node in a screen.
+#Input files have to be the pep files of each sample, renamed with maximum 4 letters name + .fasta
+
+cp -r ../orthology/Orthomcl/Nd_all_isolates/formatted/ OrthoFinder2/
+screen -a
+
+#login in a node with 16 threads and give 1G of memory to each. This is going to take a while, so try to avoid using blacklace11 and leave it for other users.
+qlogin -pe smp 16 -l virtual_free=1G
+cd analysis/orthology/OrthoFinder2/formatted
+#16 threads used
+orthofinder -f ./ -t 3 -a 3
+```
 ## Orthofinder results:
 
-```
-OrthoFinder assigned 157358 genes (99.2% of total) to 14200 orthogroups. Fifty percent of all genes were in orthogroups
-with 12 or more genes (G50 was 12) and were contained in the largest 6182 orthogroups (O50 was 6182). There were 10919
-orthogroups with all species present and 10285 of these consisted entirely of single-copy genes.
-```
+WorkDir=analysis/orthology/OrthoFinder  
+IsolateAbrv=Nd_all_isolates
 
 output files are in:
 ```bash
-ls $WorkDir/formatted/Results_Apr10
+ls $WorkDir/Results_Jul05
 ```
+```
+Number of genes 389858
+Number of genes in orthogroups  385064
+Number of unassigned genes      4794
+Percentage of genes in orthogroups      98.8
+Percentage of unassigned genes  1.2
+Number of orthogroups   17163
+Number of species-specific orthogroups  8
+Number of genes in species-specific orthogroups 22
+Percentage of genes in species-specific orthogroups     0.0
+Mean orthogroup size    22.4
+Median orthogroup size  27.0
+```
+
+
+
+
+
+
+
+
+
 
 ## 5) Plot venn diagrams:
 
 Orthofinder output:
 
 ```bash
-  GoodProts=$WorkDir/goodProteins/goodProteins.fasta
-  ProgDir=/home/armita/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
-  $ProgDir/orthoMCLgroups2tab.py $GoodProts $WorkDir/formatted/Results_Apr10/Orthogroups.txt > $WorkDir/formatted/Results_Apr10/"$IsolateAbrv"_orthogroups.tab
+  GoodProts=analysis/orthology/Orthomcl/Nd_all_isolates/goodProteins/goodProteins.fasta
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
+  $ProgDir/orthoMCLgroups2tab.py $GoodProts $WorkDir/Results_Jul05/Orthogroups.txt > $WorkDir/Results_Jul05/"$IsolateAbrv"_orthogroups.tab
   ProgDir=~/git_repos/emr_repos/scripts/phytophthora/pathogen/orthology
   $ProgDir/Pcac_Pinf_Ppar_Pcap_Psoj_venn.r --inp $WorkDir/formatted/Results_Apr10/"$IsolateAbrv"_orthogroups.tab --out $WorkDir/formatted/Results_Apr10/"$IsolateAbrv"_orthogroups.pdf
 ```
 
-Orthomcl output:
-```bash
-  ProgDir=~/git_repos/emr_repos/scripts/phytophthora/pathogen/orthology
-  $ProgDir/Pcac_Pinf_Ppar_Pcap_Psoj_venn.r --inp $WorkDir/"$IsolateAbrv"_orthogroups.tab --out $WorkDir/"$IsolateAbrv"_orthogroups.pdf
-```
+
 
 Output was a pdf file of the venn diagram.
 
@@ -383,9 +401,9 @@ This section details the commands used and the results observed.
 ## Extracting fasta files for orthogroups:
 
 ```bash
-  ProgDir=~/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
-  OrthogroupsTxt=$(ls $WorkDir/formatted/Results_Apr10/Orthogroups.txt)
-  GoodProts=$WorkDir/goodProteins/goodProteins.fasta
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
+  OrthogroupsTxt=$(ls $WorkDir/Results_Jul05/Orthogroups.txt)
+  GoodProts=analysis/orthology/Orthomcl/Nd_all_isolates/goodProteins/goodProteins.fasta
   OutDir=$WorkDir/orthogroups_fasta
   mkdir -p $OutDir
   $ProgDir/orthoMCLgroups2fasta.py --orthogroups $OrthogroupsTxt --fasta $GoodProts --out_dir $OutDir
@@ -408,9 +426,65 @@ First variables were set:
   Orthogroups=$(ls $WorkDir/formatted/Results_May04/Orthogroups.txt)
   GoodProts=$WorkDir/goodProteins/goodProteins.fasta
   # Braker_genes=
-```
+```ENG <- c("Ag02", "Ag04", "Ag05", "Ag06", "Hg199", "R0905", "R6-17-2","R6-17-3")
+NI <- c("Ag11_A", "Ag11_B", "Ag11_C")
+IRL <- c("Ag08", "Ag09_A")
+BRA <- c("ND8", "ND9")
+ESP <- c("BGV344", "P112","OPC304")
+BEL <- c("R37-15", "R39-15")
+NL <- c("R41-15", "R42-15","R45-15")
 
 #### 6.1.a ) Orthologroups only containing A. tenuissima genes were extracted:
+```bash
+  for num in 1
+  do
+      echo "The total number of orthogroups is:"
+      cat $WorkDir/Results_Jul05/Orthogroups.txt | wc -l
+      echo "The total number of genes in orthogroups is:"
+      cat $WorkDir/Results_Jul05/Orthogroups.txt | grep -o '|' | wc -l
+      echo "The number of orthogroups common to N. ditissima is:"
+      cat $WorkDir/Results_Jul05/Orthogroups.txt | grep -e 'Ag02|' | grep -e 'Ag04|' | grep -e 'Ag05|' | grep -e 'Ag06|' grep -e 'Hg199|' grep -e 'R0905|' grep -e 'R6-17-2|' grep -e 'R6-17-3|' grep -e 'Ag11_A|' grep -e 'Ag11_B|' grep -e 'Ag11_C|' grep -e 'Ag08|' grep -e 'Ag09_A|' grep -e 'ND8|' grep -e 'ND9|' grep -e 'BGV344|' grep -e 'P112|' grep -e 'OPC304|' grep -e 'R37-15|' grep -e 'R39-15|' grep -e 'R41-15|' grep -e 'R42-15|' grep -e 'R45-15|' | wc -l
+
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -e 'SCRP249|' | grep -e 'SCRP324|' | grep -e 'SCRP333|' | grep -v -e 'A4|' -e 'Bc1|' -e 'Bc16|' -e 'Bc23|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'Nov77|' -e 'Nov9|' -e 'ONT3|' -e 'SCRP245_v2|' | grep -o '|' | wc -l
+    echo "The number of orthogroups common to P. fragariae is:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'A4|' | grep -e 'Bc1|' | grep -e 'Bc16|' | grep -e 'Bc23|' | grep -e 'Nov5|' | grep -e 'Nov27|' | grep -e 'Nov71|' | grep -e 'Nov77|' | grep -e 'Nov9|' | grep -e 'ONT3|' | grep -e 'SCRP245_v2|' | wc -l
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'A4|' | grep -e 'Bc1|' | grep -e 'Bc16|' | grep -e 'Bc23|' | grep -e 'Nov5|' | grep -e 'Nov27|' | grep -e 'Nov71|' | grep -e 'Nov77|' | grep -e 'Nov9|' | grep -e 'ONT3|' | grep -e 'SCRP245_v2|' | grep -o '|' | wc -l
+    echo "The number of orthogroups common to UK1 isolates is:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'Bc23|' -e 'Nov27|' -e 'Nov71|' -e 'Nov77|' -e 'Nov9|' -e 'ONT3|' -e 'SCRP245_v2|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Bc1|' | grep -e 'Nov5|' | wc -l
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'Bc23|' -e 'Nov27|' -e 'Nov71|' -e 'Nov77|' -e 'Nov9|' -e 'ONT3|' -e 'SCRP245_v2|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Bc1|' | grep -e 'Nov5|' | grep -o '|' | wc -l
+    echo "The number of orthogroups common to UK2 isolates is:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'Bc1|' -e 'Bc23|' -e 'Nov27|' -e 'Nov71|' -e 'Nov77|' -e 'Nov9|' -e 'ONT3|' -e 'SCRP245_v2|' -e 'Nov5|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Bc16|' | grep -e 'A4|' | wc -l
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'Bc1|' -e 'Bc23|' -e 'Nov27|' -e 'Nov71|' -e 'Nov77|' -e 'Nov9|' -e 'ONT3|' -e 'SCRP245_v2|' -e 'Nov5|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Bc16|' | grep -e 'A4|' | grep -o '|' | wc -l
+    echo "The number of orthogroups common to UK3 isolates is:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'Bc23|' -e 'Nov77|' -e 'ONT3|' -e 'SCRP245_v2|' -e 'Bc1|' -e 'Nov5|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Nov27|' | grep -e 'Nov71|' | grep -e 'Nov9|' | wc -l
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'Bc23|' -e 'Nov77|' -e 'ONT3|' -e 'SCRP245_v2|' -e 'Bc1|' -e 'Nov5|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Nov27|' | grep -e 'Nov71|' | grep -e 'Nov9|' | grep -o '|' | wc -l
+    echo "The number of orthogroups common to CA4 isolates is:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'Bc23|' -e 'Nov77|' -e 'Nov9|' -e 'SCRP245_v2|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'ONT3|' | wc -l
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'Bc23|' -e 'Nov77|' -e 'Nov9|' -e 'SCRP245_v2|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'ONT3|' | grep -o '|' | wc -l
+    echo "The number of orthogroups common to CA5 isolates is:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'ONT3|' -e 'Nov9|' -e 'SCRP245_v2|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Bc23|' | grep -e 'Nov77|' | wc -l
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'ONT3|' -e 'Nov9|' -e 'SCRP245_v2|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Bc23|' | grep -e 'Nov77|' | grep -o '|' | wc -l
+    echo "The number of orthogroups common to Unknown race isolates is:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'ONT3|' -e 'Bc16|' -e 'Bc23|' -e 'Nov77|' -e 'Nov9|' -e 'A4|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'SCRP245_v2|' | wc -l
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'ONT3|' -e 'Bc16|' -e 'Bc23|' -e 'Nov77|' -e 'Nov9|' -e 'A4|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'SCRP245_v2|' | grep -o '|' | wc -l
+    echo "The number of orthogroups with only seven highly conserved target isolates is:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'ONT3|' -e 'Bc23|' -e 'Nov77|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' -e 'SCRP245_v2|' | grep -e 'Nov5|' | grep -e 'Nov27' | grep -e 'Nov71' | grep -e 'Bc16' | grep -e 'Nov9' | grep -e 'Bc1' | grep -e 'A4' | wc -l
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -v -e 'ONT3|' -e 'Bc23|' -e 'Nov77|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' -e 'SCRP245_v2|' | grep -e 'Nov5|' | grep -e 'Nov27' | grep -e 'Nov71' | grep -e 'Bc16' | grep -e 'Nov9' | grep -e 'Bc1' | grep -e 'A4' | grep -o '|' | wc -l
+    echo "The number of orthogroups containing all seven highly conserved target isolates is:"
+    cat $WorkDir/Orthogroups.txt | grep -e 'Nov5|' | grep -e 'Nov27' | grep -e 'Nov71' | grep -e 'Bc16' | grep -e 'Nov9' | grep -e 'Bc1' | grep -e 'A4' | wc -l
+    echo "This represents the following number of genes:"
+    cat $WorkDir/Orthogroups.txt | grep -e 'Nov5|' | grep -e 'Nov27' | grep -e 'Nov71' | grep -e 'Bc16' | grep -e 'Nov9' | grep -e 'Bc1' | grep -e 'A4' | grep -o '|' | wc -l
+done
+
 
 ```bash
 for num in 1; do
