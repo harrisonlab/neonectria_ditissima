@@ -592,10 +592,12 @@ mkdir -p $ReadDir
 # produce event-level information and therefore just the albacore data was used.
 ReadsFq1=$(ls raw_dna/minion/Hg199_fastq_allfiles.fastq.gz)
 #ReadsFq2=$(ls raw_dna/minion/fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz)
+#ReadsFq1=$(ls raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/fastq_runid_298a8dbc00c3db453901232f1ad01b11fd094980_pass.fastq.gz)
+#ReadsFq2=$(ls raw_dna/minion/N.ditissima/Hg199/25-10-17/rebasecalled/pass/fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz)
 cat $ReadsFq1 | gunzip -cf > $ReadDir/"$Strain"_concatenated_reads.fastq
 /home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish/nanopolish_remove_dup_reads.py --fastq $ReadDir/"$Strain"_concatenated_reads.fastq --out $ReadDir/"$Strain"_concatenated_reads_filtered.fastq
-Fast5Dir1=$(ls -d /data/scratch/gomeza/Nd_Hg199_20171203)
-Fast5Dir2=$(ls -d /data/scratch/gomeza/Nd_Hg199_20171025)
+Fast5Dir1=$(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/Nd_Hg199_20171203)
+Fast5Dir2=$(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/raw_dna/minion/N.ditissima/Hg199/25-10-17/rebasecalled/pass/Nd_Hg199_20171025)
 nanopolish index -d $Fast5Dir1 -d $Fast5Dir2 $ReadDir/"$Strain"_concatenated_reads_filtered.fastq
 OutDir=$(dirname $Assembly)
 mkdir -p $OutDir
