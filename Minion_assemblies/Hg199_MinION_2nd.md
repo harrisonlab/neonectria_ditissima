@@ -645,11 +645,6 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $RawReads $AlignedReads $Ploidy $Region $OutDir/$Region
 done
 ```
----------------------------------------
-
-
-
-
 ```bash
 Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_smartdenovo_racon_round_10.fasta)
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
@@ -693,23 +688,9 @@ qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
-```bash
-printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/N*/*/assembly/*/short_summary_*.txt | grep 'Hg199'); do
-FileName=$(basename $File)
-Complete=$(cat $File | grep "(C)" | cut -f2)
-Duplicated=$(cat $File | grep "(D)" | cut -f2)
-Fragmented=$(cat $File | grep "(F)" | cut -f2)
-Missing=$(cat $File | grep "(M)" | cut -f2)
-Total=$(cat $File | grep "Total" | cut -f2)
-printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
-done
-```
-
-short_summary_Hg199_nanoplish_min_500bp_renamed.txt	3317	11	160	248	3725
-
-
 ## R0905 Assembly correction using nanopolish
+
+This part is not needed.
 
 ```bash
 Assembly=$(ls assembly/SMARTdenovo/N.ditissima/R0905/racon_10/R0905_smartdenovo_racon_round_10.fasta)
@@ -737,73 +718,55 @@ qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $Reads $OutDir/nanopolish
 ```
 
 
-Split the assembly into 50Kb fragments and submit each to the cluster for nanopolish correction
+
+
+
+
+
+
+## Hg199 Pilon error correction
+
+Assemblies were polished using Pilon
+Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/N.ditissima/R0905/racon_10/R0905_smartdenovo_racon_round_10.fasta)
-Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-echo "$Organism - $Strain"
-OutDir=$(dirname $Assembly)
-RawReads=$(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq)
-AlignedReads=$(ls $OutDir/nanopolish/reads.sorted.bam)
-NanoPolishDir=/home/armita/prog/nanopolish/nanopolish/scripts
-python $NanoPolishDir/nanopolish_makerange.py $Assembly > $OutDir/nanopolish/nanopolish_range.txt
-Ploidy=1
-echo "nanopolish log:" > nanopolish_log.txt
-for Region in $(cat $OutDir/nanopolish/nanopolish_range.txt | tail -n+21); do
-Jobs=$(qstat | grep 'sub_nanopo' | grep 'qw' | wc -l)
-while [ $Jobs -gt 1 ]; do
-sleep 1m
-printf "."
-Jobs=$(qstat | grep 'sub_nanopo' | grep 'qw' | wc -l)
-done
-printf "\n"
-echo $Region
-echo $Region >> nanopolish_log.txt
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
-qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $RawReads $AlignedReads $Ploidy $Region $OutDir/$Region
-done
+    for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep 'Hg199'); do
+        Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+        Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+        IlluminaDir=$(ls -d qc_dna/paired/*/$Strain)
+        TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
+        TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
+        OutDir=$(dirname $Assembly)/../pilon
+        Iterations=5
+        ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+        qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+    done
 ```
 
-
-
-
-
-
+Contigs were renamed
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_racon_round_10.fasta)
-Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-OutDir=assembly/SMARTdenovo/$Organism/$Strain/nanopolish
-mkdir -p $OutDir
-# cat "" > $OutDir/"$Strain"_nanoplish.fa
-NanoPolishDir=/home/armita/prog/nanopolish/nanopolish/scripts
-python $NanoPolishDir/nanopolish_merge.py assembly/SMARTdenovo/$Organism/$Strain/racon_10/*/*.fa > $OutDir/"$Strain"_nanoplish.fa
-# for File in $(ls assembly/SMARTdenovo/F.*/*/racon2/*/*.fa | grep ":*-"); do
-#     # echo $File
-#     cat $File >> $OutDir/"$Strain"_nanoplish.fa
-# done
 echo "" > tmp.txt
+Assembly=$(ls assembly/SMARTdenovo/N.d*/Hg199/pilon/*.fasta | grep 'pilon_5')
+OutDir=$(dirname $Assembly)
 ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
-$ProgDir/remove_contaminants.py --keep_mitochondria --inp $OutDir/"$Strain"_nanoplish.fa --out $OutDir/"$Strain"_nanoplish_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+$ProgDir/remove_contaminants.py --keep_mitochondria --inp $Assembly --out $OutDir/pilon_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
 ```
 
-Quast and busco were run to assess the effects of racon on assembly quality:
+Quast and busco were run to assess the effects of pilon on assembly quality:
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/nanopolish/Hg199_nanoplish_min_500bp_renamed.fasta); do
-  Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-  Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+for Assembly in $(ls assembly/SMARTdenovo/N.di*/Hg199/pilon/*.fasta | grep 'pilon_min_500bp_renamed.fasta'); do
+  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $Assembly)
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/nanopolish/Hg199_nanoplish_min_500bp_renamed.fasta); do
+for Assembly in $(ls assembly/SMARTdenovo/N.di*/Hg199/pilon/*.fasta ); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -828,4 +791,327 @@ printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
 
+```
+Filename    Complete    Duplicated    Fragmented    Missing    Total
+short_summary_contigs_min_500bp.txt	3673	15	24	28	3725
+short_summary_Hg199.dmo.lay.txt	408	0	438	2879	3725
+short_summary_Hg199.dmo.lay.txt	789	1	661	2275	3725
 short_summary_Hg199_nanoplish_min_500bp_renamed.txt	3317	11	160	248	3725
+short_summary_pilon_1.txt	3581	17	22	122	3725
+short_summary_pilon_2.txt	3583	17	22	120	3725
+short_summary_pilon_3.txt	3586	17	20	119	3725
+short_summary_pilon_4.txt	3586	17	20	119	3725
+short_summary_pilon_5.txt	3586	17	20	119	3725
+short_summary_pilon_min_500bp_renamed.txt	3586	17	20	119	3725
+```
+
+## Hybrid Assembly
+
+### Spades Assembly
+
+```bash
+for TrimReads in $(ls qc_dna/minion/*/Hg199/*allfiles_trim.fastq.gz); do
+Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
+IlluminaDir=$(ls -d qc_dna/paired/*/$Strain)
+TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
+TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
+OutDir=assembly/spades_minion/$Organism/"$Strain"
+echo $TrimF1_Read
+echo $TrimR1_Read
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/spades
+qsub $ProgDir/sub_spades_minion.sh $TrimReads $TrimF1_Read $TrimR1_Read $OutDir
+done
+```
+
+Contigs shorter than 500bp were removed from the assembly
+
+```bash
+  for Contigs in $(ls assembly/spades_minion/*/*/contigs.fasta); do
+    AssemblyDir=$(dirname $Contigs)
+    mkdir $AssemblyDir/filtered_contigs
+    FilterDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/abyss
+    $FilterDir/filter_abyss_contigs.py $Contigs 500 > $AssemblyDir/filtered_contigs/contigs_min_500bp.fasta
+  done
+```
+
+Quast and busco were run to assess the quality of hybrid assemblies:
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/spades_minion/*/*/filtered_contigs/contigs_min_500bp.fasta); do
+  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+```bash
+for Assembly in $(ls assembly/spades_minion/*/Hg199/filtered_contigs/contigs_min_500bp.fasta); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly_spades
+# OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+
+## Merging MinION and hybrid assemblies
+
+Note - the anchor length is the starting point for contigs to be merged - only contigs larger than these will be extended.
+
+```bash
+for MinIONAssembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/pilon/*.fasta | grep 'pilon_min_500bp_renamed.fasta'); do
+Organism=$(echo $MinIONAssembly | rev | cut -f4 -d '/' | rev)
+Strain=$(echo $MinIONAssembly | rev | cut -f3 -d '/' | rev)
+HybridAssembly=$(ls assembly/spades_minion/$Organism/$Strain/filtered_contigs/contigs_min_500bp.fasta)
+# QuastReport=$(ls assembly/canu/$Organism/$Strain/filtered_contigs/report.tsv)
+# N50=$(cat $QuastReport | grep 'N50' | cut -f2)
+# AnchorLength=$N50
+
+AnchorLength=20000
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_first_20k
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid__first_20k
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
+AnchorLength=5000
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_5k
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_5k
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
+done
+```
+
+Quast and busco were run to assess the quality of hybrid assemblies:
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta | grep 'Hg199'); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+```bash
+for Assembly in $(ls assembly/merged_canu_spades/*/*_minion_5k/merged.fasta | grep 'Hg199'); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly2
+#OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+short_summary_merged.txt        3563    107     23      139     3725
+
+```bash
+for Assembly in $(ls assembly/merged_canu_spades/*/*_minion_first_20k/merged.fasta | grep 'Hg199'); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly2
+#OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+short_summary_merged.txt        2435    29      478     812     3725
+
+```bash
+printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
+for File in $(ls gene_pred/busco/N*/Hg199/assembly/*/short_summary_*.txt | grep 'Hg199'); do
+FileName=$(basename $File)
+Complete=$(cat $File | grep "(C)" | cut -f2)
+Duplicated=$(cat $File | grep "(D)" | cut -f2)
+Fragmented=$(cat $File | grep "(F)" | cut -f2)
+Missing=$(cat $File | grep "(M)" | cut -f2)
+Total=$(cat $File | grep "Total" | cut -f2)
+printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
+done
+```
+
+Minion_5K genome
+3563 Complete BUSCOs (C)
+INFO    3456 Complete and single-copy BUSCOs (S)
+INFO    107 Complete and duplicated BUSCOs (D)
+INFO    23 Fragmented BUSCOs (F)
+INFO    139 Missing BUSCOs (M)
+
+## Pilon error correction
+
+Assemblies were polished using Pilon
+Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
+
+```bash
+  for Assembly in $(ls assembly/merged_canu_spades/*/*_minion_5k/merged.fasta | grep 'Hg199'); do
+      Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+      Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+      IlluminaDir=$(ls -d qc_dna/paired/*/Hg199)
+      TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
+      TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
+      OutDir=$(dirname $Assembly)/pilon
+      Iterations=5
+      ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+      qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+  done
+```
+
+Contigs were renamed
+
+```bash
+echo "" > tmp.txt
+Assembly=$(ls assembly/merged_canu_spades/N.ditissima/Hg199_minion_5k/pilon/*.fasta | grep 'pilon_5')
+OutDir=$(dirname $Assembly)
+ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+$ProgDir/remove_contaminants.py --keep_mitochondria --inp $Assembly --out $OutDir/pilon_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+```
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/Hg199_minion_5k/pilon/pilon_min_500bp_renamed.fasta); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+```bash
+for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/Hg199_minion_5k/pilon/*.fasta); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/assembly2
+#OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+```bash
+printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
+for File in $(ls gene_pred/busco/N*/*/assembly2/*/short_summary_*.txt | grep 'Hg199'); do
+FileName=$(basename $File)
+Complete=$(cat $File | grep "(C)" | cut -f2)
+Duplicated=$(cat $File | grep "(D)" | cut -f2)
+Fragmented=$(cat $File | grep "(F)" | cut -f2)
+Missing=$(cat $File | grep "(M)" | cut -f2)
+Total=$(cat $File | grep "Total" | cut -f2)
+printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
+done
+```
+
+## Isolate R09/05 Reference
+
+```bash
+for Assembly in $(ls assembly/merged_canu_spades/*/R0905/*_contigs/*.fasta); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+Contigs=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+echo "$Organism - $Strain - $Contigs"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/$Strain/$Contigs
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+```bash
+printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
+for File in $(ls gene_pred/busco/N*/R0905/*_contigs/*/short_summary_*.txt); do
+FileName=$(basename $File)
+Complete=$(cat $File | grep "(C)" | cut -f2)
+Duplicated=$(cat $File | grep "(D)" | cut -f2)
+Fragmented=$(cat $File | grep "(F)" | cut -f2)
+Missing=$(cat $File | grep "(M)" | cut -f2)
+Total=$(cat $File | grep "Total" | cut -f2)
+printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
+done
+```
+
+Filename	Complete	Duplicated	Fragmented	Missing	Total
+short_summary_R0905_canu_contigs_modified.txt	3510	93	26	189	3725
+short_summary_R0905_contigs_renamed.txt	3510	94	26	189	3725
+
+## Repeat Masking
+
+Repeat masking was performed on the non-hybrid assembly.
+
+```bash
+for Assembly in $(ls assembly/merged_canu_spades/*/*_minion_5k/merged.fasta | grep 'Hg199'); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+OutDir=repeat_masked/$Organism/"$Strain"/filtered_contigs
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/repeat_masking
+qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
+done
+```
+
+The TransposonPSI masked bases were used to mask additional bases from the repeatmasker / repeatmodeller softmasked and hardmasked files.
+
+```bash
+
+for File in $(ls repeat_masked/*/Ref_Genomes/*/*/*_contigs_softmasked.fa); do
+OutDir=$(dirname $File)
+TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+echo "$OutFile"
+bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+echo "Number of masked bases:"
+cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+done
+# The number of N's in hardmasked sequence are not counted as some may be present within the assembly and were therefore not repeatmasked.
+for File in $(ls repeat_masked/*/Ref_Genomes/*/*/*_contigs_hardmasked.fa); do
+OutDir=$(dirname $File)
+TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+OutFile=$(echo $File | sed 's/_contigs_hardmasked.fa/_contigs_hardmasked_repeatmasker_TPSI_appended.fa/g')
+echo "$OutFile"
+bedtools maskfasta -fi $File -bed $TPSI -fo $OutFile
+done
+```
+
+```
+Number of masked bases:
+3832437
+```
+
+## R0905 Assemblies were polished using Pilon
+
+```bash
+	for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/R0905_canu.contigs.fasta); do
+	Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+  Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  IlluminaDir=$(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.ditissima/R0905)
+  TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
+  TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+  OutDir=assembly/canu_pacbio/$Organism/$Strain/Original_v3/polished
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+  qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
+	done
+```
+```bash
+	for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/racon_10/R0905_canu_racon_round_10.fasta); do
+	Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+  Strain=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+  IlluminaDir=$(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.ditissima/R0905)
+  TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
+  TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+  OutDir=assembly/canu_pacbio/$Organism/$Strain/Original_v3/racon_10/polished
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+  qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
+	done
+```
