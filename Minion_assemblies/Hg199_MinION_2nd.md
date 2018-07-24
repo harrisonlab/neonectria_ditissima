@@ -717,37 +717,29 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $Reads $OutDir/nanopolish
 ```
 
-
-
-
-
-
-
-
 ## Hg199 Pilon error correction
 
 Assemblies were polished using Pilon
 Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
 
 ```bash
-    for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep 'Hg199'); do
-        Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-        Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-        IlluminaDir=$(ls -d qc_dna/paired/*/$Strain)
-        TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
-        TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
-        OutDir=$(dirname $Assembly)/../pilon
-        Iterations=5
-        ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
-        qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
-    done
+for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_renamed.fasta | grep 'Hg199'); do
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    IlluminaDir=$(ls -d qc_dna/paired/N.ditissima/Hg199)
+    TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
+    TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
+    OutDir=$(dirname $Assembly)/../pilon
+    Iterations=10
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+    qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+done
 ```
-
 Contigs were renamed
 
 ```bash
 echo "" > tmp.txt
-Assembly=$(ls assembly/SMARTdenovo/N.d*/Hg199/pilon/*.fasta | grep 'pilon_5')
+Assembly=$(ls assembly/SMARTdenovo/N.d*/Hg199/pilon/*.fasta | grep 'pilon_10')
 OutDir=$(dirname $Assembly)
 ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
 $ProgDir/remove_contaminants.py --keep_mitochondria --inp $Assembly --out $OutDir/pilon_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
@@ -777,6 +769,12 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
+
+
+
+
+
 
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
@@ -1095,23 +1093,25 @@ Number of masked bases:
 	for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/R0905_canu.contigs.fasta); do
 	Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
   Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-  IlluminaDir=$(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.ditissima/R0905)
+  IlluminaDir=$(ls -d qc_dna/paired/N.ditissima/R0905)
   TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
   TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+  Iterations=5
   OutDir=assembly/canu_pacbio/$Organism/$Strain/Original_v3/polished
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
-  qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
+  qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
 	done
 ```
 ```bash
 	for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/racon_10/R0905_canu_racon_round_10.fasta); do
 	Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
   Strain=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-  IlluminaDir=$(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.ditissima/R0905)
+  IlluminaDir=$(ls -d qc_dna/paired/N.ditissima/R0905)
   TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
   TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+  Iterations=5
   OutDir=assembly/canu_pacbio/$Organism/$Strain/Original_v3/racon_10/polished
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
-  qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
+  qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
 	done
 ```
