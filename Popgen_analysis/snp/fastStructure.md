@@ -85,6 +85,8 @@ plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input
 
 ####Test various K values (K represents model complexity)
 
+By default, fastStructure runs using F-prior. Alternatively, logistic prior can be used when structure is difficult to resolve. 
+
 ```bash
 # Set minimum number of considered clusters
 s=1
