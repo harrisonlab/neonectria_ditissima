@@ -819,6 +819,18 @@ qsub $ProgDir/sub_spades_minion.sh $TrimReads $TrimF1_Read $TrimR1_Read $OutDir
 done
 ```
 
+Quast and busco were run to assess the quality of hybrid assemblies:
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/spades_minion/*/*/contigs.fasta); do
+  Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
 Contigs shorter than 500bp were removed from the assembly
 
 ```bash
@@ -835,8 +847,8 @@ Quast and busco were run to assess the quality of hybrid assemblies:
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/spades_minion/*/*/filtered_contigs/contigs_min_500bp.fasta); do
-  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
   OutDir=$(dirname $Assembly)
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
@@ -850,7 +862,6 @@ echo "$Organism - $Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
 OutDir=gene_pred/busco/$Organism/$Strain/assembly_spades
-# OutDir=$(dirname $Assembly)
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
@@ -1149,16 +1160,13 @@ Organism=$(echo $Assembly | rev | cut -f6 -d '/' | rev)
 echo "$Organism - $Strain"
 ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
 BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly
+OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_afterracon
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
-
-
-
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/N*/*/assembly/*/short_summary_*.txt | grep 'Hg199'); do
+for File in $(ls gene_pred/busco/N*/Ref_Genomes/*/assembly/*/short_summary_*.txt | grep 'R0905'); do
 FileName=$(basename $File)
 Complete=$(cat $File | grep "(C)" | cut -f2)
 Duplicated=$(cat $File | grep "(D)" | cut -f2)
@@ -1168,3 +1176,9 @@ Total=$(cat $File | grep "Total" | cut -f2)
 printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
+
+short_summary_pilon_1.txt	3668	18	25	32	3725
+short_summary_pilon_2.txt	3669	15	23	33	3725
+short_summary_pilon_3.txt	3670	15	22	33	3725
+short_summary_pilon_4.txt	3669	15	23	33	3725
+short_summary_pilon_5.txt	3669	15	23	33	3725
