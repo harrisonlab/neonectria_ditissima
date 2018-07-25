@@ -770,12 +770,6 @@ qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
-
-
-
-
-
-
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
 for File in $(ls gene_pred/busco/N*/*/assembly/*/short_summary_*.txt | grep 'Hg199'); do
@@ -791,15 +785,18 @@ done
 
 ```
 Filename    Complete    Duplicated    Fragmented    Missing    Total
-short_summary_contigs_min_500bp.txt	3673	15	24	28	3725
-short_summary_Hg199.dmo.lay.txt	408	0	438	2879	3725
-short_summary_Hg199.dmo.lay.txt	789	1	661	2275	3725
-short_summary_Hg199_nanoplish_min_500bp_renamed.txt	3317	11	160	248	3725
-short_summary_pilon_1.txt	3581	17	22	122	3725
-short_summary_pilon_2.txt	3583	17	22	120	3725
+short_summary_Hg199_contigs_unmasked.txt	3670	15	25	30	3725 (MiSeq data)
+short_summary_Hg199_nanoplish_min_500bp_renamed.txt	3314	12	162	249	3725
+short_summary_pilon_10.txt	3586	17	20	119	3725
+short_summary_pilon_1.txt	3582	17	21	122	3725
+short_summary_pilon_2.txt	3584	17	21	120	3725
 short_summary_pilon_3.txt	3586	17	20	119	3725
 short_summary_pilon_4.txt	3586	17	20	119	3725
 short_summary_pilon_5.txt	3586	17	20	119	3725
+short_summary_pilon_6.txt	3586	17	20	119	3725
+short_summary_pilon_7.txt	3586	17	20	119	3725
+short_summary_pilon_8.txt	3586	17	20	119	3725
+short_summary_pilon_9.txt	3586	17	20	119	3725
 short_summary_pilon_min_500bp_renamed.txt	3586	17	20	119	3725
 ```
 
@@ -1114,4 +1111,60 @@ Number of masked bases:
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
   qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
 	done
+```
+
+Quast and busco were run to assess the effects of pilon on assembly quality:
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/canu_pacbio/N.di*/R0905/Original_v3/polished/*5.fasta); do
+  Strain=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+
+for Assembly in $(ls assembly/canu_pacbio/N.di*/R0905/Original_v3/racon_10/polished/*5.fasta); do
+  Strain=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+  Organism=$(echo $Assembly | rev | cut -f6 -d '/' | rev)
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+```bash
+for Assembly in $(ls assembly/canu_pacbio/N.di*/R0905/Original_v3/polished/*.fasta); do
+Strain=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+
+for Assembly in $(ls assembly/canu_pacbio/N.di*/R0905/Original_v3/racon_10/polished/*.fasta); do
+Strain=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f6 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+
+
+
+```bash
+printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
+for File in $(ls gene_pred/busco/N*/*/assembly/*/short_summary_*.txt | grep 'Hg199'); do
+FileName=$(basename $File)
+Complete=$(cat $File | grep "(C)" | cut -f2)
+Duplicated=$(cat $File | grep "(D)" | cut -f2)
+Fragmented=$(cat $File | grep "(F)" | cut -f2)
+Missing=$(cat $File | grep "(M)" | cut -f2)
+Total=$(cat $File | grep "Total" | cut -f2)
+printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
+done
 ```
