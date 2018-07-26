@@ -346,9 +346,14 @@ analysis/orthology/OrthoFinder2/ - All isolates. Fasta file names corrected. Hg1
 analysis/orthology/OrthoFinder2/Pathtest_isolates/ - Only with isolates testes.
 
 ```bash
-WorkDir=analysis/orthology/OrthoFinder  
 IsolateAbrv=Nd_all_isolates
+
+WorkDir=analysis/orthology/OrthoFinder  
 ls $WorkDir/Results_Jul05
+WorkDir=analysis/orthology/OrthoFinder2  
+ls $WorkDir/Results_Jul05
+WorkDir=analysis/orthology/OrthoFinder2/formatted
+ls $WorkDir/PathTest_isolates/Results_Jul24
 ```
 ```
 Number of genes 389858
@@ -362,14 +367,19 @@ Number of genes in species-specific orthogroups 22
 Percentage of genes in species-specific orthogroups     0.0
 Mean orthogroup size    22.4
 Median orthogroup size  27.0
+
+Number of genes 141374
+Number of genes in orthogroups  140091
+Number of unassigned genes      1283
+Percentage of genes in orthogroups      99.1
+Percentage of unassigned genes  0.9
+Number of orthogroups   14166
+Number of species-specific orthogroups  0
+Number of genes in species-specific orthogroups 0
+Percentage of genes in species-specific orthogroups     0.0
+Mean orthogroup size    9.9
+Median orthogroup size  10.0
 ```
-
-
-
-
-
-
-
 
 
 
@@ -437,6 +447,75 @@ First variables were set:
   # Braker_genes=
   ```
 
+  #### 6.1.a ) Orthologroups only containing A. tenuissima genes were extracted:
+  ```bash
+for num in 1
+do
+echo "The total number of orthogroups is:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | wc -l
+echo "The total number of genes in orthogroups is:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -o '|' | wc -l
+echo "The number of orthogroups common to N. ditissima is:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -e 'Ag02|' | grep -e 'Ag06|' | grep -e '199R|' | grep -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep -e 'R602|' | grep -e 'R603|' | wc -l
+echo "This represents the following number of genes:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -e 'Ag02|' | grep -e 'Ag06|' | grep -e '199R|' | grep -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep -e 'R602|' | grep -e 'R603|' | grep -o '|' | wc -l
+
+echo "The number of orthogroups common to highly pathogenic isolates is:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -v -e 'Ag02|' | grep -e 'Ag06|' | grep -e '199R|' | grep -v -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep -v -e 'R602|' | grep -e 'R603|' | wc -l  
+echo "This represents the following number of genes:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -e 'Ag02|' | grep -e 'Ag06|' | grep -e '199R|' | grep -v -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep -v -e 'R602|' | grep -e 'R603|' | grep -o '|' | wc -l
+
+echo "The number of orthogroups common to low pathogenic isolates is:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -v -e 'Ag02|' | grep -v -e 'Ag06|' | grep -v -e '199R|' | grep -e 'R37|' | grep -v -e 'R39|' | grep -v -e 'R41|' | grep -v -e 'R42|' | grep -v -e 'R45|' | grep -e 'R602|' | grep -v -e 'R603|' | wc -l
+echo "This represents the following number of genes:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -v -e 'Ag02|' | grep -v -e 'Ag06|' | grep -v -e '199R|' | grep -e 'R37|' | grep -v -e 'R39|' | grep -v -e 'R41|' | grep -v -e 'R42|' | grep -v -e 'R45|' | grep -e 'R602|' | grep -v -e 'R603|' | grep -o '|' | wc -l
+
+echo "The number of orthogroups common to pathogenic isolates (all except R37) is:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt grep -e '199R|' | grep -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep -e 'R602|' | grep -e 'R603|' | wc -l
+echo "This represents the following number of genes:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -e 'Ag02|' | grep -e 'Ag06|' | grep -e '199R|' | grep -v -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep 'R602|' | grep -e 'R603|' | grep -o '|' | wc -l
+
+echo "The number of orthogroups common to pathogenic isolates (all except R37) is:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt grep -e '199R|' | grep -v -e 'R37|' | grep -v -e 'R602|' | wc -l
+
+
+
+
+
+
+echo "The number of orthogroups common to pathogenic isolates is:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -e 'Ag02|' | grep -e 'Ag06|' | grep -e '199R|' | grep -v -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep -e 'R602|' | grep -e 'R603|' | wc -l
+echo "This represents the following number of genes:"
+cat $WorkDir/PathTest_isolates/Results_Jul24/Orthogroups.txt | grep -e 'Ag02|' | grep -e 'Ag06|' | grep -e '199R|' | grep -v -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep 'R602|' | grep -e 'R603|' | grep -o '|' | wc -l
+
+
+
+  echo "The number of orthogroups common to N. ditissima is:"
+  cat $WorkDir/Results_Jul16/Orthogroups.txt | grep -v -e 'A09A|' | grep -v -e 'A11A|' | grep -v -e 'A11B|' | grep -v -e 'A11C|' | grep -e 'Ag02|' | grep -v -e 'Ag04|' | grep -v -e 'Ag05|' | grep -e 'Ag06|' | grep -v -e 'Ag08|' | grep -v -e 'BGV3|' | grep -e 'H199|' | grep -v -e 'ND8|' | grep -v -e 'ND9|' | grep -v -e 'OPC3|' | grep -v -e 'P112|' | grep -v -e 'R09|' | grep -v -e 'R305|' | grep -v -e 'R324|' | grep -v -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep -v -e 'R602|' | grep -e 'R603|' | grep -v -e 'R68|' | wc -l
+
+  echo "The number of orthogroups common to N. ditissima is:"
+  cat $WorkDir/Results_Jul16/Orthogroups.txt | grep -e 'Ag02|' | grep -e 'Ag06|' | grep -e 'H199|' | grep -v -e 'R37|' | grep -e 'R39|' | grep -e 'R41|' | grep -e 'R42|' | grep -e 'R45|' | grep -v -e 'R602|' | grep -e 'R603|' | wc -l
+
+      echo "The number of orthogroups common to CA5 isolates is:"
+      cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'ONT3|' -e 'Nov9|' -e 'SCRP245_v2|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Bc23|' | grep -e 'Nov77|' | wc -l
+      echo "This represents the following number of genes:"
+      cat $WorkDir/Orthogroups.txt | grep -v -e 'A4|' -e 'Bc16|' -e 'ONT3|' -e 'Nov9|' -e 'SCRP245_v2|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'Bc23|' | grep -e 'Nov77|' | grep -o '|' | wc -l
+      echo "The number of orthogroups common to Unknown race isolates is:"
+      cat $WorkDir/Orthogroups.txt | grep -v -e 'ONT3|' -e 'Bc16|' -e 'Bc23|' -e 'Nov77|' -e 'Nov9|' -e 'A4|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'SCRP245_v2|' | wc -l
+      echo "This represents the following number of genes:"
+      cat $WorkDir/Orthogroups.txt | grep -v -e 'ONT3|' -e 'Bc16|' -e 'Bc23|' -e 'Nov77|' -e 'Nov9|' -e 'A4|' -e 'Bc1|' -e 'Nov5|' -e 'Nov27|' -e 'Nov71|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' | grep -e 'SCRP245_v2|' | grep -o '|' | wc -l
+      echo "The number of orthogroups with only seven highly conserved target isolates is:"
+      cat $WorkDir/Orthogroups.txt | grep -v -e 'ONT3|' -e 'Bc23|' -e 'Nov77|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' -e 'SCRP245_v2|' | grep -e 'Nov5|' | grep -e 'Nov27' | grep -e 'Nov71' | grep -e 'Bc16' | grep -e 'Nov9' | grep -e 'Bc1' | grep -e 'A4' | wc -l
+      echo "This represents the following number of genes:"
+      cat $WorkDir/Orthogroups.txt | grep -v -e 'ONT3|' -e 'Bc23|' -e 'Nov77|' -e 'SCRP249|' -e 'SCRP324|' -e 'SCRP333|' -e 'SCRP245_v2|' | grep -e 'Nov5|' | grep -e 'Nov27' | grep -e 'Nov71' | grep -e 'Bc16' | grep -e 'Nov9' | grep -e 'Bc1' | grep -e 'A4' | grep -o '|' | wc -l
+      echo "The number of orthogroups containing all seven highly conserved target isolates is:"
+      cat $WorkDir/Orthogroups.txt | grep -e 'Nov5|' | grep -e 'Nov27' | grep -e 'Nov71' | grep -e 'Bc16' | grep -e 'Nov9' | grep -e 'Bc1' | grep -e 'A4' | wc -l
+      echo "This represents the following number of genes:"
+      cat $WorkDir/Orthogroups.txt | grep -e 'Nov5|' | grep -e 'Nov27' | grep -e 'Nov71' | grep -e 'Bc16' | grep -e 'Nov9' | grep -e 'Bc1' | grep -e 'A4' | grep -o '|' | wc -l
+  done
+  ```
+
+
 #### 6.1.a ) Orthologroups only containing A. tenuissima genes were extracted:
 ```bash
 for num in 1
@@ -489,227 +568,4 @@ cat $WorkDir/Results_Jul16/Orthogroups.txt | grep -e 'Ag02|' | grep -e 'Ag06|' |
     echo "This represents the following number of genes:"
     cat $WorkDir/Orthogroups.txt | grep -e 'Nov5|' | grep -e 'Nov27' | grep -e 'Nov71' | grep -e 'Bc16' | grep -e 'Nov9' | grep -e 'Bc1' | grep -e 'A4' | grep -o '|' | wc -l
 done
-```
-
-```bash
-for num in 1; do
-  # AtenUniq
-AtenUniqDir=$WorkDir/A.tenuissima_unique
-Uniq_Aten_groups=$AtenUniqDir/A.tenuissima_unique.txt
-mkdir -p $AtenUniqDir
-cat $Orthogroups | grep -e 'At_1' | grep -e 'At_2' | grep -e 'At_3' | grep -e 'At_4' | grep -e 'At_5' | grep -e 'At_6' | grep -e 'At_7' | grep -e 'At_8' | grep -v -e 'Aa' -e 'Ag' > $Uniq_Aten_groups
-echo "The number of orthogroups unique to A.tenuissima apple pathotype are:"
-cat $Uniq_Aten_groups | wc -l
-echo "The following number genes from isolate 648 are contained in these orthogorups:"
-cat $Uniq_Aten_groups | grep -o -e 'At_1' | wc -l
-echo "The following number genes from isolate 1082 are contained in these orthogorups:"
-cat $Uniq_Aten_groups | grep -o -e 'At_2' | wc -l
-echo "The following number genes from isolate 1164 are contained in these orthogorups:"
-cat $Uniq_Aten_groups | grep -o -e 'At_3' | wc -l
-echo "The following number genes from isolate 24350 are contained in these orthogorups:"
-cat $Uniq_Aten_groups | grep -o -e 'At_4' | wc -l
-echo "The following number genes from isolate 648 are contained in these orthogorups:"
-cat $Uniq_Aten_groups | grep -o -e 'At_5' | wc -l
-echo "The following number genes from isolate 743 are contained in these orthogorups:"
-cat $Uniq_Aten_groups | grep -o -e 'At_6' | wc -l
-echo "The following number genes from isolate 1166 are contained in these orthogorups:"
-cat $Uniq_Aten_groups | grep -o -e 'At_7' | wc -l
-echo "The following number genes from isolate 1177 are contained in these orthogorups:"
-cat $Uniq_Aten_groups | grep -o -e 'At_8' | wc -l
-done
-```
-
-```
-The number of orthogroups unique to A.tenuissima apple pathotype are:
-51
-The following number genes from isolate 648 are contained in these orthogorups:
-51
-The following number genes from isolate 1082 are contained in these orthogorups:
-51
-The following number genes from isolate 1164 are contained in these orthogorups:
-51
-The following number genes from isolate 24350 are contained in these orthogorups:
-52
-The following number genes from isolate 648 are contained in these orthogorups:
-51
-The following number genes from isolate 743 are contained in these orthogorups:
-51
-The following number genes from isolate 1166 are contained in these orthogorups:
-51
-The following number genes from isolate 1177 are contained in these orthogorups:
-51
-```
-
-#### 6.1.b ) Orthologroups only containing A. arborescens genes were extracted:
-
-```bash
-for num in 1; do
-  # AarbUniq
-  AarbUniqDir=$WorkDir/A.arborescens_unique
-  Uniq_Aarb_groups=$AarbUniqDir/A.arborescens_unique.txt
-  mkdir -p $AarbUniqDir
-  cat $Orthogroups | grep -e 'Aa_1' | grep -e 'Aa_2' | grep -e 'Aa_3' | grep -v -e 'At' -e 'Ag' > $Uniq_Aarb_groups
-  echo "The number of orthogroups unique to A.arborescens are:"
-  cat $Uniq_Aarb_groups | wc -l
-  echo "The following number genes from isolate 675 are contained in these orthogorups:"
-  cat $Uniq_Aarb_groups | grep -o -e 'Aa_1' | wc -l
-  echo "The following number genes from isolate 97.0013 are contained in these orthogorups:"
-  cat $Uniq_Aarb_groups | grep -o -e 'Aa_2' | wc -l
-  echo "The following number genes from isolate 97.0016 are contained in these orthogorups:"
-  cat $Uniq_Aarb_groups | grep -o -e 'Aa_3' | wc -l
-done
-```
-
-```
-The number of orthogroups unique to A.arborescens are:
-150
-The following number genes from isolate 675 are contained in these orthogorups:
-155
-The following number genes from isolate 97.0013 are contained in these orthogorups:
-154
-The following number genes from isolate 97.0016 are contained in these orthogorups:
-156
-```
-
-#### 6.1.c ) Orthologroups only containing A. gaisen genes were extracted:
-
-```bash
-for num in 1; do
-  # AgaiPathUniq
-  AgaiUniqDir=$WorkDir/A.gaisen_unique
-  Uniq_Agai_groups=$AgaiUniqDir/A.gaisen_unique.txt
-  mkdir -p $AgaiUniqDir
-  cat $Orthogroups | grep -e 'Ag_1' | grep -v  -e 'At' -e 'Aa' > $Uniq_Agai_groups
-  echo "The number of orthogroups unique to A.gaisen pear pathotype pathotype are:"
-  cat $Uniq_Agai_groups | wc -l
-  echo "The following number genes from isolate 650 are contained in these orthogorups:"
-  cat $Uniq_Agai_groups | grep -o -e 'Ag_1' | wc -l
-done
-```
-
-```
-The number of orthogroups unique to A.gaisen pear pathotype pathotype are:
-327
-The following number genes from isolate 650 are contained in these orthogorups:
-329
-```
-
-#### 6.1.d ) Orthologroups only containing A. tenuissima non pathotype genes were extracted:
-
-```bash
-for num in 1; do
-  # AtenNonPathUniq
-  AtenNonPathUniqDir=$WorkDir/A.tenuissima_non_pathotype_unique
-  Uniq_AtenNonPath_groups=$AtenNonPathUniqDir/A.tenuissima_non_pathotype_unique.txt
-  mkdir -p $AtenNonPathUniqDir
-  cat $Orthogroups | grep -e 'At_1' | grep -e 'At_2' | grep -e 'At_3' | grep -e 'At_4' | grep -v -e 'At_5' -e 'At_6' -e 'At_7' -e 'At_8' -e 'Aa' -e 'Ag' > $Uniq_AtenNonPath_groups
-  echo "The number of orthogroups unique to A.tenuissima non-apple pathotype are:"
-  cat $Uniq_AtenNonPath_groups | wc -l
-  echo "The following number genes from isolate 648 are contained in these orthogorups:"
-  cat $Uniq_AtenNonPath_groups | grep -o -e 'At_1' | wc -l
-  echo "The following number genes from isolate 1082 are contained in these orthogorups:"
-  cat $Uniq_AtenNonPath_groups | grep -o -e 'At_2' | wc -l
-  echo "The following number genes from isolate 1164 are contained in these orthogorups:"
-  cat $Uniq_AtenNonPath_groups | grep -o -e 'At_3' | wc -l
-  echo "The following number genes from isolate 24350 are contained in these orthogorups:"
-  cat $Uniq_AtenNonPath_groups | grep -o -e 'At_4' | wc -l
-done
-```
-
-```
-The number of orthogroups unique to A.tenuissima non-apple pathotype are:
-0
-The following number genes from isolate 648 are contained in these orthogorups:
-0
-The following number genes from isolate 1082 are contained in these orthogorups:
-0
-The following number genes from isolate 1164 are contained in these orthogorups:
-0
-The following number genes from isolate 24350 are contained in these orthogorups:
-0
-```
-
-#### 6.1.d ) Orthologroups only containing A. tenuissima apple pathotype genes were extracted:
-
-```bash
-for num in 1; do
-  # AtenPathUniq
-  AtenPathUniqDir=$WorkDir/A.tenuissima_apple_pathotype_unique
-  Uniq_AtenPath_groups=$AtenPathUniqDir/A.tenuissima_apple_pathotype_unique.txt
-  mkdir -p $AtenPathUniqDir
-  cat $Orthogroups | grep -e 'At_5' | grep -e 'At_6' | grep -e 'At_7' | grep -e 'At_8' | grep -v -e 'At_1' -e 'At_2' -e 'At_3' -e 'At_4' -e 'Aa' -e 'Ag' > $Uniq_AtenPath_groups
-  echo "The number of orthogroups unique to A.tenuissima apple pathotype are:"
-  cat $Uniq_AtenPath_groups | wc -l
-  echo "The following number genes from isolate 635 are contained in these orthogorups:"
-  cat $Uniq_AtenPath_groups | grep -o -e 'At_5' | wc -l
-  echo "The following number genes from isolate 743 are contained in these orthogorups:"
-  cat $Uniq_AtenPath_groups | grep -o -e 'At_6' | wc -l
-  echo "The following number genes from isolate 1166 are contained in these orthogorups:"
-  cat $Uniq_AtenPath_groups | grep -o -e 'At_7' | wc -l
-  echo "The following number genes from isolate 1177 are contained in these orthogorups:"
-  cat $Uniq_AtenPath_groups | grep -o -e 'At_8' | wc -l
-done
-```
-
-```
-The number of orthogroups unique to A.tenuissima apple pathotype are:
-49
-The following number genes from isolate 635 are contained in these orthogorups:
-56
-The following number genes from isolate 743 are contained in these orthogorups:
-57
-The following number genes from isolate 1166 are contained in these orthogorups:
-72
-The following number genes from isolate 1177 are contained in these orthogorups:
-55
-```
-
-```bash
-cat $Uniq_AtenPath_groups | grep -o -P "At_7\|\S+" | cut -f2 -d '|' > tmp.txt
-Isolate='1166'
-AnnotTab=$(ls gene_pred/annotation/A.*/$Isolate/${Isolate}_annotation_ncbi.tsv)
-OutFile=$(echo $AnnotTab | sed 's/_annotation_ncbi.tsv/_apple_pathotype_unique_orthogroups.tsv/g')
-for Gene in $(cat tmp.txt); do
-  cat $AnnotTab | grep -w "^$Gene"
-done > $OutFile
-```
-
-
-#### 6.1.e ) Orthologroups only containing genes from apple and pear pathotypes were extracted:
-
-```bash
-for num in 1; do
-  # PathUniq
-  PathUniqDir=$WorkDir/Pathotype_unique
-  Uniq_Path_groups=$PathUniqDir/Path_unique.txt
-  mkdir -p $PathUniqDir
-  cat $Orthogroups | grep -e 'Ag' | grep -e 'At_5' | grep -e 'At_6' | grep -e 'At_7' | grep -e 'At_8' | grep -v -e 'At_1' -e 'At_2' -e 'At_3' -e 'At_4' -e 'Aa' > $Uniq_Path_groups
-  echo "The number of orthogroups unique to apple and pear pathotypes are:"
-  cat $Uniq_Path_groups | wc -l
-  echo "The following number genes from isolate 650 are contained in these orthogorups:"
-  cat $Uniq_Path_groups | grep -o -e 'Ag_1' | wc -l
-  echo "The following number genes from isolate 648 are contained in these orthogorups:"
-  cat $Uniq_Path_groups | grep -o -e 'At_5' | wc -l
-  echo "The following number genes from isolate 743 are contained in these orthogorups:"
-  cat $Uniq_Path_groups | grep -o -e 'At_6' | wc -l
-  echo "The following number genes from isolate 1166 are contained in these orthogorups:"
-  cat $Uniq_Path_groups | grep -o -e 'At_7' | wc -l
-  echo "The following number genes from isolate 1177 are contained in these orthogorups:"
-  cat $Uniq_Path_groups | grep -o -e 'At_8' | wc -l
-done
-```
-
-```
-The number of orthogroups unique to apple and pear pathotypes are:
-48
-The following number genes from isolate 650 are contained in these orthogorups:
-62
-The following number genes from isolate 648 are contained in these orthogorups:
-58
-The following number genes from isolate 743 are contained in these orthogorups:
-58
-The following number genes from isolate 1166 are contained in these orthogorups:
-54
-The following number genes from isolate 1177 are contained in these orthogorups:
-60
 ```
