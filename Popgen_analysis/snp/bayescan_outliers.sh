@@ -21,7 +21,6 @@ do
 $vcftools/vcftools --vcf $filename --max-missing 0.95 --mac 1 --min-alleles 2 --max-alleles 2 --recode --out ${filename%.vcf}_bi_filtered
 done
 
-
 ############# 2) PGDSpider conversion from VCF to Bayescan format
 #First need to prepare a simple file with custom assignment of each individual sample
 #name to one of the populations identified using PCA, STRUCTURE analysis etc.
@@ -45,9 +44,11 @@ sed -i 's,^\(VCF_PARSER_POP_FILE_QUESTION=\).*,\1'"$pop_assignment_file"',' $con
 
 #Convert to Bayescan input format with PGDSpider.
 #For bigger input VCF file (>50 MB) use the script to convert to BayeScan input (will take a couple of hours):
-#qsub $scripts/sub_pgdspider.sh $filename $config
+scripts=/home/sobczm/bin/popgen/summary_stats
+qsub $scripts/sub_pgdspider.sh $filename $config
 #dos2unix ${filename%.vcf}.geno
 
+ 
 java -jar -Xmx1024m -Xms512m $pgdspid/PGDSpider2-cli.jar -inputfile $filename -inputformat VCF -outputfile ${filename%.vcf}.geno -outputformat GESTE_BAYE_SCAN -spid $config
 dos2unix ${filename%.vcf}.geno
 
