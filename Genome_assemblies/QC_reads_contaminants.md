@@ -1,4 +1,4 @@
-Identification of potential contaminants in the raw reads
+Identification of potential contaminants in the raw reads.
 
 ```bash
 for Strain in Ag11_B R68-17; do
