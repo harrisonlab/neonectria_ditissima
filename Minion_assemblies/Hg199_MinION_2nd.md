@@ -892,8 +892,6 @@ qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorL
 done
 ```
 
-
-
 Quast and busco were run to assess the quality of hybrid assemblies:
 
 ```bash
@@ -917,29 +915,39 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly_merged
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+Hybrid assemblies are more fragmented with bigger number of busco genes. Minion are less fragmented but with less busco genes presnt.
 
-
-
+I will run again quickmerge using N50 values for AnchorLength. Lowering this value may lead to more merging but may increase the probability of mis-joins.
 
 ```bash
-printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/N*/Hg199/assembly/*/short_summary_*.txt | grep 'Hg199'); do
-FileName=$(basename $File)
-Complete=$(cat $File | grep "(C)" | cut -f2)
-Duplicated=$(cat $File | grep "(D)" | cut -f2)
-Fragmented=$(cat $File | grep "(F)" | cut -f2)
-Missing=$(cat $File | grep "(M)" | cut -f2)
-Total=$(cat $File | grep "Total" | cut -f2)
-printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
+for MinIONAssembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/pilon/*.fasta | grep 'pilon_min_500bp_renamed.fasta'); do
+Organism=$(echo $MinIONAssembly | rev | cut -f4 -d '/' | rev)
+Strain=$(echo $MinIONAssembly | rev | cut -f3 -d '/' | rev)
+HybridAssembly=$(ls assembly/spades_minion/$Organism/$Strain/filtered_contigs/contigs_min_500bp.fasta)
+QuastReport=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/pilon/report.tsv)
+N50=$(cat $QuastReport | grep 'N50' | cut -f2)
+AnchorLength=$N50
+#AnchorLength=600000
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_600k
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_20k
+qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
+
+QuastReport=$(ls assembly/spades_minion/N.ditissima/Hg199/filtered_contigs/report.tsv)
+N50=$(cat $QuastReport | grep 'N50' | cut -f2)
+AnchorLength=$N50
+#AnchorLength=500000
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_500k
+qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_500k
+qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
 done
 ```
 
-Minion_5K genome
-3563 Complete BUSCOs (C)
-INFO    3456 Complete and single-copy BUSCOs (S)
-INFO    107 Complete and duplicated BUSCOs (D)
-INFO    23 Fragmented BUSCOs (F)
-INFO    139 Missing BUSCOs (M)
+
+
+
 
 ## Pilon error correction
 
