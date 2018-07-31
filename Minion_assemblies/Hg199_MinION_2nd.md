@@ -1186,7 +1186,7 @@ done
     echo $TrimF1_Read
     echo $TrimR1_Read
     OutDir=assembly/spades_pacbio/$Organism/$Strain
-    qsub $ProgDir/sub_spades_pacbio.sh $PacBioDat $TrimF1_Read $TrimR1_Read $OutDir 15
+    qsub -R y $ProgDir/sub_spades_pacbio.sh $PacBioDat $TrimF1_Read $TrimR1_Read $OutDir 15
   	done
 ```
 
