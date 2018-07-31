@@ -54,5 +54,4 @@ dos2unix ${filename%.vcf}.geno
 
 ############# 3) Bayescan analysis
 #Bayescan run and plot the results in R.
-scripts=/home/gomeza/bin/popgen/summary_stats
-qsub $scripts/sub_bayescan.sh ${filename%.vcf}.geno
+qsub -R y $scripts/sub_bayescan.sh ${filename%.vcf}.geno
