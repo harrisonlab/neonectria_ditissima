@@ -3,7 +3,7 @@
 #$ -cwd
 #$ -pe smp 20
 #$ -l virtual_free=1G
-#$ -l h=blacklace05.blacklace|blacklace06.blacklace|blacklace07.blacklace|blacklace08.blacklace|blacklace09.blacklace|blacklace10.blacklace
+#$ -l h=blacklace11.blacklace
 
 input=$1
 cpath=$PWD
