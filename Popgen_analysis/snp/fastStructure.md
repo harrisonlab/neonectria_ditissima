@@ -6,7 +6,7 @@ This uses only biallelic SNP sites
 
 ```bash
 input=/data/scratch/gomeza/fastStructure
-scripts=/home/sobczm/bin/popgen/snp
+scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 ```
 
 ###Convert from VCF to Plink's PED format
@@ -85,7 +85,7 @@ plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input
 
 ####Test various K values (K represents model complexity)
 
-By default, fastStructure runs using F-prior. Alternatively, logistic prior can be used when structure is difficult to resolve. 
+By default, fastStructure runs using F-prior. Alternatively, logistic prior can be used when structure is difficult to resolve.
 
 ```bash
 # Set minimum number of considered clusters
