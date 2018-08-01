@@ -102,6 +102,7 @@ For PacBio data
         qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
     done
 ```
+
 ```bash
   for StrainDir in $(ls -d raw_dna/pacbio/*/*/*); do
     Strain=$(basename $StrainDir)
@@ -112,7 +113,8 @@ For PacBio data
     done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
   done
 ```
-MinION coverage was: 91.44
+
+Pacbio extracted coverage was: 91.44
 
 For Miseq data:
 
@@ -137,6 +139,7 @@ For Miseq data:
         done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
     done
 ```
+
 Miseq coverage was:	134.1
 
 ## Identify sequencing coverage after porechop for the Hg199 assembly
@@ -144,6 +147,7 @@ Miseq coverage was:	134.1
 cp /home/.../neonectria_ditissima/qc_dna/minion/N.ditisima/Hg199/Hg199_fastq_allfiles_trim.fastq.gz /data/scratch/gomeza/qc_dna/N.ditisima/Hg199
 
 For Minion data:
+
 ```bash
   for RawData in $(ls qc_dna/minion/*/*/*q.gz); do
     echo $RawData;
@@ -153,6 +157,7 @@ For Minion data:
     qsub $ProgDir/sub_count_nuc.sh $GenomeSz $RawData $OutDir
   done
 ```
+
 ```bash
   for StrainDir in $(ls -d qc_dna/minion/*/*); do
     Strain=$(basename $StrainDir)
@@ -163,6 +168,7 @@ For Minion data:
     done | grep -v '.txt' | awk '{ SUM += $1} END { print SUM }'
   done
 ```
+
 Allfiles MinION coverage was: 94.14
 
 ## Read correction and assembly
@@ -180,6 +186,26 @@ Read correction using Canu
     qsub $ProgDir/sub_canu_correction.sh $TrimReads 45m $Strain $OutDir
   done
 ```
+
+```bash
+  for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
+    Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+    Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
+    OutDir=assembly/canu_minion/N.ditissima/"$Strain"_40m
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
+    qsub -R y $ProgDir/sub_canu_correction.sh $TrimReads 40m $Strain $OutDir
+  done
+```
+```bash
+  for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
+    Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+    Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
+    OutDir=assembly/canu_minion/N.ditissima/"$Strain"_50m
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
+    qsub -R y $ProgDir/sub_canu_correction.sh $TrimReads 50m $Strain $OutDir
+  done
+```
+
 ```bash
   for CorrectedReads in $(ls assembly/canu_minion/N.d*/Hg199/*.trimmedReads.fasta.gz); do
     Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
@@ -189,6 +215,7 @@ Read correction using Canu
     qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 45m $Strain $OutDir
   done
 ```
+
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/canu_minion/N.ditissima/Hg199/Hg199.contigs.fasta); do
@@ -198,9 +225,9 @@ for Assembly in $(ls assembly/canu_minion/N.ditissima/Hg199/Hg199.contigs.fasta)
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
-```
-165 contigs
-```
+
+    165 contigs
+
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
@@ -226,6 +253,7 @@ Hg199 - Assembly using CANU 1 step
   	qsub $ProgDir/submit_canu.sh $Reads $GenomeSz $Prefix $OutDir
   done    
 ```
+
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/canu_minion_1step/N.ditissima/Hg199/Hg199_canu.contigs.fasta); do
@@ -235,9 +263,9 @@ OutDir=$(dirname $Assembly)
 qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
-```
-178 contigs
-```
+
+    178 contigs
+
 ```bash
 for Assembly in $(ls assembly/canu_minion_1step/N.ditissima/Hg199/Hg199_canu.contigs.fasta); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
@@ -263,6 +291,7 @@ Hg199 - Assembly using SMARTdenovo
     qsub $ProgDir/sub_SMARTdenovo.sh $CorrectedReads $Prefix $OutDir
   done
 ```
+
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
@@ -272,9 +301,9 @@ for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dm
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
-```
-137 contigs
-```
+
+    137 contigs
+
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
@@ -286,7 +315,6 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
-
 
 R09/05 - I will test different assembly methods. Canu in 2 steps and in 1 step.
 
@@ -301,6 +329,7 @@ R09/05 - Assembbly using CANU
     qsub $ProgDir/sub_canu_correction.sh $TrimReads 45m $Strain $OutDir
   done
 ```
+
 ```bash
   for CorrectedReads in $(ls assembly/canu_minion/N.d*/Hg199/*.trimmedReads.fasta.gz); do
     Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
@@ -310,6 +339,7 @@ R09/05 - Assembbly using CANU
     qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 45m $Strain $OutDir
   done
 ```
+
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/R0905.contigs.fasta); do
@@ -319,9 +349,8 @@ for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/R0905.contigs.fasta)
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
-```
-541 contigs. BAD, no Busco done.
-```
+
+    541 contigs. BAD, no Busco done.
 
 R0905 - Assembly using CANU 1 step
 
@@ -336,6 +365,7 @@ R0905 - Assembly using CANU 1 step
   	qsub $ProgDir/submit_canu.sh $Reads $GenomeSz $Prefix $OutDir
   done    
 ```
+
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/R0905_canu.contigs.fasta); do
@@ -345,9 +375,9 @@ for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/R0905_ca
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
-```
-50 contigs
-```
+
+    50 contigs
+
 ```bash
 for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/R0905_canu.contigs.fasta); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
@@ -373,6 +403,7 @@ R09/05 - Assembbly using SMARTdenovo
     qsub $ProgDir/sub_SMARTdenovo.sh $CorrectedReads $Prefix $OutDir
   done
 ```
+
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/R0905/R0905_smartdenovo.dmo.lay.utg); do
@@ -382,9 +413,9 @@ for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/R0905/R0905_smartdenovo.dm
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
-```
-135 contigs
-```
+
+    135 contigs
+
 Busco has replaced CEGMA and was run to check gene space in assemblies
 
 ```bash
@@ -398,9 +429,8 @@ OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
-```
-Bad prediction
-```
+
+    Bad prediction
 
 ## Error correction using racon:
 
@@ -418,6 +448,7 @@ ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
 done
 ```
+
 ```bash
 for Assembly in $(ls assembly/canu_minion/N.ditissima/Hg199/Hg199.contigs.fasta); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
@@ -464,7 +495,9 @@ OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_canu_minion/racon_
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
 I will run busco in all of the racon iterations
+
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/*.fasta); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
@@ -477,7 +510,9 @@ OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_canu_minion/racon_
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
 I will repeat racon with 20 interations
+
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
 Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
@@ -490,6 +525,7 @@ ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
 done
 ```
+
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_20/*20.fasta); do
@@ -499,6 +535,7 @@ for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_20/*20.fasta);
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
+
 ```bash
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_20/*20.fasta); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
@@ -510,6 +547,7 @@ OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_SMARTdenovo/racon_
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
 R09/05
 
 ```bash
@@ -524,6 +562,7 @@ ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
 done
 ```
+
 ```bash
 for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/R0905_canu.contigs.fasta); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
@@ -536,6 +575,7 @@ ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/racon
 qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
 done
 ```
+
 Quast and busco were run to assess the effects of racon on assembly quality:
 
 ```bash
@@ -547,6 +587,7 @@ for Assembly in $(ls assembly/*/N.ditissima/R0905/Original_v3/racon_10/*10.fasta
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
+
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/R0905/racon_10/*10.fasta); do
@@ -556,6 +597,7 @@ for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/R0905/racon_10/*10.fasta);
   qsub $ProgDir/sub_quast.sh $Assembly $OutDir
 done
 ```
+
 ```bash
 for Assembly in $(ls assembly/*/N.ditissima/R0905/Original_v3/racon_10/*10.fasta); do
 Strain=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
@@ -605,6 +647,7 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 # submit alignments for nanoppolish
 qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $ReadDir/"$Strain"_concatenated_reads_filtered.fastq $OutDir/nanopolish
 ```
+
 ```bash
 Assembly=$(ls assembly/canu_minion/N.ditissima/Hg199/racon_10/*10.fasta)
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
@@ -645,6 +688,7 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $RawReads $AlignedReads $Ploidy $Region $OutDir/$Region
 done
 ```
+
 ```bash
 Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_smartdenovo_racon_round_10.fasta)
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
@@ -704,6 +748,7 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 # submit alignments for nanoppolish
 qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $Reads $OutDir/nanopolish
 ```
+
 ```bash
 Assembly=$(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/racon_10/R0905_canu_racon_round_10.fasta)
 Strain=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
@@ -735,6 +780,7 @@ for Assembly in $(ls assembly/SMARTdenovo/*/*/nanopolish/*_nanoplish_min_500bp_r
     qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
 done
 ```
+
 Contigs were renamed
 
 ```bash
@@ -783,22 +829,20 @@ printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
 done
 ```
 
-```
-Filename    Complete    Duplicated    Fragmented    Missing    Total
-short_summary_Hg199_contigs_unmasked.txt	3670	15	25	30	3725 (MiSeq data)
-short_summary_Hg199_nanoplish_min_500bp_renamed.txt	3314	12	162	249	3725
-short_summary_pilon_10.txt	3586	17	20	119	3725
-short_summary_pilon_1.txt	3582	17	21	122	3725
-short_summary_pilon_2.txt	3584	17	21	120	3725
-short_summary_pilon_3.txt	3586	17	20	119	3725
-short_summary_pilon_4.txt	3586	17	20	119	3725
-short_summary_pilon_5.txt	3586	17	20	119	3725
-short_summary_pilon_6.txt	3586	17	20	119	3725
-short_summary_pilon_7.txt	3586	17	20	119	3725
-short_summary_pilon_8.txt	3586	17	20	119	3725
-short_summary_pilon_9.txt	3586	17	20	119	3725
-short_summary_pilon_min_500bp_renamed.txt	3586	17	20	119	3725
-```
+    Filename    Complete    Duplicated    Fragmented    Missing    Total
+    short_summary_Hg199_contigs_unmasked.txt	3670	15	25	30	3725 (MiSeq data)
+    short_summary_Hg199_nanoplish_min_500bp_renamed.txt	3314	12	162	249	3725
+    short_summary_pilon_10.txt	3586	17	20	119	3725
+    short_summary_pilon_1.txt	3582	17	21	122	3725
+    short_summary_pilon_2.txt	3584	17	21	120	3725
+    short_summary_pilon_3.txt	3586	17	20	119	3725
+    short_summary_pilon_4.txt	3586	17	20	119	3725
+    short_summary_pilon_5.txt	3586	17	20	119	3725
+    short_summary_pilon_6.txt	3586	17	20	119	3725
+    short_summary_pilon_7.txt	3586	17	20	119	3725
+    short_summary_pilon_8.txt	3586	17	20	119	3725
+    short_summary_pilon_9.txt	3586	17	20	119	3725
+    short_summary_pilon_min_500bp_renamed.txt	3586	17	20	119	3725
 
 ## Hybrid Assembly
 
@@ -915,6 +959,7 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly_merged
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
 Hybrid assemblies are more fragmented with bigger number of busco genes. Minion are less fragmented but with less busco genes presnt.
 
 I will run again quickmerge using N50 values for AnchorLength. Lowering this value may lead to more merging but may increase the probability of mis-joins.
@@ -931,7 +976,7 @@ AnchorLength=$N50
 OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_600k
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
 qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_20k
+OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_600k
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
 
 QuastReport=$(ls assembly/spades_minion/N.ditissima/Hg199/filtered_contigs/report.tsv)
@@ -944,6 +989,31 @@ OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_500k
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
 done
 ```
+
+Quast and busco were run to assess the quality of hybrid assemblies:
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/merged_canu_spades/*/*00k/merged.fasta | grep 'Hg199'); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+```bash
+for Assembly in $(ls assembly/merged_canu_spades/*/*00k/merged.fasta | grep 'Hg199'); do
+Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_merged
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+AnchorLength=N50 does not improve the completeness of the genome. 
 
 
 
@@ -1000,6 +1070,7 @@ OutDir=gene_pred/busco/$Organism/$Strain/assembly2
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
 for File in $(ls gene_pred/busco/N*/*/assembly2/*/short_summary_*.txt | grep 'Hg199'); do
@@ -1027,6 +1098,7 @@ OutDir=gene_pred/busco/$Organism/$Strain/$Contigs
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
 for File in $(ls gene_pred/busco/N*/R0905/*_contigs/*/short_summary_*.txt); do
@@ -1063,7 +1135,6 @@ done
 The TransposonPSI masked bases were used to mask additional bases from the repeatmasker / repeatmodeller softmasked and hardmasked files.
 
 ```bash
-
 for File in $(ls repeat_masked/*/Ref_Genomes/*/*/*_contigs_softmasked.fa); do
 OutDir=$(dirname $File)
 TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
@@ -1083,10 +1154,8 @@ bedtools maskfasta -fi $File -bed $TPSI -fo $OutFile
 done
 ```
 
-```
-Number of masked bases:
-3832437
-```
+    Number of masked bases:
+    3832437
 
 ## R0905 Assemblies were polished using Pilon
 
@@ -1103,6 +1172,7 @@ Number of masked bases:
   qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
 	done
 ```
+
 ```bash
 	for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/racon_10/R0905_canu_racon_round_10.fasta); do
 	Organism=$(echo $Assembly | rev | cut -f5 -d '/' | rev)
@@ -1157,6 +1227,7 @@ OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_afterracon
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
 for File in $(ls gene_pred/busco/N*/Ref_Genomes/*/assembly/*/short_summary_*.txt | grep 'R0905'); do
@@ -1190,13 +1261,6 @@ done
   	done
 ```
 
-
-
-
-
-
-
-
 cat contigs.fasta | grep 'NODE' | wc -l
 641
 
@@ -1220,6 +1284,7 @@ Contigs shorter than 500bp were removed from the assembly
     $FilterDir/filter_abyss_contigs.py $Contigs 500 > $AssemblyDir/filtered_contigs_min_500bp/contigs_min_500bp.fasta
   done
 ```
+
 cat contigs_min_500bp.fasta | grep 'NODE' | wc -l
 364
 
@@ -1279,9 +1344,7 @@ This merged assembly was polished using Pilon
   done
 ```
 
-
-#Contigs were renamed in accordance with ncbi recomendations.
-
+\#Contigs were renamed in accordance with ncbi recomendations.
 
 ```bash
   ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
@@ -1311,8 +1374,7 @@ Assembly stats were collected using quast
   done
 ```
 
-#Canu assembly contigs were renamed in accordance with ncbi recomendations.
-
+\#Canu assembly contigs were renamed in accordance with ncbi recomendations.
 
 ```bash
   ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
@@ -1328,6 +1390,7 @@ Assembly stats were collected using quast
 ```
 
 ## Renaming assemblies - temporarily
+
 Fus2 was temporarily renamed for preliminary analysis
 
 ```bash
@@ -1358,10 +1421,9 @@ Fus2 was temporarily renamed for preliminary analysis
   done
 ```
 
-** % bases masked by repeatmasker: 11.57% (bases masked:5290972 bp)
+\*\* % bases masked by repeatmasker: 11.57% (bases masked:5290972 bp)
 
-** % bases masked by transposon psi: 10.29% (bases masked:4704506 bp)
-
+\*\* % bases masked by transposon psi: 10.29% (bases masked:4704506 bp)
 
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
@@ -1376,5 +1438,6 @@ for File in $(ls repeat_masked/*/*/filtered_contigs_repmask/*_contigs_softmasked
       cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
     done
 ```
+
 repeat_masked/N.ditissima/R0905_pacbio_canu/filtered_contigs_repmask/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
 Number of masked bases:5398957
