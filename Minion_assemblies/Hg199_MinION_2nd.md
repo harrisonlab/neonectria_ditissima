@@ -1375,24 +1375,33 @@ Quast
   done
 ```
 
-
-
-
-
-
-
-
-
-
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  	for Assembly in $(ls assembly/merged_canu_spades/*/*/merged.fasta); do
-    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
+  	for Assembly in $(ls assembly/merged_canu_spades/*/*/*/merged.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
     OutDir=assembly/merged_canu_spades/$Organism/$Strain/quast
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
   	done
 ```
+```bash
+    for Assembly in $(ls assembly/merged_canu_spades/*/*/*/merged.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/merged_canu_spades
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
+```
+
+
+
+
+
+
+
 
 This merged assembly was polished using Pilon
 
