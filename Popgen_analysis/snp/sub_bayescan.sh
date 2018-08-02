@@ -2,7 +2,7 @@
 #$ -S /bin/bash
 #$ -cwd
 #$ -pe smp 16
-#$ -l virtual_free=2G
+#$ -l virtual_free=1G
 #$ -l h=blacklace01.blacklace|blacklace11.blacklace
 
 input=$1
