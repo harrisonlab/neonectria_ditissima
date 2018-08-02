@@ -1357,9 +1357,10 @@ Quast
     Organism=$(echo $PacBioAssembly | rev | cut -f5 -d '/' | rev)
     Strain=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
     HybridAssembly=$(ls assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp/contigs_min_500bp.fasta)
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/pilon_5
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
-    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir
+    AnchorLength=5000
+    OutDir=assembly/merged_canu_spades/$Organism/$Strain/"$Strain"_pacbio_5k
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
   done
 ```
 ```bash
@@ -1367,11 +1368,19 @@ Quast
     Organism=$(echo $PacBioAssembly | rev | cut -f6 -d '/' | rev)
     Strain=$(echo $PacBioAssembly | rev | cut -f5 -d '/' | rev)
     HybridAssembly=$(ls assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp/contigs_min_500bp.fasta)
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/after_racon
+    AnchorLength=5000
+    OutDir=assembly/merged_canu_spades/$Organism/$Strain/"$Strain"_pacbio_afterracon_5k
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
-    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir
+    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
   done
 ```
+
+
+
+
+
+
+
 
 
 
@@ -1403,7 +1412,7 @@ This merged assembly was polished using Pilon
   done
 ```
 
-\#Contigs were renamed in accordance with ncbi recomendations.
+Contigs were renamed in accordance with ncbi recomendations.
 
 ```bash
   ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
@@ -1433,7 +1442,7 @@ Assembly stats were collected using quast
   done
 ```
 
-\#Canu assembly contigs were renamed in accordance with ncbi recomendations.
+###Canu assembly contigs were renamed in accordance with ncbi recomendations.
 
 ```bash
   ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
