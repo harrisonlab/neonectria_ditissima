@@ -378,14 +378,11 @@ Mean orthogroup size    22.4
 Median orthogroup size  27.0
 ```
 
-# 5) Downstream analysis
+## 5) Downstream analysis
 
 Particular orthogroups were analysed for expansion in isolates.
 
 This section details the commands used and the results observed.
-
-
-### 5.1 ) Clade unique gene families
 
 The genes unique to N.ditissima were identified within the orthology analysis.
 
@@ -394,8 +391,6 @@ First variables were set:
   WorkDir=analysis/orthology/OrthoFinder2
   Orthogroups=$(ls $WorkDir/formatted/Results_Jul25/Orthogroups.txt)
 ```
-
-#### 6.1.a ) Orthologroups only containing A. tenuissima genes were extracted:
 
 ```bash
 for num in 1
@@ -450,19 +445,22 @@ echo "The number of orthogroups unique in the New Zealanders isolates is:"
 cat $WorkDir/formatted/Results_Jul25/Orthogroups.txt | grep -v -e 'Ag02|' | grep -v -e 'Ag04|' | grep -v -e 'Ag05|' | grep -v -e 'Ag06|' | grep -v -e 'Ag08|' | grep -v -e 'A09A|' | grep -v -e 'A11A|' | grep -v -e 'A11B|' | grep -v -e 'A11C|' | grep -v -e 'BGV3' | grep -v -e 'H199' | grep -v -e '199R|' | grep -v -e 'ND8|' | grep -v -e 'ND9' | grep -v -e 'OPC3' | grep -v -e 'P112' | grep -v -e 'R09' | grep -e 'R305' | grep -e 'R324' | grep -v -e 'R37|' | grep -v -e 'R39|' | grep -v -e 'R41|' | grep -v -e 'R42|' | grep -v -e 'R45|' | grep -v -e 'R602|' | grep -v -e 'R603|' | grep -v -e 'R68|' | wc -l
 echo "This represents the following number of genes:"
 cat $WorkDir/formatted/Results_Jul25/Orthogroups.txt | grep -v -e 'Ag02|' | grep -v -e 'Ag04|' | grep -v -e 'Ag05|' | grep -v -e 'Ag06|' | grep -v -e 'Ag08|' | grep -v -e 'A09A|' | grep -v -e 'A11A|' | grep -v -e 'A11B|' | grep -v -e 'A11C|' | grep -v -e 'BGV3' | grep -v -e 'H199' | grep -v -e '199R|' | grep -v -e 'ND8|' | grep -v -e 'ND9' | grep -v -e 'OPC3' | grep -v -e 'P112' | grep -v -e 'R09' | grep -e 'R305' | grep -e 'R324' | grep -v -e 'R37|' | grep -v -e 'R39|' | grep -v -e 'R41|' | grep -v -e 'R42|' | grep -v -e 'R45|' | grep -v -e 'R602|' | grep -v -e 'R603|' | grep -v -e 'R68|' | grep -o '|' | wc -l
+done
+```
 
-
-
-## 5) Plot venn diagrams:
+## 6) Plot venn diagrams:
 
 Orthofinder output:
 
 ```bash
-  GoodProts=analysis/orthology/Orthomcl/Nd_all_isolates/goodProteins/goodProteins.fasta
-  ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
-  $ProgDir/orthoMCLgroups2tab.py $GoodProts $WorkDir/Results_Jul05/Orthogroups.txt > $WorkDir/Results_Jul05/"$IsolateAbrv"_orthogroups.tab
-  ProgDir=~/git_repos/emr_repos/scripts/phytophthora/pathogen/orthology
-  $ProgDir/Pcac_Pinf_Ppar_Pcap_Psoj_venn.r --inp $WorkDir/formatted/Results_Apr10/"$IsolateAbrv"_orthogroups.tab --out $WorkDir/formatted/Results_Apr10/"$IsolateAbrv"_orthogroups.pdf
+IsolateAbrv=Nd_all_isolates
+WorkDir=analysis/orthology/OrthoFinder2
+GoodProts=analysis/orthology/Orthomcl/Nd_all_isolates/goodProteins/goodProteins.fasta
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
+$ProgDir/orthoMCLgroups2tab.py $GoodProts $WorkDir/formatted/Results_Jul25/Orthogroups.txt > $WorkDir/formatted/Results_Jul25/"$IsolateAbrv"_orthogroups.tab
+
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Pathogen/Orthology
+$ProgDir/Ndit_Ortholog_venn.r --inp $WorkDir/formatted/Results_Jul25/"$IsolateAbrv"_orthogroups.tab --out $WorkDir/formatted/Results_Jul25/"$IsolateAbrv"_orthogroups.pdf
 ```
 
 
