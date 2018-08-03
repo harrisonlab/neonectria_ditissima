@@ -25,7 +25,7 @@ opt_list = list(
     make_option("--out", type="character", help="output venn diagram in pdf format")
 #    make_option("--maxrf", type="double", default=0.2, help="max rf to consider as linked"),
 #    make_option("--minlod", type="double", default=20.0, help="min LOD to consider as linked")
-)
+
 opt = parse_args(OptionParser(option_list=opt_list))
 f = opt$inp
 o = opt$out
