@@ -1441,39 +1441,26 @@ Quast
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 This merged assembly was polished using Pilon
 
 ```bash
-  for Assembly in $(ls assembly/merged_canu_spades/F.oxysporum_fsp_cepae/Fus2/merged.fasta); do
-  # for Assembly in $(ls assembly/pacbio_test/F.oxysporum_fsp_cepae/Fus2_pacbio_merged/merged.fasta); do
-    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+  for Assembly in $(ls assembly/merged_canu_spades/N.dit*/R0905/R0905_pacbio_5k/merged.fasta); do
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     IlluminaDir=$(ls -d qc_dna/paired/$Organism/$Strain)
-    # IlluminaDir=$(ls -d qc_dna/paired/$Organism/Fus2)
-    TrimF1_Read=$(ls $IlluminaDir/F/s_6_1_sequence_trim.fq.gz);
-    TrimR1_Read=$(ls $IlluminaDir/R/s_6_2_sequence_trim.fq.gz);
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/polished
-    # OutDir=assembly/pacbio_test/$Organism/$Strain/polished
+    TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
+    TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+    OutDir=assembly/merged_canu_spades/$Organism/$Strain/R0905_pacbio_5k/polished
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
     qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
   done
 ```
+
+
+
+
+
+
 
 Contigs were renamed in accordance with ncbi recomendations.
 
@@ -1572,3 +1559,34 @@ for File in $(ls repeat_masked/*/*/filtered_contigs_repmask/*_contigs_softmasked
 
 repeat_masked/N.ditissima/R0905_pacbio_canu/filtered_contigs_repmask/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
 Number of masked bases:5398957
+
+
+#CSAR scaffolding
+
+CSAR is a web server of contig scaffolding using algebraic rearrangements
+https://lu168.cs.nthu.edu.tw/CSAR-web/
+
+I did a few tests with this tool. As reference genome, I used the R0905 pilon_5, since it was the most contiguous and complete genome assembly that I had so far. As a target I used theHg199_minion_20k merged assembly for the same reasons.
+
+```bash
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/Scaffold_test/*/*/*.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    OutDir=assembly/Scaffold_test/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
+```bash
+    for Assembly in $(ls assembly/Scaffold_test/*/*/*.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=assembly/Scaffold_test/Busco/$Organism/$Strain
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
+```
+
+Next will be Hg199 hybrid due to the higher completeness against the same reference.
