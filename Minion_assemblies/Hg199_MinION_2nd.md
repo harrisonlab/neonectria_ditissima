@@ -1061,26 +1061,30 @@ I lost busco genes and genome size after the SMARTdenovo assembly. I will rerun 
   done
 ```
 ```bash
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/*0m/merged.fasta | grep 'Hg199'); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-done
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/SMARTdenovo/*/*0m/*.dmo.lay.utg); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
+    OutDir=assembly/SMARTdenovo/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
+```bash
+    for Assembly in $(ls assembly/SMARTdenovo/*/*0m/*.dmo.lay.utg); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=gene_pred/busco/$Organism/Ref_Genomes/R0905/$Strain/SMARTdenovo_assembly
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
 ```
 
-```bash
-for Assembly in $(ls assembly/merged_canu_spades/*/*500/merged.fasta | grep 'Hg199'); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-echo "$Organism - $Strain"
-ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_merged
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
-```
+
+
+
+
 
 
 
@@ -1415,24 +1419,36 @@ Quast
 
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  	for Assembly in $(ls assembly/SMARTdenovo/*/*0m/*.dmo.lay.utg); do
-    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
-    OutDir=assembly/SMARTdenovo/$Organism/$Strain/filtered_contigs
+  	for Assembly in $(ls assembly/merged_canu_spades/*/*/*/merged.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    Merged=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    OutDir=assembly/SMARTdenovo/$Organism/$Strain/$Merged/filtered_contigs
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
   	done
 ```
 ```bash
-    for Assembly in $(ls assembly/SMARTdenovo/*/*0m/*.dmo.lay.utg); do
-    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    for Assembly in $(ls assembly/merged_canu_spades/*/*/*/merged.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    Merged=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     echo "$Organism - $Strain"
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=gene_pred/busco/$Organism/Ref_Genomes/R0905/$Strain/SMARTdenovo_assembly
+    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/merged_canu_spades/$Merged
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
+
+
+
+
+
+
+
+
+
+
 
 
 
