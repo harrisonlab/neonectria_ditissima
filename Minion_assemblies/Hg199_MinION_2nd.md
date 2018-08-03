@@ -188,25 +188,6 @@ Read correction using Canu
 ```
 
 ```bash
-  for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
-    Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
-    Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
-    OutDir=assembly/canu_minion/N.ditissima/"$Strain"_40m
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-    qsub -R y $ProgDir/sub_canu_correction.sh $TrimReads 40m $Strain $OutDir
-  done
-```
-```bash
-  for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
-    Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
-    Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
-    OutDir=assembly/canu_minion/N.ditissima/"$Strain"_50m
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-    qsub -R y $ProgDir/sub_canu_correction.sh $TrimReads 50m $Strain $OutDir
-  done
-```
-
-```bash
   for CorrectedReads in $(ls assembly/canu_minion/N.d*/Hg199/*.trimmedReads.fasta.gz); do
     Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
     Strain=$(echo $CorrectedReads | rev | cut -f2 -d '/' | rev)
@@ -217,27 +198,27 @@ Read correction using Canu
 ```
 
 ```bash
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/canu_minion/N.ditissima/Hg199/Hg199.contigs.fasta); do
-  Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-  Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-  OutDir=$(dirname $Assembly)
-  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-done
+  ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  for Assembly in $(ls assembly/canu_minion/N.ditissima/Hg199/Hg199.contigs.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    OutDir=$(dirname $Assembly)
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  done
 ```
 
-    165 contigs
+165 contigs
 
 ```bash
-for Assembly in $(ls assembly/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-echo "$Organism - $Strain"
-ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
+  for Assembly in $(ls assembly/canu_minion/N.ditissima/Hg199/Hg199.contigs.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=gene_pred/busco/$Organism/$Strain/assembly
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+  done
 ```
 
 Hg199 - Assembly using CANU 1 step
@@ -923,15 +904,15 @@ HybridAssembly=$(ls assembly/spades_minion/$Organism/$Strain/filtered_contigs/co
 # N50=$(cat $QuastReport | grep 'N50' | cut -f2)
 # AnchorLength=$N50
 AnchorLength=20000
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_20k
+OutDir=assembly/merged_SMART_spades/$Organism/"$Strain"_minion_20k
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
 qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_20k
+OutDir=assembly/merged_SMART_spades/$Organism/"$Strain"_hybrid_20k
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
 AnchorLength=5000
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_5k
+OutDir=assembly/merged_SMART_spades/$Organism/"$Strain"_minion_5k
 qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_5k
+OutDir=assembly/merged_SMART_spades/$Organism/"$Strain"_hybrid_5k
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
 done
 ```
@@ -973,19 +954,19 @@ QuastReport=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/pilon/report.tsv)
 N50=$(cat $QuastReport | grep 'N50' | cut -f2)
 AnchorLength=$N50
 #AnchorLength=600000
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_600k
+OutDir=assembly/merged_SMART_spades/$Organism/"$Strain"_minion_600k
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
 qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_600k
+OutDir=assembly/merged_SMART_spades/$Organism/"$Strain"_hybrid_600k
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
 
 QuastReport=$(ls assembly/spades_minion/N.ditissima/Hg199/filtered_contigs/report.tsv)
 N50=$(cat $QuastReport | grep 'N50' | cut -f2)
 AnchorLength=$N50
 #AnchorLength=500000
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_minion_500k
+OutDir=assembly/merged_SMART_spades/$Organism/"$Strain"_minion_500k
 qsub $ProgDir/sub_quickmerge.sh $MinIONAssembly $HybridAssembly $OutDir $AnchorLength
-OutDir=assembly/merged_canu_spades/$Organism/"$Strain"_hybrid_500k
+OutDir=assembly/merged_SMART_spades/$Organism/"$Strain"_hybrid_500k
 qsub $ProgDir/sub_quickmerge.sh $HybridAssembly $MinIONAssembly $OutDir $AnchorLength
 done
 ```
@@ -1047,6 +1028,43 @@ OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_merged
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
+
+I lost busco genes and genome size after the SMARTdenovo assembly. I will rerun canu correction with different expected genome sizes, 40 Mb and 50 Mb, and repeat the assembly.
+
+```bash
+  for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
+    Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+    Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
+    OutDir=assembly/canu_minion/N.ditissima/"$Strain"_40m
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
+    qsub -R y $ProgDir/sub_canu_correction.sh $TrimReads 40m $Strain $OutDir
+  done
+```
+```bash
+  for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
+    Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+    Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
+    OutDir=assembly/canu_minion/N.ditissima/"$Strain"_50m
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
+    qsub -R y $ProgDir/sub_canu_correction.sh $TrimReads 50m $Strain $OutDir
+  done
+```
+```bash
+  for CorrectedReads in $(ls assembly/canu_minion/N.d*/Hg199_*0m/*.trimmedReads.fasta.gz); do
+    Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
+    Strain=$(echo $CorrectedReads | rev | cut -f2 -d '/' | rev)
+    Prefix="$Strain"_smartdenovo
+    OutDir=assembly/SMARTdenovo/N.ditissima/"$Strain"
+    mkdir -p $OutDir
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/SMARTdenovo
+    qsub $ProgDir/sub_SMARTdenovo.sh $CorrectedReads $Prefix $OutDir
+  done
+```
+
+
+
+
+
 
 
 
@@ -1380,7 +1398,8 @@ Quast
   	for Assembly in $(ls assembly/merged_canu_spades/*/*/*/merged.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/quast
+    Merged=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    OutDir=assembly/merged_canu_spades/$Organism/$Strain/$Merged/filtered_contigs
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
   	done
 ```
@@ -1388,10 +1407,11 @@ Quast
     for Assembly in $(ls assembly/merged_canu_spades/*/*/*/merged.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    Merged=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     echo "$Organism - $Strain"
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/merged_canu_spades
+    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/merged_SMART_spades/$Merged
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
