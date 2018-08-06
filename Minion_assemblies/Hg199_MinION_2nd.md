@@ -1029,6 +1029,8 @@ qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
+#######This part is a test of genome sizes for the SMARTdenovo.
+
 I lost busco genes and genome size after the SMARTdenovo assembly. I will rerun canu correction with different expected genome sizes, 40 Mb and 50 Mb, and repeat the assembly.
 
 ```bash
@@ -1076,24 +1078,11 @@ I lost busco genes and genome size after the SMARTdenovo assembly. I will rerun 
     echo "$Organism - $Strain"
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=gene_pred/busco/$Organism/Ref_Genomes/R0905/$Strain/SMARTdenovo_assembly
+    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/assembly_SMARTdenovo
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Statistics were similar to the previous assembly. 50mb reduce a little the number of contigs and increase the busco predictions. 40mb increases number of contigs and number of busco genes.
 
 
 ## Pilon error correction
@@ -1456,7 +1445,7 @@ This merged assembly was polished using Pilon
   done
 ```
 
-
+This is in qw state.
 
 
 
