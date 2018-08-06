@@ -7,8 +7,8 @@
 
 #Add '--prior logistic' when invoking structure below to change prior for more sensitive but exponentially slower structure detection
 
-input=$1 
-k=$2 
+input=$1
+k=$2
 
-structure=/home/sobczm/bin/fastStructure
+structure=/home/gomeza/bin/fastStructure
 python $structure/structure.py -K $k --input $input --output $input --prior logistic
