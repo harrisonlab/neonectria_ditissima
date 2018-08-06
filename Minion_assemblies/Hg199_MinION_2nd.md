@@ -1085,7 +1085,12 @@ I lost busco genes and genome size after the SMARTdenovo assembly. I will rerun 
 Statistics were similar to the previous assembly. 50mb reduce a little the number of contigs and increase the busco predictions. 40mb increases number of contigs and number of busco genes.
 
 
-## Pilon error correction
+
+
+
+
+
+## Pilon error correction. this needs tobe done with the best assembly
 
 Assemblies were polished using Pilon
 Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
@@ -1430,7 +1435,11 @@ Quast
 ```
 
 
-This merged assembly was polished using Pilon
+
+
+
+
+This merged assembly was polished using Pilon. This needs to be done.
 
 ```bash
   for Assembly in $(ls assembly/merged_canu_spades/N.dit*/R0905/R0905_pacbio_5k/merged.fasta); do
@@ -1444,12 +1453,6 @@ This merged assembly was polished using Pilon
     qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
   done
 ```
-
-This is in qw state.
-
-
-
-
 
 Contigs were renamed in accordance with ncbi recomendations.
 
