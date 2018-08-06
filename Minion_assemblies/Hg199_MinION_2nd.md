@@ -1566,7 +1566,7 @@ Number of masked bases:5398957
 CSAR is a web server of contig scaffolding using algebraic rearrangements
 https://lu168.cs.nthu.edu.tw/CSAR-web/
 
-I did a few tests with this tool. As reference genome, I used the R0905 pilon_5, since it was the most contiguous and complete genome assembly that I had so far. As a target I used theHg199_minion_20k merged assembly for the same reasons.
+I did a few tests with this tool. As reference genome, I used the R0905 pilon_5, since it was the most contiguous and complete genome assembly that I had so far. As a target I used the Hg199_minion_20k merged assembly for the same reasons.
 
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
@@ -1589,20 +1589,56 @@ I did a few tests with this tool. As reference genome, I used the R0905 pilon_5,
     done
 ```
 
+Next will the same genomes, chaging the reference to target and target to references. Hg199_minion_5k was uses as a reference.
+
+```bash
+    mv 20180806_SN104_ref.fna_scaffolding /data/scratch/gomeza/assembly/Scaffold_2/N.ditisima/Hg199/Hg199.fasta
+    mv 20180806_SN104_target.fna_scaffolding /data/scratch/gomeza/assembly/Scaffold_2/N.ditisima/R0905/R0905.fasta
+
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+    touch tmp.csv
+    for Assembly in $(ls assembly/Scaffold_2/N.ditissima/*/*.fasta); do
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    OutDir=assembly/Scaffold_2/$Organism/$Strain
+    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_contigs_renamed.fasta --coord_file tmp.csv
+    done
+    rm tmp.csv
+```
+```bash
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/Scaffold_2/*/*/*renamed.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    OutDir=assembly/Scaffold_2/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
+```bash
+    for Assembly in $(ls assembly/Scaffold_2/*/*/*renamed.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=assembly/Scaffold_2/Busco/$Organism/$Strain
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
+```
+
 This merged assembly was polished using Pilon
 
 ```bash
 for Strain in Hg199; do
-  for Assembly in $(ls assembly/Scaffold_test/*/Hg199/*.fasta); do
+  for Assembly in $(ls assembly/Scaffold_2/*/Hg199/*renamed.fasta); do
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     IlluminaDir=$(ls -d qc_dna/paired/$Organism/$Strain)
     TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
     TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
-    OutDir=assembly/Scaffold_test/$Organism/$Strain/polished
+    OutDir=assembly/Scaffold_2/$Organism/$Strain/polished
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
     qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
   done
 done  
 ```
-Next will be Hg199 hybrid due to the higher completeness against the same reference.
