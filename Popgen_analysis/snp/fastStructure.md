@@ -39,7 +39,7 @@ input=${input_file%.vcf}
 structure=/home/sobczm/bin/fastStructure
 python $structure/structure.py -K 3 --input $input --output $input --prior logistic
 
-This is runniing on screen in blacklace11. the next is running from test folder. there is another running from new test folder
+This is runniing on screen in blacklace11. the next is running from test folder. 
 
 
 ```bash
