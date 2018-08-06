@@ -1589,4 +1589,20 @@ I did a few tests with this tool. As reference genome, I used the R0905 pilon_5,
     done
 ```
 
+This merged assembly was polished using Pilon
+
+```bash
+for Strain in Hg199; do
+  for Assembly in $(ls assembly/Scaffold_test/*/Hg199/*.fasta); do
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    IlluminaDir=$(ls -d qc_dna/paired/$Organism/$Strain)
+    TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
+    TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+    OutDir=assembly/Scaffold_test/$Organism/$Strain/polished
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+    qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
+  done
+done  
+```
 Next will be Hg199 hybrid due to the higher completeness against the same reference.
