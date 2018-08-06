@@ -26,12 +26,29 @@ plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input
 # Set minimum number of considered clusters
 s=1
 # Set maximum number of considered clusters
-f=10
+f=5
 for i in $(seq $s $f)
 do
 qsub $scripts/sub_fast_structure.sh ${input_file%.vcf} $i
 done
 ```
+
+Alternatively, I run the following commands in blacklace11.
+
+input=${input_file%.vcf}
+structure=/home/sobczm/bin/fastStructure
+python $structure/structure.py -K 3 --input $input --output $input --prior logistic
+
+This is runniing on screen in blacklace11. the next is running from test folder. there is another running from new test folder
+
+
+```bash
+scripts=/home/adamst/git_repos/scripts/popgen/snp
+
+qsub $scripts/sub_fast_structure.sh ${input_file%.vcf} $i logistic
+done
+```
+
 
 ####Choosing model complexity (K) among all the K values tested
 
