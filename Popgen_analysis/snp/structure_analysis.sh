@@ -79,8 +79,10 @@ done
 mv structure_* analysis/popgen/SNP_calling/structure
 
 # structureHarvester - summarise the results
-harvester=/home/gomeza/bin/structureHarvester/structureHarvester.py
+harvester=/home/sobczm/bin/structureHarvester/structureHarvester.py
 $harvester --dir=$input/analysis/popgen/SNP_calling/structure/structureHarvester --out=$input/analysis/popgen/SNP_calling/structure/structureHarvester --evanno --clumpp
+
+$harvester --dir=$input/structureHarvester --out=$input/structureHarvester --evanno --clumpp
 
 # CLUMPP - permute the results
 cd analysis/popgen/SNP_calling/structure/structureHarvester
@@ -101,13 +103,20 @@ mv paramfile_ind paramfile
 c=24
 r=5
 s=1
-f=10
+f=5
 for i in $(seq $s $f) #input range of K values tested
 do
 $clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.indivq -k $i -c $c -r $r
 done
 cp $clumpp/paramfile_pop ./
 mv paramfile_pop paramfile
+
+
+
+
+
+
+
 for i in $(seq $s $f) #input range of K values tested
 do
 $clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.popq -k $i -c $c -r $r
