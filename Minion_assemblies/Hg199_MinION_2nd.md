@@ -1228,6 +1228,12 @@ done
     Number of masked bases:
     3832437
 
+
+
+
+
+
+
 ## R0905 Assemblies were polished using Pilon
 
 ```bash
@@ -1630,5 +1636,25 @@ This merged assembly was polished using Pilon
     OutDir=assembly/Scaffold_2/$Organism/$Strain/polished
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
     qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
-  done 
+  done
+```
+```bash
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/Scaffold_2/*/*/polished/*.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    OutDir=assembly/Scaffold_2/$Organism/$Strain/polished
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
+```bash
+    for Assembly in $(ls assembly/Scaffold_2/*/*/polished/*.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=assembly/Scaffold_2/Busco/$Organism/$Strain
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
 ```
