@@ -1085,29 +1085,29 @@ I lost busco genes and genome size after the SMARTdenovo assembly. I will rerun 
 Statistics were similar to the previous assembly. 50mb reduce a little the number of contigs and increase the busco predictions. 40mb increases number of contigs and number of busco genes.
 
 
-
-
-
-
-
-## Pilon error correction. this needs tobe done with the best assembly
+## Pilon error correction.
 
 Assemblies were polished using Pilon
 Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
 
 ```bash
-  for Assembly in $(ls assembly/merged_canu_spades/*/*_minion_5k/merged.fasta | grep 'Hg199'); do
-      Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-      Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-      IlluminaDir=$(ls -d qc_dna/paired/*/Hg199)
-      TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
-      TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
-      OutDir=$(dirname $Assembly)/pilon
-      Iterations=5
-      ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
-      qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
-  done
+for Assembly in $(ls assembly/merged_SMART_spades/*_minion_5k/merged.fasta | grep 'Hg199'); do
+    IlluminaDir=$(ls -d qc_dna/paired/*/Hg199)
+    TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
+    TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
+    OutDir=$(dirname $Assembly)/pilon
+    Iterations=5
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+    qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+done
 ```
+
+
+
+
+
+
+
 
 Contigs were renamed
 
@@ -1440,25 +1440,27 @@ Quast
     done
 ```
 
-
-
-
-
-
-This merged assembly was polished using Pilon. This needs to be done.
+This merged assembly was polished using Pilon.
 
 ```bash
   for Assembly in $(ls assembly/merged_canu_spades/N.dit*/R0905/R0905_pacbio_5k/merged.fasta); do
-    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    IlluminaDir=$(ls -d qc_dna/paired/$Organism/$Strain)
+    IlluminaDir=$(ls -d qc_dna/paired/*/R0905)
     TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
     TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/R0905_pacbio_5k/polished
+    OutDir=$(dirname $Assembly)/pilon
+    Iterations=5
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
-    qsub $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
+    qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
   done
 ```
+
+
+
+
+
+
+
+
 
 Contigs were renamed in accordance with ncbi recomendations.
 
@@ -1477,18 +1479,6 @@ Contigs were renamed in accordance with ncbi recomendations.
   rm tmp.csv
 ```
 
-Assembly stats were collected using quast
-
-```bash
-  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  # for Assembly in $(ls assembly/merged_canu_spades/*/*/filtered_contigs/R0905_contigs_renamed.fasta); do
-  for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/R0905/filtered_contigs/R0905_contigs_renamed.fasta); do
-    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
-    OutDir=$(dirname $Assembly)
-    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-  done
-```
 
 ###Canu assembly contigs were renamed in accordance with ncbi recomendations.
 
@@ -1587,7 +1577,7 @@ I did a few tests with this tool. As reference genome, I used the R0905 pilon_5,
     done
 ```
 
-Next will the same genomes, chaging the reference to target and target to references. Hg199_minion_5k was uses as a reference.
+Next will the same genomes, changing the reference to target and target to references. Hg199_minion_5k was uses as a reference.
 
 ```bash
     mv 20180806_SN104_ref.fna_scaffolding /data/scratch/gomeza/assembly/Scaffold_2/N.ditisima/Hg199/Hg199.fasta
@@ -1627,17 +1617,23 @@ Next will the same genomes, chaging the reference to target and target to refere
 This merged assembly was polished using Pilon
 
 ```bash
-  for Assembly in $(ls assembly/Scaffold_2/*/*/*renamed.fasta); do
-    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-    IlluminaDir=$(ls -d qc_dna/paired/$Organism/$Strain)
-    TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
-    TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
-    OutDir=assembly/Scaffold_2/$Organism/$Strain/polished
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
-    qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir
-  done
+    for Assembly in $(ls assembly/CSAR/Scaffold_v2/*/*/*renamed.fasta); do
+      Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+      Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+      IlluminaDir=$(ls -d qc_dna/paired/$Organism/$Strain)
+      TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
+      TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+      Iterations=5
+      OutDir=assembly/Scaffold_2/$Organism/$Strain/polished
+      ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+      qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+    done
 ```
+
+
+
+
+
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
   	for Assembly in $(ls assembly/Scaffold_2/*/*/polished/*.fasta); do
@@ -1658,3 +1654,4 @@ This merged assembly was polished using Pilon
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
+After pilon, only one additional gene was predicted in the R0905 genome.
