@@ -56,7 +56,11 @@ trellis.device(width=7, height=5, new=FALSE, color=FALSE)
 histogram(~audpc|'Plant_ID',data=AG04, breaks=100, xlab=("AUDPC") , ylab=("% Disease"))
 
 
+aggregate(audpc~Plant_ID,AG01,mean)
 
+aggregate(audpc~Plant_ID,AG01,FUN=(function(x){ifelse(sum(x==0)>0 & sum(x !=0) >0, mean(x[x>0]), mean(x))}))
+
+AG01[,14] <- rowMeans(AG01[c('audpc')], na.rm=TRUE)
 
 
 
