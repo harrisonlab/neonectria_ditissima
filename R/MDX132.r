@@ -5,11 +5,6 @@ library(agricolae)
 
 AG01=read.csv("C20.csv")
 days<-c(12,19,26,33,40,54,76)
-
-AG01[,1]=as.factor(AG01[,4])
-AG01[,2]=as.factor(AG01[,4])
-AG01[,3]=as.factor(AG01[,4])
-AG01[,4]=as.factor(AG01[,4])
 AG01[,12]=audpc(AG01[,5:11],days)
 AG01[,13]=audpc(AG01[,5:11],days,"relative")
 colnames(AG01)[12]=c('audpc')
@@ -31,16 +26,6 @@ write.csv(AG02,'C18.csv')
 
 AG03=read.csv("Cut1.csv")
 days<-c(15,22,30,37,44,52,59)
-
-AG03[,1]=as.factor(AG03[,1])
-AG03[,2]=as.factor(AG03[,2])
-AG03[,3]=as.factor(AG03[,3])
-AG03[,4]=as.factor(AG03[,4])
-AG03[,5]=as.factor(AG03[,5])
-AG03[,6]=as.factor(AG03[,6])
-AG03[,7]=as.factor(AG03[,7])
-AG03[,8]=as.factor(AG03[,8])
-AG03[,9]=as.factor(AG03[,9])
 AG03[,17]=audpc(AG03[,10:16],days)
 AG03[,18]=audpc(AG03[,10:16],days,"relative")
 colnames(AG03)[17]=c('audpc')
@@ -49,21 +34,33 @@ write.csv(AG03,'Cut1.csv')
 
 AG04=read.csv("Cut2.csv")
 days<-c(15,22,30,37,44,52,59)
-
-AG04[,1]=as.factor(AG04[,1])
-AG04[,2]=as.factor(AG04[,2])
-AG04[,3]=as.factor(AG04[,3])
-AG04[,4]=as.factor(AG04[,4])
-AG04[,5]=as.factor(AG04[,5])
-AG04[,6]=as.factor(AG04[,6])
-AG04[,7]=as.factor(AG04[,7])
-AG04[,8]=as.factor(AG04[,8])
-AG04[,9]=as.factor(AG04[,9])
 AG04[,17]=audpc(AG04[,10:16],days)
 AG04[,18]=audpc(AG04[,10:16],days,"relative")
 colnames(AG04)[17]=c('audpc')
 colnames(AG04)[18]=c('audpc_r')
 write.csv(AG04,'Cut2.csv')
+
+library(lattice)
+histogram(~audpc | 'Plant_ID', data=AG01)
+histogram(~audpc | 'Plant_ID', data=AG02)
+histogram(~audpc | 'Plant_ID', data=AG03)
+histogram(~audpc | 'Plant_ID', data=AG04)
+
+trellis.device(width=7, height=5, new=FALSE, color=FALSE)
+histogram(~audpc|'Plant_ID',data=AG01, breaks=100, xlab=("AUDPC") , ylab=("% Disease"))
+trellis.device(width=7, height=5, new=FALSE, color=FALSE)
+histogram(~audpc|'Plant_ID',data=AG02, breaks=100, xlab=("AUDPC") , ylab=("% Disease"))
+trellis.device(width=7, height=5, new=FALSE, color=FALSE)
+histogram(~audpc|'Plant_ID',data=AG03, breaks=100, xlab=("AUDPC") , ylab=("% Disease"))
+trellis.device(width=7, height=5, new=FALSE, color=FALSE)
+histogram(~audpc|'Plant_ID',data=AG04, breaks=100, xlab=("AUDPC") , ylab=("% Disease"))
+
+
+
+
+
+
+
 
 
 library(PerformanceAnalytics)
@@ -76,46 +73,10 @@ library(agricolae)
 
 
 
-Ag09=read.csv('132data.csv')
- #Ag09[,12]=rep(1:2,174)
- #colnames(Ag09)[12]=c('pseudo')
-library(agricolae)
 
-Ag09[,1]=as.factor(Ag09[,1])
-Ag09[,2]=as.factor(Ag09[,2])
-Ag09[,3]=as.factor(Ag09[,3])
-Ag09[,4]=as.factor(Ag09[,4])
-Ag09[,5]=as.factor(Ag09[,5])
-Ag09[,6]=as.factor(Ag09[,6])
 
-days<-c(15,22,30,37,44,52,59)
 
-Ag09[,14]=audpc(Ag09[,7:13],days)
-Ag09[,15]=audpc(Ag09[,7:13],days,"relative")
-colnames(Ag09)[14]=c('audpc')
-colnames(Ag09)[15]=c('audpc_r')
-
-summary(Ag09)
-write.csv(Ag09,'132data.csv')
-
-library(lattice)
-trellis.device(width=7, height=5, new=FALSE, color=FALSE)
-histogram(~audpc|'Pseudo',data=Ag09, breaks=100, xlab=("AUDPC") , ylab=("% Disease"))
-
-library(lattice)
-histogram(~audpc | 'Plant ID', data=AGNd08)
-
-  #library(RColorBrewer)
-  #myColours <- brewer.pal(6,"Blues")
-
-  #my.settings <- list(
-  #superpose.polygon=list(col=myColours[2:5], border="transparent"),
-  #strip.background=list(col=myColours[6]),
-  #strip.border=list(col="black")
-  #)
-
-normal.freq(Ag09,frequency=2,col="green")
-
+ 
 
 
 
