@@ -40,7 +40,7 @@ do
   contig_name=$(echo contig_"$num")
   Out_prefix=$(echo ldhat_"$contig_name")
   mkdir -p $contig_name
-  $vcftools/vcftools --vcf $input_vcf --out $Out_prefix --chr $contig_name --ldhat
+  $vcftools/vcftools --vcf $input_vcf --out $Out_prefix --chr $contig_name --phased --ldhat
   mv ldhat_"$contig_name".log $contig_name/.
   mv ldhat_"$contig_name".ldhat.locs $contig_name/.
   mv ldhat_"$contig_name".ldhat.sites $contig_name/.
