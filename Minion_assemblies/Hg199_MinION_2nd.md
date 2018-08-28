@@ -1101,6 +1101,23 @@ for Assembly in $(ls assembly/merged_SMART_spades/*_minion_5k/merged.fasta | gre
     qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
 done
 ```
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls assembly/merged_SMART_spades/*_minion_5k/pilon/*5.fasta); do
+OutDir=$(dirname $Assembly)
+qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+```bash
+for Assembly in $(ls assembly/merged_SMART_spades/*_minion_5k/pilon/*5.fasta); do
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=$(dirname $Assembly)/busco
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+
+
 
 
 
@@ -1119,28 +1136,7 @@ ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_cont
 $ProgDir/remove_contaminants.py --keep_mitochondria --inp $Assembly --out $OutDir/pilon_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
 ```
 
-```bash
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/Hg199_minion_5k/pilon/pilon_min_500bp_renamed.fasta); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_quast.sh $Assembly $OutDir
-done
-```
 
-```bash
-for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/Hg199_minion_5k/pilon/*.fasta); do
-Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-echo "$Organism - $Strain"
-ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/assembly2
-#OutDir=$(dirname $Assembly)
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
-```
 
 ```bash
 printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
@@ -1453,6 +1449,26 @@ This merged assembly was polished using Pilon.
     qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
   done
 ```
+```bash
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/merged_canu_spades/N.dit*/R0905/R0905_pacbio_5k/pilon/*5.fasta); do
+    OutDir=$(dirname $Assembly)
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
+```bash
+    for Assembly in $(ls assembly/merged_canu_spades/N.dit*/R0905/R0905_pacbio_5k/pilon/*5.fasta); do
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=$(dirname $Assembly)/busco
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
+```
+
+
+
+
+
 
 
 
@@ -1629,14 +1645,9 @@ This merged assembly was polished using Pilon
       qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
     done
 ```
-
-
-
-
-
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  	for Assembly in $(ls assembly/Scaffold_2/*/*/polished/*.fasta); do
+  	for Assembly in $(ls assembly/Scaffold_2/*/*/polished/*5.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
     OutDir=assembly/Scaffold_2/$Organism/$Strain/polished
@@ -1644,7 +1655,7 @@ This merged assembly was polished using Pilon
   	done
 ```
 ```bash
-    for Assembly in $(ls assembly/Scaffold_2/*/*/polished/*.fasta); do
+    for Assembly in $(ls assembly/Scaffold_2/*/*/polished/*5.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
     echo "$Organism - $Strain"
@@ -1654,4 +1665,10 @@ This merged assembly was polished using Pilon
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
+
+
+
+
+
+
 After pilon, only one additional gene was predicted in the R0905 genome.
