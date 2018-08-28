@@ -227,7 +227,7 @@ trellis.device(width=7, height=5, new=FALSE, color=FALSE)
 histogram(~audpc|'Plant_ID',data=AG04, breaks=100, xlab=("AUDPC") , ylab=("% Disease"))
 
 #Replace 0 values with NA.
-AG01$audpc[AG01$audpc==0]<-NA
+AG01[,c(5,6,8,10)][AG01[,c(5,6,8,10)]==0]<-NA
 AG02$audpc[AG02$audpc==0]<-NA
 AG03$audpc[AG03$audpc==0]<-NA
 AG04$audpc[AG04$audpc==0]<-NA
@@ -265,10 +265,16 @@ cor.test(merged_cut[,2],merged_cut[,3])
 write.csv(merged_data,'Merged1.csv')
 write.csv(merged_cut,'Merged2.csv')
 
+Mean1=read.csv("Merged1.csv")
+Mean2=read.csv("Merged2.csv")
+mergemean=merge(Mean1,Mean2,by="Plant_ID")
+
+plot(mergemean[,5],mergemean[,9])
+cor.test(mergemean[,5],mergemean[,9])
 install.packages("PerformanceAnalytics")
 library(PerformanceAnalytics)
 
-my_data<-merged_data[,c(2:3)] # select just pheno collumn
+my_data<-mergemean[,c(5,9)] # select just pheno collumn
 chart.Correlation(my_data, histogram=TRUE)
-my_data2<-merged_cut[,c(2:3)] # select just pheno collumn
-chart.Correlation(my_data2, histogram=TRUE)
+
+write.csv(mergemean,'audpcboth.csv')
