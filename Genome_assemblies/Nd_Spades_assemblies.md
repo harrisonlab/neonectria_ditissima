@@ -13,6 +13,12 @@ Data is copied from /data/seq_data/miseq/2017/ANALYSIS/171115_M04465_0055_000000
 
 to raw_dna/paired/N.ditissima
 
+I cat together the two sequencing runs of the isolate R09/05.
+```bash
+cat R0905_v2/F/R0905_S1_L001_R1_001.fastq.gz NG-R0905/F/NG-R0905_S4_L001_R1_001.fastq.gz > R0905_all/F/R0905_F_all.fastq.gz
+cat R0905_v2/R/R0905_S1_L001_R2_001.fastq.gz NG-R0905/R/NG-R0905_S4_L001_R2_001.fastq.gz > R0905_all/R/R0905_R_all.fastq.gz
+```
+
 #Data qc
 
 programs: fastqc fastq-mcf kmc
@@ -56,7 +62,7 @@ for Strain in R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
 Data quality was visualised once again following trimming:
 
 ```bash
-for Strain in R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
+for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
   #for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   RawData=$(ls qc_dna/paired/*/$Strain/F/*.fq.gz)
   echo $RawData;
@@ -64,9 +70,9 @@ for Strain in R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
 	qsub $ProgDir/run_fastqc.sh $RawData;
 done
 
-for Strain in R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
+for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
   #for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
-  RawData=$(ls qc_dna/paired/*/$Strain/R/*.fq.gz)
+  RawData=$(ls qc_dna/paired/*/R0905_all/R/*.fq.gz)
   echo $RawData;
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/dna_qc;
 	qsub $ProgDir/run_fastqc.sh $RawData;
@@ -77,7 +83,7 @@ kmer counting was performed using kmc.
 This allowed estimation of sequencing depth and total genome size:
 
 ```bash
-for Strain in R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
+for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
   #for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do  echo $Strain
   Trim_F=$(ls qc_dna/paired/N.*/$Strain/F/*.fq.gz)
   Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*.fq.gz)
