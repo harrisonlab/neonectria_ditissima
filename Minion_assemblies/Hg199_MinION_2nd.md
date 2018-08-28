@@ -1640,35 +1640,43 @@ This merged assembly was polished using Pilon
       TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
       TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
       Iterations=5
-      OutDir=assembly/Scaffold_2/$Organism/$Strain/polished
+      OutDir=assembly/CSAR/Scaffold_v2/$Organism/$Strain/polished
       ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
       qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
     done
 ```
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  	for Assembly in $(ls assembly/Scaffold_2/*/*/polished/*5.fasta); do
+  	for Assembly in $(ls assembly/CSAR/Scaffold_v2/*/*/polished/*5.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-    OutDir=assembly/Scaffold_2/$Organism/$Strain/polished
+    OutDir=assembly/CSAR/Scaffold_v2/$Organism/$Strain/polished
     qsub $ProgDir/sub_quast.sh $Assembly $OutDir
   	done
 ```
 ```bash
-    for Assembly in $(ls assembly/Scaffold_2/*/*/polished/*5.fasta); do
+    for Assembly in $(ls assembly/CSAR/Scaffold_v2/*/*/polished/*5.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
     echo "$Organism - $Strain"
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=assembly/Scaffold_2/Busco/$Organism/$Strain
+    OutDir=assembly/CSAR/Scaffold_v2/Busco/$Organism/$Strain
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
+After pilon, only two additional gene was predicted in the R0905 genome.
+ontigs were renamed in accordance with ncbi recomendations.
 
-
-
-
-
-
-After pilon, only one additional gene was predicted in the R0905 genome.
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+  touch tmp.csv
+  for Assembly in $(ls assembly/CSAR/Scaffold_v2/N.ditissima/*/polished/pilon_5.fasta); do
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    OutDir=assembly/CSAR/Scaffold_v2/$Organism/$Strain/filtered_contigs
+    mkdir -p $OutDir
+    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_contigs_renamed.fasta --coord_file tmp.csv
+  done
+  rm tmp.csv
+```
