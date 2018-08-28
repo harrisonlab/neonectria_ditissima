@@ -20,7 +20,7 @@ programs: fastqc fastq-mcf kmc
 Data quality was visualised using fastqc:
 
 ```bash
-for Strain in R0905_v2 R68-17-C2 SVK1 SVK2; do
+for Strain in R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
   #for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
     RawData=$(ls raw_dna/paired/*/$Strain/F/*.fastq.gz)
 	  echo $RawData;
@@ -28,7 +28,7 @@ for Strain in R0905_v2 R68-17-C2 SVK1 SVK2; do
 	  qsub $ProgDir/run_fastqc.sh $RawData;
   done
 
-for Strain in R0905_v2 R68-17-C2 SVK1 SVK2; do
+for Strain in R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
   #for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
     RawData=$(ls raw_dna/paired/*/$Strain/R/*.fastq.gz)
     echo $RawData;
@@ -41,11 +41,10 @@ Trimming was performed on data to trim adapters from sequences and remove poor q
 This was done with fastq-mcf
 
 ```bash
-  for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
-  #for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
-  #for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
-    Read_F=raw_dna/paired/N.ditissima/$Strain/F/*.fastq.gz
-    Read_R=raw_dna/paired/N.ditissima/$Strain/R/*.fastq.gz
+for Strain in R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
+  #for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+    Read_F=raw_dna/paired/*/$Strain/F/*.fastq.gz
+    Read_R=raw_dna/paired/*/$Strain/R/*.fastq.gz
     echo $Read_F;
     echo $Read_R;
     IluminaAdapters=/home/gomeza/git_repos/emr_repos/tools/seq_tools/illumina_full_adapters.fa
