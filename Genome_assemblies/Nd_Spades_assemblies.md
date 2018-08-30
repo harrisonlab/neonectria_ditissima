@@ -89,8 +89,56 @@ for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
   Trim_R=$(ls qc_dna/paired/N.*/$Strain/R/*.fq.gz)
   Outdir=qc_dna/kmc/N.ditissima/$Strain
   ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/dna_qc
-  qsub $ProgDir/kmc_kmer_counting.sh 21 $Outdir $Trim_F $Trim_R
+  qsub $ProgDir/kmc_kmer_counting.sh $Outdir $Trim_F $Trim_R
 done
+```
+```bash
+for DataDir in $(ls -d qc_dna/paired/N.ditissima/R6-17-2); do
+   F_Read=$(ls $DataDir/F/*.gz)
+   R_Read=$(ls $DataDir/R/*.gz)
+   Strain=$(echo $DataDir | rev | cut -f1 -d ‘/’ | rev)
+   Organism=$(echo $DataDir | rev | cut -f2 -d ‘/’ | rev)
+   WorkDir=tmp_dir/R6-17-2
+   mkdir -p $WorkDir
+   cp -r $F_Read $WorkDir
+   cp -r $R_Read $WorkDir
+   cd $WorkDir
+   Read1=*R1*
+   Read2=*R2*
+   gunzip $Read1
+   gunzip $Read2
+   Sub1=*R1*.fq
+   Sub2=*R2*.fq
+   echo “$Organism - $Strain”
+   count_nucl.pl -i $Sub1 -i $Sub2 -g 45
+   cd /home/groups/harrisonlab/project_files/neonectria_ditissima
+done
+```
+```
+Ag02 144.71
+Ag04 46.19
+Ag05 125.05
+Ag06 73.52
+Ag08 45.42
+Ag09_A 67.41
+Ag11_A 45.39
+Ag11_B 22.29
+Ag11_C 87.03
+ND8 242.97
+ND9 63.88
+Hg199 89.92
+R6-17-2
+R6-17-3
+R68-17-C3 65.59
+P112 54.03
+BGV344 55.05
+OPC304 37.73
+R0905 67.06
+R09/05_v2 48.69
+R68-17-C2 52.09
+NMaj 57.09
+SVK1 57.17
+SVK2 65.08
 ```
 
 #Assembly
@@ -99,23 +147,22 @@ Assembly was performed using: Spades
 A range of hash lengths were used and the best assembly selected for subsequent analysis
 
 ```bash
-#for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
-#for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
-for Strain in Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
+for Strain in NMaj; do
+#for Strain in R0905_all R0905_v2 R68-17-C2 SVK1 SVK2 Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag08 Ag11-B R6-17-2 R6-17-3 R41-15; do
   echo $Strain
   F_Read=$(ls qc_dna/paired/N.*/$Strain/F/*.fq.gz)
   R_Read=$(ls qc_dna/paired/N.*/$Strain/R/*.fq.gz)
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
-	Outdir=assembly/spades/N.ditissima/$Strain/
+	Outdir=assembly/spades/N.major/$Strain/
 	qsub $ProgDir/submit_SPAdes_HiMem.sh $F_Read $R_Read $Outdir correct
 done
 ```
 
 ```bash
-for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
-#for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
+#for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-for Assembly in $(ls assembly/spades/N.ditissima/$Strain/filtered_contigs/contigs_min_500bp.fasta); do
+for Assembly in $(ls assembly/spades/N.*/$Strain/filtered_contigs/contigs_min_500bp.fasta); do
   Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
   Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
   OutDir=assembly/spades/$Organism/$Strain/filtered_contigs
@@ -168,7 +215,8 @@ for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
 Sequence data for isolates with a data from a single sequencing run was aligned against the Nd genome
 
 ```bash
-for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
+#for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
 #for Strain in Ag11_B R41-15 R6-17-2 R6-17-3; do
 #for Strain in Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
 #Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
