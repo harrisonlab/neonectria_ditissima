@@ -93,12 +93,12 @@ for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
 done
 ```
 ```bash
-for DataDir in $(ls -d qc_dna/paired/N.ditissima/R6-17-2); do
+for DataDir in $(ls -d qc_dna/paired/N.ditissima/R45-15); do
    F_Read=$(ls $DataDir/F/*.gz)
    R_Read=$(ls $DataDir/R/*.gz)
    Strain=$(echo $DataDir | rev | cut -f1 -d ‘/’ | rev)
    Organism=$(echo $DataDir | rev | cut -f2 -d ‘/’ | rev)
-   WorkDir=tmp_dir/R6-17-2
+   WorkDir=tmp_dir/R45-15
    mkdir -p $WorkDir
    cp -r $F_Read $WorkDir
    cp -r $R_Read $WorkDir
@@ -127,8 +127,13 @@ Ag11_C 87.03
 ND8 242.97
 ND9 63.88
 Hg199 89.92
-R6-17-2
-R6-17-3
+R6-17-2 52.60
+R6-17-3 65.28
+R37-15 117.17
+R39-15 51.68
+R41-15 51.77
+R42-15 66.00
+R45-15 118.89
 R68-17-C3 65.59
 P112 54.03
 BGV344 55.05
