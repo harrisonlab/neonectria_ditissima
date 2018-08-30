@@ -186,10 +186,11 @@ The best assembly was used to perform repeatmasking
 for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
 #for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
 #for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_C BGV344 ND9 OPC304 P112 Ag08 Ag11_B R41-15 R6-17-2 R6-17-3; do  
-  NewSpades=$(ls assembly/spades/*/$Strain/filtered_contigs/contigs_min_500bp.fasta)
-  for Assembly in $(ls $NewSpades); do
+  for Assembly in $(ls assembly/spades/*/$Strain/filtered_contigs/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-    OutDir=repeat_masked/N.ditissima/$Strain/
+    OutDir=repeat_masked/$Organism/$Strain/
     qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
     qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
   done
