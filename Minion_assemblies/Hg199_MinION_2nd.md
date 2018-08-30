@@ -1116,118 +1116,7 @@ OutDir=$(dirname $Assembly)/busco
 qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
-
-
-
-
-
-
-
-
-
-
-Contigs were renamed
-
-```bash
-echo "" > tmp.txt
-Assembly=$(ls assembly/merged_canu_spades/N.ditissima/Hg199_minion_5k/pilon/*.fasta | grep 'pilon_5')
-OutDir=$(dirname $Assembly)
-ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
-$ProgDir/remove_contaminants.py --keep_mitochondria --inp $Assembly --out $OutDir/pilon_min_500bp_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
-```
-
-
-
-```bash
-printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/N*/*/assembly2/*/short_summary_*.txt | grep 'Hg199'); do
-FileName=$(basename $File)
-Complete=$(cat $File | grep "(C)" | cut -f2)
-Duplicated=$(cat $File | grep "(D)" | cut -f2)
-Fragmented=$(cat $File | grep "(F)" | cut -f2)
-Missing=$(cat $File | grep "(M)" | cut -f2)
-Total=$(cat $File | grep "Total" | cut -f2)
-printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
-done
-```
-
-## Isolate R09/05 Reference
-
-```bash
-for Assembly in $(ls assembly/merged_canu_spades/*/R0905/*_contigs/*.fasta); do
-Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-Contigs=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-echo "$Organism - $Strain - $Contigs"
-ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
-BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-OutDir=gene_pred/busco/$Organism/$Strain/$Contigs
-qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
-done
-```
-
-```bash
-printf "Filename\tComplete\tDuplicated\tFragmented\tMissing\tTotal\n"
-for File in $(ls gene_pred/busco/N*/R0905/*_contigs/*/short_summary_*.txt); do
-FileName=$(basename $File)
-Complete=$(cat $File | grep "(C)" | cut -f2)
-Duplicated=$(cat $File | grep "(D)" | cut -f2)
-Fragmented=$(cat $File | grep "(F)" | cut -f2)
-Missing=$(cat $File | grep "(M)" | cut -f2)
-Total=$(cat $File | grep "Total" | cut -f2)
-printf "$FileName\t$Complete\t$Duplicated\t$Fragmented\t$Missing\t$Total\n"
-done
-```
-
-Filename	Complete	Duplicated	Fragmented	Missing	Total
-short_summary_R0905_canu_contigs_modified.txt	3510	93	26	189	3725
-short_summary_R0905_contigs_renamed.txt	3510	94	26	189	3725
-
-## Repeat Masking
-
-Repeat masking was performed on the non-hybrid assembly.
-
-```bash
-for Assembly in $(ls assembly/merged_canu_spades/*/*_minion_5k/merged.fasta | grep 'Hg199'); do
-Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-echo "$Organism - $Strain"
-OutDir=repeat_masked/$Organism/"$Strain"/filtered_contigs
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/repeat_masking
-qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
-qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
-done
-```
-
-The TransposonPSI masked bases were used to mask additional bases from the repeatmasker / repeatmodeller softmasked and hardmasked files.
-
-```bash
-for File in $(ls repeat_masked/*/Ref_Genomes/*/*/*_contigs_softmasked.fa); do
-OutDir=$(dirname $File)
-TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
-OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
-echo "$OutFile"
-bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
-echo "Number of masked bases:"
-cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
-done
-# The number of N's in hardmasked sequence are not counted as some may be present within the assembly and were therefore not repeatmasked.
-for File in $(ls repeat_masked/*/Ref_Genomes/*/*/*_contigs_hardmasked.fa); do
-OutDir=$(dirname $File)
-TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
-OutFile=$(echo $File | sed 's/_contigs_hardmasked.fa/_contigs_hardmasked_repeatmasker_TPSI_appended.fa/g')
-echo "$OutFile"
-bedtools maskfasta -fi $File -bed $TPSI -fo $OutFile
-done
-```
-
-    Number of masked bases:
-    3832437
-
-
-
-
-
+Same statistics before pilon
 
 
 ## R0905 Assemblies were polished using Pilon
@@ -1464,105 +1353,7 @@ This merged assembly was polished using Pilon.
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Contigs were renamed in accordance with ncbi recomendations.
-
-```bash
-  ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
-  touch tmp.csv
-  # for Assembly in $(ls assembly/merged_canu_spades/*/*/polished/pilon.fasta); do
-  for Assembly in $(ls assembly/merged_canu_spades/N.ditissima/R0905/polished/pilon.fasta); do
-    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
-    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    # OutDir=assembly/merged_canu_spades/$Organism/$Strain/filtered_contigs
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/filtered_contigs
-    mkdir -p $OutDir
-    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_contigs_renamed.fasta --coord_file tmp.csv
-  done
-  rm tmp.csv
-```
-
-
-###Canu assembly contigs were renamed in accordance with ncbi recomendations.
-
-```bash
-  ProgDir=~/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
-  touch tmp.csv
-  for Assembly in $(ls assembly/canu/N.ditissima/R0905/polished/pilon.fasta); do
-    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
-    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-    OutDir=assembly/canu/$Organism/$Strain/filtered_contigs
-    mkdir -p $OutDir
-    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_contigs_renamed.fasta --coord_file tmp.csv
-  done
-  rm tmp.csv
-```
-
-## Renaming assemblies - temporarily
-
-Fus2 was temporarily renamed for preliminary analysis
-
-```bash
-  cp -r assembly/canu/F.oxysporum_fsp_cepae/Fus2 assembly/canu/F.oxysporum_fsp_cepae/Fus2_pacbio_test_canu
-  cp -r assembly/merged_canu_spades/F.oxysporum_fsp_cepae/Fus2 assembly/merged_canu_spades/F.oxysporum_fsp_cepae/Fus2_pacbio_test_merged
-  cp -r assembly/pacbio_test/F.oxysporum_fsp_cepae/Fus2_pacbio_merged assembly/pacbio_test/F.oxysporum_fsp_cepae/Fus2_pacbio_merged_richards
-```
-
-# Repeatmasking assemblies
-
-```bash
-  R0905_pacbio_merged=$(ls assembly/merged_canu_spades/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
-  # for Assembly in $(ls $Fus2_pacbio_merged $Fus2_pacbio_canu); do
-  for Assembly in $(ls $R0905_pacbio_merged); do
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-    qsub $ProgDir/rep_modeling.sh $Assembly
-    qsub $ProgDir/transposonPSI.sh $Assembly
-  done
-```
-
-```bash
-  R0905_pacbio_canu=$(ls assembly/canu/*/R0905/filtered_contigs/R0905_contigs_renamed.fasta)
-  # for Assembly in $(ls $Fus2_pacbio_merged $Fus2_pacbio_canu); do
-  for Assembly in $(ls $R0905_pacbio_canu); do
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/repeat_masking
-    qsub $ProgDir/rep_modeling.sh $Assembly
-    qsub $ProgDir/transposonPSI.sh $Assembly
-  done
-```
-
-\*\* % bases masked by repeatmasker: 11.57% (bases masked:5290972 bp)
-
-\*\* % bases masked by transposon psi: 10.29% (bases masked:4704506 bp)
-
-Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
-
-```bash
-for File in $(ls repeat_masked/*/*/filtered_contigs_repmask/*_contigs_softmasked.fa); do
-      OutDir=$(dirname $File)
-      TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
-      OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
-      bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
-      echo "$OutFile"
-      echo "Number of masked bases:"
-      cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
-    done
-```
-
-repeat_masked/N.ditissima/R0905_pacbio_canu/filtered_contigs_repmask/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:5398957
+Same statistics before pilon
 
 
 #CSAR scaffolding
@@ -1666,7 +1457,7 @@ This merged assembly was polished using Pilon
     done
 ```
 After pilon, only two additional gene was predicted in the R0905 genome.
-ontigs were renamed in accordance with ncbi recomendations.
+Contigs were renamed in accordance with ncbi recomendations.
 
 ```bash
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
@@ -1679,4 +1470,228 @@ ontigs were renamed in accordance with ncbi recomendations.
     $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_contigs_renamed.fasta --coord_file tmp.csv
   done
   rm tmp.csv
+```
+
+## Repeat Masking
+
+Repeat masking was performed on the non-hybrid assembly.
+
+```bash
+for Assembly in $(ls assembly/CSAR/Scaffold_v2/N.ditissima/*/polished/pilon_5.fasta); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+OutDir=repeat_masked/Ref_Genomes/$Organism/"$Strain"/filtered_contigs
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/repeat_masking
+qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
+done
+```
+
+
+
+
+
+
+
+
+
+The TransposonPSI masked bases were used to mask additional bases from the repeatmasker / repeatmodeller softmasked and hardmasked files.
+
+```bash
+
+for File in $(ls repeat_masked/*/Ref_Genomes/*/*/*_contigs_softmasked.fa); do
+OutDir=$(dirname $File)
+TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+echo "$OutFile"
+bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+echo "Number of masked bases:"
+cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+done
+# The number of N's in hardmasked sequence are not counted as some may be present within the assembly and were therefore not repeatmasked.
+for File in $(ls repeat_masked/*/Ref_Genomes/*/*/*_contigs_hardmasked.fa); do
+OutDir=$(dirname $File)
+TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+OutFile=$(echo $File | sed 's/_contigs_hardmasked.fa/_contigs_hardmasked_repeatmasker_TPSI_appended.fa/g')
+echo "$OutFile"
+bedtools maskfasta -fi $File -bed $TPSI -fo $OutFile
+done
+```
+
+```
+Number of masked bases:
+3832437
+```
+### Improving R0905 assembly.
+
+### R0905 Hybrid Spades Assembly
+
+```bash
+  	for PacBioDat in $(ls raw_dna/pacbio/*/*/extracted/concatenated_pacbio.fastq); do
+    echo $StrainPath
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
+    Organism=$(echo $PacBioDat | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $PacBioDat | rev | cut -f3 -d '/' | rev)
+    IlluminaDir=$(ls -d qc_dna/paired/$Organism/R0905_all)
+    echo $Strain
+    echo $Organism
+    TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
+    TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+    echo $TrimF1_Read
+    echo $TrimR1_Read
+    OutDir=assembly/spades_pacbio/$Organism/"$Strain"_all
+    qsub -R y $ProgDir/sub_spades_pacbio.sh $PacBioDat $TrimF1_Read $TrimR1_Read $OutDir 15
+  	done
+```
+```bash
+  	for PacBioDat in $(ls raw_dna/pacbio/*/*/extracted/concatenated_pacbio.fastq); do
+    echo $StrainPath
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/spades
+    Organism=$(echo $PacBioDat | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $PacBioDat | rev | cut -f3 -d '/' | rev)
+    IlluminaDir=$(ls -d qc_dna/paired/$Organism/R0905_v2)
+    echo $Strain
+    echo $Organism
+    TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
+    TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+    echo $TrimF1_Read
+    echo $TrimR1_Read
+    OutDir=assembly/spades_pacbio/$Organism/"$Strain"_v2
+    qsub -R y $ProgDir/sub_spades_pacbio.sh $PacBioDat $TrimF1_Read $TrimR1_Read $OutDir 15
+  	done
+```
+
+
+
+```bash
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/spades_pacbio/*/*/contigs.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
+    OutDir=assembly/spades_pacbio/$Organism/$Strain/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
+```bash
+    for Assembly in $(ls assembly/spades_pacbio/*/*/contigs.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/spades_pacbio
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
+```
+
+Contigs shorter than 500bp were removed from the assembly
+
+```bash
+  for Contigs in $(ls assembly/spades_pacbio/*/*/contigs.fasta); do
+    AssemblyDir=$(dirname $Contigs)
+    mkdir $AssemblyDir/filtered_contigs_min_500bp
+    FilterDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/abyss
+    $FilterDir/filter_abyss_contigs.py $Contigs 500 > $AssemblyDir/filtered_contigs_min_500bp/contigs_min_500bp.fasta
+  done
+```
+
+Quast
+
+```bash
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+    for Assembly in $(ls assembly/spades_pacbio/*/*/filtered_contigs_min_500bp/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    OutDir=assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+    done
+```
+```bash
+    for Assembly in $(ls assembly/spades_pacbio/*/*/filtered_contigs_min_500bp/contigs_min_500bp.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/spades_pacbio
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
+```
+
+## Merging pacbio and hybrid assemblies
+
+```bash
+  for PacBioAssembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/polished/pilon_5.fasta); do
+    Organism=$(echo $PacBioAssembly | rev | cut -f5 -d '/' | rev)
+    Strain=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
+    HybridAssembly=$(ls assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp/contigs_min_500bp.fasta)
+    AnchorLength=5000
+    OutDir=assembly/merged_canu_spades/$Organism/$Strain/"$Strain"_pacbio_5k
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
+  done
+```
+```bash
+  for PacBioAssembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/racon_10/polished/pilon_5.fasta); do
+    Organism=$(echo $PacBioAssembly | rev | cut -f6 -d '/' | rev)
+    Strain=$(echo $PacBioAssembly | rev | cut -f5 -d '/' | rev)
+    HybridAssembly=$(ls assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp/contigs_min_500bp.fasta)
+    AnchorLength=5000
+    OutDir=assembly/merged_canu_spades/$Organism/$Strain/"$Strain"_pacbio_afterracon_5k
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
+  done
+```
+
+```bash
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/merged_canu_spades/*/*/*/merged.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    Merged=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    OutDir=assembly/SMARTdenovo/$Organism/$Strain/$Merged/filtered_contigs
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
+```bash
+    for Assembly in $(ls assembly/merged_canu_spades/*/*/*/merged.fasta); do
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+    Merged=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    echo "$Organism - $Strain"
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/merged_canu_spades/$Merged
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
+```
+
+This merged assembly was polished using Pilon.
+
+```bash
+  for Assembly in $(ls assembly/merged_canu_spades/N.dit*/R0905/R0905_pacbio_5k/merged.fasta); do
+    IlluminaDir=$(ls -d qc_dna/paired/*/R0905)
+    TrimF1_Read=$(ls $IlluminaDir/F/*trim.fq.gz);
+    TrimR1_Read=$(ls $IlluminaDir/R/*trim.fq.gz);
+    OutDir=$(dirname $Assembly)/pilon
+    Iterations=5
+    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/pilon
+    qsub -R y $ProgDir/sub_pilon.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+  done
+```
+```bash
+  	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+  	for Assembly in $(ls assembly/merged_canu_spades/N.dit*/R0905/R0905_pacbio_5k/pilon/*5.fasta); do
+    OutDir=$(dirname $Assembly)
+    qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+  	done
+```
+```bash
+    for Assembly in $(ls assembly/merged_canu_spades/N.dit*/R0905/R0905_pacbio_5k/pilon/*5.fasta); do
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=$(dirname $Assembly)/busco
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
 ```
