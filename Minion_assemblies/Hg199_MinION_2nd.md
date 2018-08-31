@@ -1474,10 +1474,8 @@ Contigs were renamed in accordance with ncbi recomendations.
 
 ## Repeat Masking
 
-Repeat masking was performed on the non-hybrid assembly.
-
 ```bash
-for Assembly in $(ls assembly/CSAR/Scaffold_v2/N.ditissima/*/polished/pilon_5.fasta); do
+for Assembly in $(ls assembly/CSAR/Scaffold_v2/N.ditissima/*/filtered_contigs/*_contigs_renamed.fasta); do
 Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -1487,20 +1485,11 @@ qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
 qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
 done
 ```
-
-
-
-
-
-
-
-
-
 The TransposonPSI masked bases were used to mask additional bases from the repeatmasker / repeatmodeller softmasked and hardmasked files.
 
 ```bash
 
-for File in $(ls repeat_masked/*/Ref_Genomes/*/*/*_contigs_softmasked.fa); do
+for File in $(ls repeat_masked/Ref_Genomes/*/*/*/*_contigs_softmasked.fa); do
 OutDir=$(dirname $File)
 TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
 OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
@@ -1510,19 +1499,16 @@ echo "Number of masked bases:"
 cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
 done
 # The number of N's in hardmasked sequence are not counted as some may be present within the assembly and were therefore not repeatmasked.
-for File in $(ls repeat_masked/*/Ref_Genomes/*/*/*_contigs_hardmasked.fa); do
-OutDir=$(dirname $File)
-TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
-OutFile=$(echo $File | sed 's/_contigs_hardmasked.fa/_contigs_hardmasked_repeatmasker_TPSI_appended.fa/g')
-echo "$OutFile"
-bedtools maskfasta -fi $File -bed $TPSI -fo $OutFile
-done
+```
+```
+repeat_masked/Ref_Genomes/N.ditissima/Hg199/filtered_contigs/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+3752435
+repeat_masked/Ref_Genomes/N.ditissima/R0905/filtered_contigs/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+5939621
 ```
 
-```
-Number of masked bases:
-3832437
-```
 ### Improving R0905 assembly.
 
 ### R0905 Hybrid Spades Assembly
