@@ -1503,10 +1503,10 @@ done
 ```
 repeat_masked/Ref_Genomes/N.ditissima/Hg199/filtered_contigs/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
 Number of masked bases:
-3752435
+4060878
 repeat_masked/Ref_Genomes/N.ditissima/R0905/filtered_contigs/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
 Number of masked bases:
-5939621
+5516834
 ```
 
 ### Improving R0905 assembly.
