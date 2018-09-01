@@ -20,7 +20,7 @@ This program is used to convert fasta files into input format for circos
 ```
 
 ```bash
-OutDir=analysis/circos/At_vs_Ag_genome_alignment_circos
+OutDir=analysis/circos/Hg_vs_R9_genome_alignment_circos
 Coords=$(ls analysis/genome_alignment/mummer/A.alternata_ssp_tenuissima/1166/1166_vs_650/1166_vs_650_coords.tsv)
 ProgDir=/home/armita/git_repos/emr_repos/scripts/alternaria/pathogen/genome_alignment
 $ProgDir/nucmer_coords2circos.py --inp_coords $Coords --queery_id At --ref_id Ag > $OutDir/At_vs_Ag_links.txt
