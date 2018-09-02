@@ -8,10 +8,10 @@ This program is used to convert fasta files into input format for circos
   ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Pathogen/Circos
 
   Hg199_genome=$(ls repeat_masked/*/*/*/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa | grep 'Hg199')
-  $ProgDir/fasta2circos.py --genome $Hg199_genome --contig_prefix "Hg199_" > $OutDir/Hg199_genome.txt
+  $ProgDir/fasta2circos.py --genome $Hg199_genome --contig_prefix "Hg_" > $OutDir/Hg199_genome.txt
 
   R0905_genome=$(ls repeat_masked/*/*/*/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa | grep 'R0905')
-  $ProgDir/fasta2circos.py --genome $R0905_genome --contig_prefix "R0905_" > $OutDir/R0905_genome.txt
+  $ProgDir/fasta2circos.py --genome $R0905_genome --contig_prefix "R9_" > $OutDir/R0905_genome.txt
 
   cat $OutDir/Hg199_genome.txt > $OutDir/Hg199_R0905_genome.txt
   tac $OutDir/R0905_genome.txt >> $OutDir/Hg199_R0905_genome.txt
@@ -21,19 +21,17 @@ This program is used to convert fasta files into input format for circos
 
 ```bash
 OutDir=analysis/circos/Hg_vs_R9_genome_alignment_circos
-Coords=$(ls analysis/genome_alignment/mummer/A.alternata_ssp_tenuissima/1166/1166_vs_650/1166_vs_650_coords.tsv)
+Coords=$(ls analysis/genome_alignment/mummer/N.ditissima/Hg199/Hg199_vs_R0905/Hg199_vs_R0905_coords.tsv)
 ProgDir=/home/armita/git_repos/emr_repos/scripts/alternaria/pathogen/genome_alignment
-$ProgDir/nucmer_coords2circos.py --inp_coords $Coords --queery_id At --ref_id Ag > $OutDir/At_vs_Ag_links.txt
-cat $OutDir/At_vs_Ag_links.txt > $OutDir/At_vs_Ag_links_edited.txt
+$ProgDir/nucmer_coords2circos.py --inp_coords $Coords --queery_id Hg --ref_id R9 > $OutDir/Hg_vs_R9_links.txt
+cat $OutDir/Hg_vs_R9_links.txt > $OutDir/Hg_vs_R9_links_edited.txt
 ```
-
-
 
 A file showing contig orientations was made:
 ```bash
-  cat $OutDir/At_Ag_genome.txt | cut -f3 -d ' ' | sed "s/$/; /g" | tr -d '\n' > $OutDir/At_contig_order.txt
+  cat $OutDir/Hg199_R0905_genome.txt | cut -f3 -d ' ' | sed "s/$/; /g" | tr -d '\n' > $OutDir/Hg_contig_order.txt
   ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/circos
-  $ProgDir/find_contig_orientation.py --links_file $OutDir/At_vs_Ag_links_edited.txt > $OutDir/At_vs_Ag_contig_orientation.txt
+  $ProgDir/find_contig_orientation.py --links_file $OutDir/Hg_vs_R9_links_edited.txt > $OutDir/Hg_vs_R9_contig_orientation.txt
 ```
 <!--
 The number of bp in syntenous contigs was identified using:
@@ -47,11 +45,18 @@ Contig order was selected by taking the first line of that file and then also
 taking the reversed order of FoL contigs using the command:
 
 ```bash
-cat $OutDir/At_vs_Ag_contig_orientation.txt | grep -A1 'Order of all seen contigs' | tail -n1 | sed "s/, /\n/g" > tmp.txt
-cat $OutDir/At_vs_Ag_contig_orientation.txt | grep -A1 'Order of all seen contigs' | tail -n1
-cat $OutDir/At_Ag_genome.txt | grep 'At' | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/At/, At/g'
-cat $OutDir/At_Ag_genome.txt | grep 'Ag' | cut -f3 -d ' ' | tr -d '\n' | sed 's/Ag/, Ag/g'
+cat $OutDir/Hg_vs_R9_contig_orientation.txt | grep -A1 'Order of all seen contigs' | tail -n1 | sed "s/, /\n/g" > tmp.txt
+cat $OutDir/Hg_vs_R9_contig_orientation.txt | grep -A1 'Order of all seen contigs' | tail -n1
+cat $OutDir/Hg199_R0905_genome.txt | grep 'Hg' | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/Hg/, Hg/g'
+cat $OutDir/Hg199_R0905_genome.txt | grep 'R9' | cut -f3 -d ' ' | tr -d '\n' | sed 's/R9/, R9/g' >> tmp.txt
 ```
+
+cat $OutDir/At_Ag_genome.txt | grep 'Ag' | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/Ag/, Ag/g'
+cat $OutDir/At_Ag_genome.txt | grep 'At' | cut -f3 -d ' ' | tr -d '\n' | sed 's/At/, At/g' >> tmp.txt
+
+
+
+
 
 ```bash
 ProgDir=/home/armita/git_repos/emr_repos/scripts/alternaria/pathogen/circos
