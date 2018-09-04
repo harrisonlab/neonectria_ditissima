@@ -193,7 +193,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
     Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
     echo "$Organism - $Strain"
     OutDir=gene_pred/braker/Ref_Genomes/$Organism/$Strain
-    AcceptedHits=alignment/Ref_Genomes/N.ditissima/Hg199/Hg199/accepted_hits.bam
+    AcceptedHits=alignment/Ref_Genomes/N.ditissima/R0905/R0905/accepted_hits.bam
     GeneModelName="$Organism"_"$Strain"_braker
     rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
@@ -204,7 +204,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 Fasta and gff files were extracted from Braker1 output.
 
 ```bash
-  for File in $(ls gene_pred/braker/N.*/*/augustus.gff); do
+  for File in $(ls gene_pred/braker/Ref_Genomes/N.*/*/augustus.gff); do
     getAnnoFasta.pl $File
     OutDir=$(dirname $File)
     echo "##gff-version 3" > $OutDir/augustus_extracted.gff
