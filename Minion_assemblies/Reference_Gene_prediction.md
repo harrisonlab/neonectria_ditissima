@@ -204,7 +204,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 Fasta and gff files were extracted from Braker1 output.
 
 ```bash
-  for File in $(ls gene_pred/braker/Ref_Genomes/N.*/*/augustus.gff); do
+  for File in $(ls gene_pred/braker/Ref_Genomes/N.*/*/*/augustus.gff); do
     getAnnoFasta.pl $File
     OutDir=$(dirname $File)
     echo "##gff-version 3" > $OutDir/augustus_extracted.gff
@@ -223,28 +223,28 @@ Note - cufflinks doesn't always predict direction of a transcript and
 therefore features can not be restricted by strand when they are intersected.
 
 ```bash
-    for Assembly in $(ls Hg199_genome/*_contigs_unmasked.fa); do
-    Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
-    Organism=N.ditissima
-    echo "$Organism - $Strain"
-    OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
-    mkdir -p $OutDir
-    AcceptedHits=Hg199_genome/accepted_hits.bam
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-    qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
-    done
+  for Assembly in $(ls repeat_masked/Ref_Genomes/N.ditissima/*/*/*_contigs_unmasked.fa); do
+  Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+  Organism=$(echo $Assembly| rev | cut -d '/' -f4 | rev)
+  echo "$Organism - $Strain"
+  OutDir=gene_pred/cufflinks/Ref_Genomes/$Organism/$Strain/concatenated_prelim
+  mkdir -p $OutDir
+  AcceptedHits=alignment/Ref_Genomes/N.ditissima/$Strain/$Strain/accepted_hits.bam
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
+  qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
+  done
 ```
 
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-	for Assembly in $(ls Hg199_genome/*_contigs_unmasked.fa); do
-		Strain=Hg199_minion
-		Organism=N.ditissima
+	for Assembly in $(ls repeat_masked/Ref_Genomes/N.ditissima/*/*/*_contigs_unmasked.fa); do
+		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
+	  Organism=$(echo $Assembly| rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
-		OutDir=gene_pred/codingquary/$Organism/$Strain/
+		OutDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/
 		mkdir -p $OutDir
-		CufflinksGTF=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim/transcripts.gtf
+		CufflinksGTF=gene_pred/cufflinks/Ref_Genomes/$Organism/$Strain/concatenated_prelim/transcripts.gtf
 		ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
 		qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
 	done
@@ -255,15 +255,15 @@ genes were predicted in regions of the genome, not containing Braker gene
 models:
 
 ```bash
-	for BrakerGff in $(ls gene_pred/braker/*/*/augustus.gff3); do
-		Strain=$(echo $BrakerGff| rev | cut -d '/' -f2 | rev)
-		Organism=$(echo $BrakerGff | rev | cut -d '/' -f3 | rev)
+	for BrakerGff in $(ls gene_pred/braker/Ref_Genomes/*/*/*/augustus.gff3); do
+		Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
+		Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
-		Assembly=$(ls Hg199_genome/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
-		CodingQuaryGff=gene_pred/codingquary/$Organism/$Strain/out/PredictedPass.gff3
-		PGNGff=gene_pred/codingquary/$Organism/$Strain/out/PGN_predictedPass.gff3
-		AddDir=gene_pred/codingquary/$Organism/$Strain/additional
-		FinalDir=gene_pred/codingquary/$Organism/$Strain/final
+		Assembly=$(ls repeat_masked/Ref_Genomes/N.ditissima/*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+		CodingQuaryGff=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/out/PredictedPass.gff3
+		PGNGff=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/out/PGN_predictedPass.gff3
+		AddDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/additional
+		FinalDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final
 		AddGenesList=$AddDir/additional_genes.txt
 		AddGenesGff=$AddDir/additional_genes.gff
 		FinalGff=$AddDir/combined_genes.gff
