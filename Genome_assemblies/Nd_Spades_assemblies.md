@@ -200,10 +200,9 @@ done
 Up till now we have been using just the repeatmasker/repeatmodeller fasta file when we have used softmasked fasta files. You can merge in transposonPSI masked sites using the following command:
 
 ```bash
-for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
-#for Strain in Ag11_B R41-15 R6-17-2 R6-17-3; do
+for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
 #for Strain in Ag11_C BGV344 ND9 OPC304 P112; do
-#for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
+#for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_C BGV344 ND9 OPC304 P112 Ag08 Ag11_B R41-15 R6-17-2 R6-17-3; do
   for File in $(ls repeat_masked/*/$Strain/*_contigs_softmasked.fa); do
       OutDir=$(dirname $File)
       TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
@@ -220,14 +219,15 @@ for Strain in Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
 
 Sequence data for isolates with a data from a single sequencing run was aligned against the Nd genome
 
+This was done again using the newest version of the Hg199 genome.
+
 ```bash
-for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
-#for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17; do
-#for Strain in Ag11_B R41-15 R6-17-2 R6-17-3; do
-#for Strain in Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
+#for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
+for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
 #Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
-Reference=$(ls Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/*_contigs_unmasked.fa)
-for StrainPath in $(ls -d qc_dna/paired/N.ditissima/$Strain); do
+#New genome version was copied to the REFERENCE folder.
+Reference=$(ls REFERENCE/Hg199_contigs_unmasked.fa)
+for StrainPath in $(ls -d qc_dna/paired/N.*/$Strain); do
   Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
   Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
   echo "$Organism - $Strain"
@@ -236,7 +236,6 @@ for StrainPath in $(ls -d qc_dna/paired/N.ditissima/$Strain); do
   echo $F_Read
   echo $R_Read
   OutDir=analysis/genome_alignment/bowtie/$Organism/$Strain/
-  #mkdir -p $OutDir
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
   qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
 done
