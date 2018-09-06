@@ -385,7 +385,7 @@ was redirected to a temporary output file named interproscan_submission.log .
 ```bash
 	screen -a
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/Ref_Genomes/N.*/R0905/*/final_genes_combined.pep.fasta); do
+	for Genes in $(ls gene_pred/codingquary/Ref_Genomes/N.*/Hg199/*/final_genes_combined.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
