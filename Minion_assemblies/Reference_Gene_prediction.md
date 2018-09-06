@@ -254,49 +254,49 @@ Then, additional transcripts were added to Braker gene models, when CodingQuary
 genes were predicted in regions of the genome, not containing Braker gene
 models:
 
+Note: This needs to run step by step.
+
 ```bash
-	for BrakerGff in $(ls gene_pred/braker/Ref_Genomes/*/*/*/augustus.gff3); do
-		Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
-		Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
-		echo "$Organism - $Strain"
-		Assembly=$(ls repeat_masked/Ref_Genomes/N.ditissima/*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
-		CodingQuaryGff=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/out/PredictedPass.gff3
-		PGNGff=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/out/PGN_predictedPass.gff3
-		AddDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/additional
-		FinalDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final
-		AddGenesList=$AddDir/additional_genes.txt
-		AddGenesGff=$AddDir/additional_genes.gff
-		FinalGff=$AddDir/combined_genes.gff
-		mkdir -p $AddDir
-		mkdir -p $FinalDir
+  BrakerGff=$(ls gene_pred/braker/Ref_Genomes/*/R0905/*/augustus.gff3)
+	Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
+	Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
+	echo "$Organism - $Strain"
+	Assembly=$(ls repeat_masked/Ref_Genomes/N.ditissima/R0905/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+	CodingQuaryGff=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/out/PredictedPass.gff3
+	PGNGff=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/out/PGN_predictedPass.gff3
+	AddDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/additional
+	FinalDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final
+	AddGenesList=$AddDir/additional_genes.txt
+	AddGenesGff=$AddDir/additional_genes.gff
+	FinalGff=$AddDir/combined_genes.gff
+	mkdir -p $AddDir
+	mkdir -p $FinalDir
 
-		bedtools intersect -v -a $CodingQuaryGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' > $AddGenesList
-		bedtools intersect -v -a $PGNGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' >> $AddGenesList
-		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation
-		$ProgDir/gene_list_to_gff.pl $AddGenesList $CodingQuaryGff CodingQuarry_v2.0 ID CodingQuary > $AddGenesGff
-		$ProgDir/gene_list_to_gff.pl $AddGenesList $PGNGff PGNCodingQuarry_v2.0 ID CodingQuary >> $AddGenesGff
-		ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
+	bedtools intersect -v -a $CodingQuaryGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' > $AddGenesList
+	bedtools intersect -v -a $PGNGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' >> $AddGenesList
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation
+	$ProgDir/gene_list_to_gff.pl $AddGenesList $CodingQuaryGff CodingQuarry_v2.0 ID CodingQuary > $AddGenesGff
+	$ProgDir/gene_list_to_gff.pl $AddGenesList $PGNGff PGNCodingQuarry_v2.0 ID CodingQuary >> $AddGenesGff
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
 
-		$ProgDir/add_CodingQuary_features.pl $AddGenesGff $Assembly > $FinalDir/final_genes_CodingQuary.gff3
-		$ProgDir/gff2fasta.pl $Assembly $FinalDir/final_genes_CodingQuary.gff3 $FinalDir/final_genes_CodingQuary
-		cp $BrakerGff $FinalDir/final_genes_Braker.gff3
-		$ProgDir/gff2fasta.pl $Assembly $FinalDir/final_genes_Braker.gff3 $FinalDir/final_genes_Braker
-		cat $FinalDir/final_genes_Braker.pep.fasta $FinalDir/final_genes_CodingQuary.pep.fasta | sed -r 's/\*/X/g' > $FinalDir/final_genes_combined.pep.fasta
-		cat $FinalDir/final_genes_Braker.cdna.fasta $FinalDir/final_genes_CodingQuary.cdna.fasta > $FinalDir/final_genes_combined.cdna.fasta
-		cat $FinalDir/final_genes_Braker.gene.fasta $FinalDir/final_genes_CodingQuary.gene.fasta > $FinalDir/final_genes_combined.gene.fasta
-		cat $FinalDir/final_genes_Braker.upstream3000.fasta $FinalDir/final_genes_CodingQuary.upstream3000.fasta > $FinalDir/final_genes_combined.upstream3000.fasta
+	$ProgDir/add_CodingQuary_features.pl $AddGenesGff $Assembly > $FinalDir/final_genes_CodingQuary.gff3
+	$ProgDir/gff2fasta.pl $Assembly $FinalDir/final_genes_CodingQuary.gff3 $FinalDir/final_genes_CodingQuary
+	cp $BrakerGff $FinalDir/final_genes_Braker.gff3
+	$ProgDir/gff2fasta.pl $Assembly $FinalDir/final_genes_Braker.gff3 $FinalDir/final_genes_Braker
+	cat $FinalDir/final_genes_Braker.pep.fasta $FinalDir/final_genes_CodingQuary.pep.fasta | sed -r 's/\*/X/g' > $FinalDir/final_genes_combined.pep.fasta
+	cat $FinalDir/final_genes_Braker.cdna.fasta $FinalDir/final_genes_CodingQuary.cdna.fasta > $FinalDir/final_genes_combined.cdna.fasta
+	cat $FinalDir/final_genes_Braker.gene.fasta $FinalDir/final_genes_CodingQuary.gene.fasta > $FinalDir/final_genes_combined.gene.fasta
+	cat $FinalDir/final_genes_Braker.upstream3000.fasta $FinalDir/final_genes_CodingQuary.upstream3000.fasta > $FinalDir/final_genes_combined.upstream3000.fasta
 
-		GffBraker=$FinalDir/final_genes_CodingQuary.gff3
-		GffQuary=$FinalDir/final_genes_Braker.gff3
-		GffAppended=$FinalDir/final_genes_appended.gff3
-		cat $GffBraker $GffQuary > $GffAppended
-		done
-	done
+	GffBraker=$FinalDir/final_genes_CodingQuary.gff3
+	GffQuary=$FinalDir/final_genes_Braker.gff3
+	GffAppended=$FinalDir/final_genes_appended.gff3
+	cat $GffBraker $GffQuary > $GffAppended
 ```
 
 The final number of genes per isolate was observed using:
 ```bash
-	for DirPath in $(ls -d gene_pred/codingquary/N.*/*/final); do
+	for DirPath in $(ls -d gene_pred/codingquary/Ref_Genomes/N.*/*/final); do
 	echo $DirPath;
 	cat $DirPath/final_genes_Braker.pep.fasta | grep '>' | wc -l;
 	cat $DirPath/final_genes_CodingQuary.pep.fasta | grep '>' | wc -l;
@@ -305,10 +305,31 @@ The final number of genes per isolate was observed using:
 	done
 ```
 
-gene_pred/codingquary/N.ditissima/Hg199_minion/final
-13674
-1245
-14919
+gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final
+13665
+1418
+15083
+
+gene_pred/codingquary/Ref_Genomes/N.ditissima/R0905/final
+13300
+1134
+14434
+
+Remove duplicate genes
+```bash
+for GffAppended in $(ls gene_pred/codingquary/Ref_Genomes/*/*/final/final_genes_appended.gff3);
+do
+  Strain=$(echo $GffAppended | rev | cut -d '/' -f3 | rev)
+  Organism=$(echo $GffAppended | rev | cut -d '/' -f4 | rev)
+  echo "$Organism - $Strain"
+  FinalDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final
+  GffFiltered=$FinalDir/filtered_duplicates.gff
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary/
+  $ProgDir/remove_dup_features.py --inp_gff $GffAppended --out_gff $GffFiltered
+done
+```
+Not sure if this works. No duplicated genes were detected.
+
 
 
 =================================
@@ -323,7 +344,7 @@ also printing ORFs in .gff format.
 
 ```bash
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-for Genome in $(ls Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa); do
+for Genome in $(ls repeat_masked/Ref_Genomes/N.ditissima/R0905/*/*_contigs_unmasked.fa); do
 	qsub $ProgDir/run_ORF_finder.sh $Genome
 done
 ```
@@ -343,6 +364,7 @@ corrected using the following commands:
 		$ProgDir/gff_corrector.pl $ORF_Gff > $ORF_Gff_mod
 	done
 ```
+qalter -l h=blacklace09.blacklace
 
 =================================
 # Functional annotation
@@ -357,13 +379,13 @@ Note: This is a long-running script. As such, these commands were run using
 'screen' to allow jobs to be submitted and monitored in the background.
 This allows the session to be disconnected and reconnected over time.
 
-Screen ouput detailing the progress of submission of interporscan jobs
+Screen ouput detailing the progress of submission of interproscan jobs
 was redirected to a temporary output file named interproscan_submission.log .
 
 ```bash
 	screen -a
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Genes in $(ls gene_pred/codingquary/Ref_Genomes/N.*/R0905/*/final_genes_combined.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
