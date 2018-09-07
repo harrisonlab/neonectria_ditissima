@@ -316,6 +316,7 @@ gene_pred/codingquary/Ref_Genomes/N.ditissima/R0905/final
 14434
 
 Remove duplicate genes
+
 ```bash
 for GffAppended in $(ls gene_pred/codingquary/Ref_Genomes/*/*/final/final_genes_appended.gff3);
 do
@@ -326,10 +327,20 @@ do
   GffFiltered=$FinalDir/filtered_duplicates.gff
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary/
   $ProgDir/remove_dup_features.py --inp_gff $GffAppended --out_gff $GffFiltered
+	GffRenamed=$FinalDir/final_genes_appended_renamed.gff3
+	LogFile=$FinalDir/final_genes_appended_renamed.log
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
+	$ProgDir/gff_rename_genes.py --inp_gff $GffFiltered --conversion_log $LogFile > $GffRenamed
+	rm $GffFiltered
+	Assembly=$(ls repeat_masked/Ref_Genomes/$Organism/$Strain/filtered_contigs/*_softmasked_repeatmasker_TPSI_appended.fa)
+	$ProgDir/gff2fasta.pl $Assembly $GffRenamed gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final/final_genes_appended_renamed
+	# The proteins fasta file contains * instead of Xs for stop codons, these should
+	# be changed
+	sed -i 's/\*/X/g' gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final/final_genes_appended_renamed.pep.fasta
 done
 ```
-Not sure if this works. No duplicated genes were detected.
 
+No duplicated genes were detected.
 
 
 =================================
@@ -385,7 +396,7 @@ was redirected to a temporary output file named interproscan_submission.log .
 ```bash
 	screen -a
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/Ref_Genomes/N.*/Hg199/*/final_genes_combined.pep.fasta); do
+	for Genes in $(ls gene_pred/codingquary/Ref_Genomes/N.*/Hg199/*/final_genes_appended_renamed.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
@@ -409,10 +420,10 @@ commands:
 ## B) SwissProt
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_combined.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-		OutDir=gene_pred/swissprot/$Organism/$Strain
+		OutDir=gene_pred/swissprot/Ref_Genomes/$Organism/$Strain
 		SwissDbDir=../../../../home/groups/harrisonlab/uniprot/swissprot
 		SwissDbName=uniprot_sprot
 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
