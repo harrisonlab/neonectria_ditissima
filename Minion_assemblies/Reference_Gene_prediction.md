@@ -420,7 +420,7 @@ commands:
 ## B) SwissProt
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_appended_renamed.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		OutDir=gene_pred/swissprot/Ref_Genomes/$Organism/$Strain
