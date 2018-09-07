@@ -41,8 +41,7 @@ The number of bp in syntenous contigs was identified using:
   cat $OutDir/At_Ag_genome.txt | grep -f $OutDir/At_vs_Ag_syntenous_contigs.txt | cut -f6 -d ' ' | awk '{s+=$1} END {print s}'
 ``` -->
 
-Contig order was selected by taking the first line of that file and then also
-taking the reversed order of FoL contigs using the command:
+Contig order was selected by taking the first line of that file and then also taking the reversed order of contigs using the command:
 
 ```bash
 cat $OutDir/Hg_vs_R9_contig_orientation.txt | grep -A1 'Order of all seen contigs' | tail -n1 | sed "s/, /\n/g" > tmp.txt
@@ -50,6 +49,35 @@ cat $OutDir/Hg_vs_R9_contig_orientation.txt | grep -A1 'Order of all seen contig
 cat $OutDir/Hg199_R0905_genome.txt | grep 'Hg' | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/Hg/, Hg/g'
 cat $OutDir/Hg199_R0905_genome.txt | grep 'R9' | cut -f3 -d ' ' | tr -d '\n' | sed 's/R9/, R9/g' >> tmp.txt
 ```
+
+
+Contig order was selected by taking the first line of that file and then also taking the reversed order of contigs using the command:
+
+cat $OutDir/At_vs_As_contig_orientation.txt | grep -A1 'Order of all seen contigs' | tail -n1 | sed "s/, /\n/g" > tmp.txt
+cat $OutDir/At_As_genome.txt | grep 'As' | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/As/, As/g'
+# cat $OutDir/At_As_genome.txt | grep 'Ag' | cut -f3 -d ' ' | tr -d '\n' | sed 's/Ag/, Ag/g' >> tmp.txt
+
+echo "Order of unseen At contigs and remaining As contigs"
+cat $OutDir/At_As_genome.txt | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/At/, At/g' | sed 's/As/, As/g'
+ProgDir=/home/armita/git_repos/emr_repos/scripts/alternaria/pathogen/circos
+circos -conf $ProgDir/At_vs_As/At_vs_As_circos.conf -outputdir $OutDir
+mv $OutDir/circos.png $OutDir/At_vs_As_circos.png
+mv $OutDir/circos.svg $OutDir/At_vs_As_circos.svg
+ls $PWD/$OutDir/At_vs_As_circos.png
+
+
+
+echo "Order of unseen At contigs and remaining As contigs"
+cat $OutDir/Hg199_R0905_genome.txt | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/Hg/, Hg/g' | sed 's/R9/, R9/g'
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/alternaria/pathogen/circos
+circos -conf $ProgDir/Hg_vs_R9/Hg_vs_R9_circos.conf -outputdir $OutDir
+mv $OutDir/circos.png $OutDir/At_vs_As_circos.png
+mv $OutDir/circos.svg $OutDir/At_vs_As_circos.svg
+ls $PWD/$OutDir/At_vs_As_circos.png
+
+
+
+
 
 cat $OutDir/At_Ag_genome.txt | grep 'Ag' | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/Ag/, Ag/g'
 cat $OutDir/At_Ag_genome.txt | grep 'At' | cut -f3 -d ' ' | tr -d '\n' | sed 's/At/, At/g' >> tmp.txt
@@ -64,47 +92,3 @@ circos -conf $ProgDir/Ag_vs_At_genome_alignment/At_vs_Ag_circos.conf -outputdir 
 mv $OutDir/circos.png $OutDir/At_vs_Ag_circos.png
 mv $OutDir/circos.svg $OutDir/At_vs_Ag_circos.svg
 ```
-<!--
-```bash
-OutDir=analysis/circos/At_vs_Ag_genome_alignment_circos
-cat $OutDir/At_Ag_genome_edited2.txt | grep -v '4287' > $OutDir/At_Ag_genome_final.txt
-mkdir -p $OutDir/by_FoC_chr
-for Num in $(seq 1 22); do
-  Chr="contig_"$Num"_pilon"
-  echo "$Chr"
-  OrthologyTxt=analysis/orthology/orthomcl/FoC_vs_Fo_vs_FoL_publication_ncbi/FoC_vs_Fo_vs_FoL_publication_ncbi_orthogroups.txt
-  ProgDir=~/git_repos/emr_repossh s/scripts/fusarium/pathogen/identify_LS_chromosomes/circos
-  $ProgDir/orthology2ribbons_internal.py \
-  --chr1 $Chr \
-  --orthology $OrthologyTxt \
-  --name1 Fus2 \
-  --gff1 gene_pred/final_genes/F.oxysporum_fsp_cepae/Fus2_canu_new/final/final_genes_appended.gff3 \
-  | sort | uniq \
-  > $OutDir/At_vs_Ag_links_edited.txt
-  ProgDir=/home/armita/git_repos/emr_repos/scripts/fusarium/pathogen/identify_LS_chromosomes/circos
-  circos -conf $ProgDir/Fus2/Fus2_FoL/At_vs_Ag_circos.conf -outputdir $OutDir
-  mv $OutDir/circos.png $OutDir/by_FoC_chr/At_vs_Ag_LS_"$Chr"_circos.png
-  mv $OutDir/circos.svg $OutDir/by_FoC_chr/At_vs_Ag_LS_"$Chr"_circos.svg
-done
-``` -->
-<!--
-The frequency of gene duplications within and between chromosomes was investigated:
-
-```bash
-OutDir=analysis/circos/At_vs_Ag_genome_alignment_circos
-for Num in $(seq 1 22); do
-Chr="contig_"$Num"_pilon"
-ChrList="$ChrList $Chr"
-done
-echo "$ChrList"
-OrthologyTxt=analysis/orthology/orthomcl/FoC_vs_Fo_vs_FoL_publication_ncbi/FoC_vs_Fo_vs_FoL_publication_ncbi_orthogroups.txt
-ProgDir=~/git_repos/emr_repos/scripts/fusarium/pathogen/identify_LS_chromosomes/circos
-$ProgDir/orthology2ribbons_internal.py \
---chr1 $ChrList \
---orthology $OrthologyTxt \
---name1 Fus2 \
---gff1 gene_pred/final_genes/F.oxysporum_fsp_cepae/Fus2_canu_new/final/final_genes_appended.gff3 \
-| sort | uniq > $OutDir/Fus2_all_Fus2_links.txt
-cat $OutDir/Fus2_all_Fus2_links.txt | cut -f1,4 | sort | uniq -c > $OutDir/Fus2_all_Fus2_links_occurence.txt
-
-``` -->
