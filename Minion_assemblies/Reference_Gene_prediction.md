@@ -407,12 +407,12 @@ commands:
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+	for Proteins in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_appended_renamed.pep.fasta); do
 		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
 		echo $Strain
-		InterProRaw=gene_pred/interproscan/$Organism/$Strain/raw
+		InterProRaw=gene_pred/interproscan/Ref_Genomes/$Organism/$Strain/raw
 		$ProgDir/append_interpro.sh $Proteins $InterProRaw
 	done
 ```
@@ -457,14 +457,14 @@ commands:
 
  ```bash
   screen -a
-	for Strain in Hg199_minion; do
+	for Strain in Hg199 R0905; do
   SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
   CurPath=$PWD
-  for Proteome in $(ls gene_pred/codingquary/N.*/$Strain/*/final_genes_combined.pep.fasta); do
+  for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/$Strain/*/final_genes_appended_renamed.pep.fasta); do
   Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
   Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-  SplitDir=gene_pred/final_genes_split/$Organism/$Strain
+  SplitDir=gene_pred/final_genes_split/Ref_Genomes/$Organism/$Strain
   mkdir -p $SplitDir
   BaseName="$Organism""_$Strain"_final_preds
   $SplitfileDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName
