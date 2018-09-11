@@ -355,7 +355,7 @@ also printing ORFs in .gff format.
 
 ```bash
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-for Genome in $(ls repeat_masked/Ref_Genomes/N.ditissima/R0905/*/*_contigs_unmasked.fa); do
+for Genome in $(ls repeat_masked/Ref_Genomes/N.ditissima/Hg199/*/*_contigs_unmasked.fa); do
 	qsub $ProgDir/run_ORF_finder.sh $Genome
 done
 ```
@@ -365,7 +365,7 @@ corrected using the following commands:
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation
-	for ORF_Gff in $(ls gene_pred/ORF_finder/*/*/*_ORF.gff | grep -v '_F_atg_' | grep -v '_R_atg_'); do
+	for ORF_Gff in $(ls gene_pred/ORF_finder/*/R0905/*_ORF.gff | grep -v '_F_atg_' | grep -v '_R_atg_'); do
 		ORF_Gff_mod=$(echo $ORF_Gff | sed 's/_ORF.gff/_ORF_corrected.gff3/g')
 		echo ""
 		echo "Correcting the following file:"
@@ -375,7 +375,7 @@ corrected using the following commands:
 		$ProgDir/gff_corrector.pl $ORF_Gff > $ORF_Gff_mod
 	done
 ```
-qalter -l h=blacklace09.blacklace
+
 
 =================================
 # Functional annotation
@@ -396,7 +396,7 @@ was redirected to a temporary output file named interproscan_submission.log .
 ```bash
 	screen -a
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_appended_renamed.pep.fasta); do
+	for Genes in $(ls gene_pred/codingquary/Ref_Genomes/N.*/Hg199/*/final_genes_appended_renamed.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
@@ -407,7 +407,7 @@ commands:
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_appended_renamed.pep.fasta); do
+	for Proteins in $(ls gene_pred/codingquary/Ref_Genomes/N.*/Hg199/*/final_genes_appended_renamed.pep.fasta); do
 		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 		echo "$Organism - $Strain"
@@ -478,7 +478,7 @@ commands:
   printf "\n"
   echo $File
   qsub $ProgDir/pred_sigP.sh $File
-  qsub $ProgDir/pred_sigP.sh $File signalp-3.0
+  #qsub $ProgDir/pred_sigP.sh $File signalp-3.0
   qsub $ProgDir/pred_sigP.sh $File signalp-4.1
   done
   done
@@ -488,10 +488,10 @@ commands:
  single file for each strain. This was done with the following commands:
 
  ```bash
-for SplitDir in $(ls -d gene_pred/final_genes_split/N.*/Hg199_minion); do
+for SplitDir in $(ls -d gene_pred/final_genes_split/Ref_Genomes/N.*/Hg199); do
 Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
 Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
-for SigpDir in $(ls -d gene_pred/final_genes_signalp-4.1 | cut -f2 -d'/')
+for SigpDir in $(ls -d gene_pred/Ref_Genomes_signalp-4.1 | cut -f2 -d'/')
 do
 InStringAA=''
 InStringNeg=''
@@ -511,19 +511,23 @@ done
 done
 ```
 
- Some proteins that are incorporated into the cell membrane require secretion.
- Therefore proteins with a transmembrane domain are not likely to represent
- cytoplasmic or apoplastic effectors.
+SigP v2 did not predict any gene. Only v4 prediction will be used.
 
- Proteins containing a transmembrane domain were identified:
+Some proteins that are incorporated into the cell membrane require secretion.
+Therefore proteins with a transmembrane domain are not likely to represent
+cytoplasmic or apoplastic effectors.
+
+Proteins containing a transmembrane domain were identified:
 
  ```bash
- 	for Proteome in $(ls gene_pred/codingquary/N.*/Hg199_minion/*/final_genes_combined.pep.fasta); do
- 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
- 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
- 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
- 		qsub $ProgDir/submit_TMHMM.sh $Proteome
- 	done
+for Strain in Hg199 R0905; do
+for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_appended_renamed.pep.fasta); do
+	Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+	Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
+	qsub $ProgDir/submit_TMHMM.sh $Proteome
+done
+done
  ```
 
  Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
