@@ -592,10 +592,10 @@ Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
 at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
 
 ```bash
-  for Proteome in $(ls gene_pred/codingquary/N.*/*/*/final_genes_combined.pep.fasta); do
+  for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/R0905/*/final_genes_appended_renamed.pep.fasta); do
     Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-    OutDir=gene_pred/CAZY/$Organism/$Strain
+    OutDir=gene_pred/CAZY/Ref_Genomes/$Organism/$Strain
     mkdir -p $OutDir
     Prefix="$Strain"_CAZY
     CazyHmm=dbCAN/dbCAN-fam-HMMs.txt
