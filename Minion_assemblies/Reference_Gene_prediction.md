@@ -406,15 +406,15 @@ Following interproscan annotation split files were combined using the following
 commands:
 
 ```bash
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Proteins in $(ls gene_pred/codingquary/Ref_Genomes/N.*/Hg199/*/final_genes_appended_renamed.pep.fasta); do
-		Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
-		Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
-		echo "$Organism - $Strain"
-		echo $Strain
-		InterProRaw=gene_pred/interproscan/Ref_Genomes/$Organism/$Strain/raw
-		$ProgDir/append_interpro.sh $Proteins $InterProRaw
-	done
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
+for Proteins in $(ls gene_pred/codingquary/Ref_Genomes/N.*/Hg199/*/final_genes_appended_renamed.pep.fasta); do
+	Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
+	Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
+	echo "$Organism - $Strain"
+	echo $Strain
+	InterProRaw=gene_pred/interproscan/Ref_Genomes/$Organism/$Strain/raw
+	$ProgDir/append_interpro.sh $Proteins $InterProRaw
+done
 ```
 
 ## B) SwissProt
@@ -432,11 +432,11 @@ commands:
 ```
 
 ```bash
-	for SwissTable in $(ls gene_pred/swissprot/*/*/swissprot_vJul2016_10_hits.tbl); do
+	for SwissTable in $(ls gene_pred/swissprot/Ref_*/*/*/swissprot_vMar2018_10_hits.tbl); do
 		Strain=$(echo $SwissTable | rev | cut -f2 -d '/' | rev)
 		Organism=$(echo $SwissTable | rev | cut -f3 -d '/' | rev)
 		echo "$Organism - $Strain"
-		OutTable=gene_pred/swissprot/$Organism/$Strain/swissprot_vJul2016_tophit_parsed.tbl
+		OutTable=gene_pred/swissprot/Ref_Genomes/$Organism/$Strain/swissprot_vMar2018_tophit_parsed.tbl
 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
 		$ProgDir/swissprot_parser.py --blast_tbl $SwissTable --blast_db_fasta /home/groups/harrisonlab/uniprot/swissprot/uniprot_sprot.fasta > $OutTable
 	done
@@ -488,7 +488,7 @@ commands:
  single file for each strain. This was done with the following commands:
 
  ```bash
-for SplitDir in $(ls -d gene_pred/final_genes_split/Ref_Genomes/N.*/Hg199); do
+for SplitDir in $(ls -d gene_pred/final_genes_split/Ref_Genomes/N.*/R0905); do
 Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
 Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
 for SigpDir in $(ls -d gene_pred/Ref_Genomes_signalp-4.1 | cut -f2 -d'/')
@@ -533,23 +533,26 @@ done
  Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
 
  ```bash
-for File in $(ls gene_pred/trans_mem/*/Hg199_minion/*_TM_genes_neg.txt); do
+for File in $(ls gene_pred/trans_mem/*/R0905/*_TM_genes_neg.txt); do
  Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
  Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
  echo "$Organism - $Strain"
  TmHeaders=$(echo "$File" | sed 's/neg.txt/neg_headers.txt/g')
  cat $File | cut -f1 > $TmHeaders
- SigP=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
+ SigP=$(ls gene_pred/Ref_Genomes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
  OutDir=$(dirname $SigP)
  ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
  $ProgDir/extract_from_fasta.py --fasta $SigP --headers $TmHeaders > $OutDir/"$Strain"_final_sp_no_trans_mem.aa
  cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
 done
  ```
-
- N.ditissima - Hg199_minion
-1033
-
+ ```
+N.ditissima - Hg199
+1034
+N.ditissima - R0905
+1001
+ ```
+ 
 ## B) From Augustus gene models - Effector identification using EffectorP
 
 Required programs:
