@@ -685,9 +685,9 @@ makeblastdb -in $dbFasta -input_type fasta -dbtype $dbType -title $Prefix.db -pa
  cat $OutDir/${Prefix}_hits.txt | grep 'effector' | cut -f1,2 | sort | uniq > $OutDir/${Prefix}_hits_headers.txt
 ```
 
-=================================
+==================================================================
 # Looking for Transcription Factors
-=================================
+==================================================================
 
 ```bash
 for Interpro in $(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199_minion/Hg199_minion_interproscan.tsv); do
@@ -713,10 +713,9 @@ Interproscan results use transcript IDs rather gene IDs. I produce an additional
 cat analysis/transcription_factors/N.ditissima/Hg199_minion/Hg199_minion_TF_gene_headers.txt | sed -e "s/.t.*//g" > analysis/transcription_factors/N.ditissima/Hg199_minion/Hg199_minion_TF_geneid_headers.txt
 ```
 
-=================================
-
+==================================================================
 Secondary metabolites (Antismash and SMURF)
-=================================
+==================================================================
 
 Antismash was run to identify clusters of secondary metabolite genes within the genome. Antismash was run using the weserver at: http://antismash.secondarymetabolites.org
 
