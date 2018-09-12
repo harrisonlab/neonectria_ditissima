@@ -1547,12 +1547,9 @@ Number of masked bases:
     qsub -R y $ProgDir/sub_spades_pacbio.sh $PacBioDat $TrimF1_Read $TrimR1_Read $OutDir 15
   	done
 ```
-
-
-
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-  	for Assembly in $(ls assembly/spades_pacbio/*/*/contigs.fasta); do
+  	for Assembly in $(ls assembly/spades_pacbio/*/R0905_*/contigs.fasta); do
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)  
     OutDir=assembly/spades_pacbio/$Organism/$Strain/filtered_contigs
@@ -1560,13 +1557,13 @@ Number of masked bases:
   	done
 ```
 ```bash
-    for Assembly in $(ls assembly/spades_pacbio/*/*/contigs.fasta); do
+    for Assembly in $(ls assembly/spades_pacbio/*/R0905_*/contigs.fasta); do
     Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     echo "$Organism - $Strain"
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/spades_pacbio
+    OutDir=gene_pred/spades_pacbio/$Organism/$Strain/busco
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
@@ -1574,7 +1571,7 @@ Number of masked bases:
 Contigs shorter than 500bp were removed from the assembly
 
 ```bash
-  for Contigs in $(ls assembly/spades_pacbio/*/*/contigs.fasta); do
+  for Contigs in $(ls assembly/spades_pacbio/*/R0905_*/contigs.fasta); do
     AssemblyDir=$(dirname $Contigs)
     mkdir $AssemblyDir/filtered_contigs_min_500bp
     FilterDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/abyss
@@ -1586,7 +1583,7 @@ Quast
 
 ```bash
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
-    for Assembly in $(ls assembly/spades_pacbio/*/*/filtered_contigs_min_500bp/contigs_min_500bp.fasta); do
+    for Assembly in $(ls assembly/spades_pacbio/*/R0905_*/filtered_contigs_min_500bp/contigs_min_500bp.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
     OutDir=assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp
@@ -1594,41 +1591,40 @@ Quast
     done
 ```
 ```bash
-    for Assembly in $(ls assembly/spades_pacbio/*/*/filtered_contigs_min_500bp/contigs_min_500bp.fasta); do
+    for Assembly in $(ls assembly/spades_pacbio/*/R0905_*/filtered_contigs_min_500bp/contigs_min_500bp.fasta); do
     Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
     echo "$Organism - $Strain"
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=gene_pred/busco/$Organism/Ref_Genomes/$Strain/spades_pacbio
+    OutDir=assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp/busco
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
 
 ## Merging pacbio and hybrid assemblies
 
+I used the pilon_5 genome because busco prediction was slightly better than racon genome.
+
 ```bash
   for PacBioAssembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/polished/pilon_5.fasta); do
-    Organism=$(echo $PacBioAssembly | rev | cut -f5 -d '/' | rev)
-    Strain=$(echo $PacBioAssembly | rev | cut -f4 -d '/' | rev)
-    HybridAssembly=$(ls assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp/contigs_min_500bp.fasta)
+    HybridAssembly=$(ls assembly/spades_pacbio/$Organism/R0905_v2/filtered_contigs_min_500bp/contigs_min_500bp.fasta)
+    Organism=$(echo $HybridAssembly | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $HybridAssembly | rev | cut -f3 -d '/' | rev)
     AnchorLength=5000
     OutDir=assembly/merged_canu_spades/$Organism/$Strain/"$Strain"_pacbio_5k
     ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
     qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
   done
 ```
-```bash
-  for PacBioAssembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/racon_10/polished/pilon_5.fasta); do
-    Organism=$(echo $PacBioAssembly | rev | cut -f6 -d '/' | rev)
-    Strain=$(echo $PacBioAssembly | rev | cut -f5 -d '/' | rev)
-    HybridAssembly=$(ls assembly/spades_pacbio/$Organism/$Strain/filtered_contigs_min_500bp/contigs_min_500bp.fasta)
-    AnchorLength=5000
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/"$Strain"_pacbio_afterracon_5k
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
-    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
-  done
-```
+
+
+
+
+
+
+
+
 
 ```bash
   	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
