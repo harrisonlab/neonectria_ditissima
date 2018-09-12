@@ -1509,6 +1509,22 @@ Number of masked bases:
 5516834
 ```
 
+Identify Telomere repeats:
+Telomeric repeats were identified in assemblies
+
+```bash
+for Assembly in $(ls repeat_masked/Ref_Genomes/*/*/filtered_contigs/*_contigs_unmasked.fa); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+OutDir=analysis/telomere/$Organism/$Strain
+mkdir -p $OutDir
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/telomeres
+$ProgDir/annotate_telomeres.py --fasta $Assembly --out $OutDir/telomere_hits
+done
+cat $OutDir/telomere_hits.txt | sort -nr -k5 | less
+```
+
 ### Improving R0905 assembly.
 
 ### R0905 Hybrid Spades Assembly
