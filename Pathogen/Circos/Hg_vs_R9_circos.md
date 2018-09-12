@@ -15,8 +15,12 @@ This program is used to convert fasta files into input format for circos
 
   cat $OutDir/Hg199_genome.txt > $OutDir/Hg199_R0905_genome.txt
   tac $OutDir/R0905_genome.txt >> $OutDir/Hg199_R0905_genome.txt
+```
+Telomere locations on contigs:
 
-  # cat $OutDir/At_Ag_genome.txt | grep -v 'DS231' | grep -v -e 'chr23' -e 'chr24' -e 'chr25' -e 'chr26' -e 'chr27' -e 'chr28' -e 'chr29' -e 'chr30' -e 'chr31' -e 'chr32' -e 'chr33' -e 'chr34' > $OutDir/At_Ag_genome_edited.txt
+```bash
+cat analysis/telomere/N.ditissima/Hg199/telomere_hits_circos.txt | sed 's/contig/Hg_contig/g' | sort -k3 -n -t'_' > $OutDir/Hg_vs_R9_telomere_hits.txt
+cat analysis/telomere/N.ditissima/R0905/telomere_hits_circos.txt  | sed 's/contig/R9_contig/g' | sort -k3 -n -t'_' >> $OutDir/Hg_vs_R9_telomere_hits.txt
 ```
 
 ```bash
@@ -33,13 +37,6 @@ A file showing contig orientations was made:
   ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/circos
   $ProgDir/find_contig_orientation.py --links_file $OutDir/Hg_vs_R9_links_edited.txt > $OutDir/Hg_vs_R9_contig_orientation.txt
 ```
-<!--
-The number of bp in syntenous contigs was identified using:
-
-```bash
-  cat $OutDir/At_vs_Ag_contig_orientation.txt | tail -n3 | grep -v 'orientation' | sed 's/, /\n/g' > $OutDir/At_vs_Ag_syntenous_contigs.txt
-  cat $OutDir/At_Ag_genome.txt | grep -f $OutDir/At_vs_Ag_syntenous_contigs.txt | cut -f6 -d ' ' | awk '{s+=$1} END {print s}'
-``` -->
 
 Contig order was selected by taking the first line of that file and then also taking the reversed order of contigs using the command:
 
