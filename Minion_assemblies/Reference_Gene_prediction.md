@@ -664,13 +664,15 @@ number of Secreted CAZY genes identified:
 
 ```bash
 cd /data/scratch/gomeza
-dbFasta=$(ls /home/groups/harrisonlab/phibase/v4.5/phi_accessions2.fa)
+dbFasta=$(ls /home/groups/harrisonlab/phibase/v4.5/phi_accessions.fa)
 dbType="prot"
 QueryFasta=$(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.cdna.fasta)
 Prefix="Hg199_phi_accessions"
 Eval="1e-30"
 OutDir=analysis/blast_homology/Ref_Genomes/N.ditissima/Hg199
 mkdir -p $OutDir
+
+
  #-------------------------------------------------------
  # 		Step 1.		Make database
  #-------------------------------------------------------
@@ -683,6 +685,18 @@ makeblastdb -in $dbFasta -input_type fasta -dbtype $dbType -title $Prefix.db -pa
  # 		Step 3.		Summarise hits
  #-------------------------------------------------------
  cat $OutDir/${Prefix}_hits.txt | grep 'effector' | cut -f1,2 | sort | uniq > $OutDir/${Prefix}_hits_headers.txt
+
+
+cd /data/scratch/gomeza
+dbFasta=$(ls /home/groups/harrisonlab/phibase/v4.5/phi_accessions.fa)
+dbType="prot"
+QueryFasta=$(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/R0905/final/final_genes_appended_renamed.cdna.fasta)
+Prefix="R0905_phi_accessions"
+Eval="1e-30"
+OutDir=analysis/blast_homology/Ref_Genomes/N.ditissima/R0905
+mkdir -p $OutDir
+
+#Repeat steps 1,2 and 3.
 ```
 
 ==================================================================
