@@ -1,6 +1,6 @@
-=================================
+==================================================================
 # Gene  Prediction
-=================================
+==================================================================
 
 Gene prediction followed three steps:
 	Pre-gene prediction
@@ -343,9 +343,9 @@ done
 No duplicated genes were detected.
 
 
-=================================
+==================================================================
 # ORF Finder
-=================================
+==================================================================
 
 The genome was searched in six reading frames for any start codon and following
 translated identification of a start codon translating sequence until a stop
@@ -377,9 +377,9 @@ corrected using the following commands:
 ```
 
 
-=================================
+==================================================================
 # Functional annotation
-=================================
+==================================================================
 
 ## A) Interproscan
 
@@ -442,9 +442,9 @@ done
 	done
 ```
 
-=================================
+==================================================================
 # Effector genes
-=================================
+==================================================================
 
 ## A) From Augustus gene models - Identifying secreted proteins
 
@@ -552,47 +552,56 @@ N.ditissima - Hg199
 N.ditissima - R0905
 1001
  ```
- 
+
 ## B) From Augustus gene models - Effector identification using EffectorP
 
 Required programs:
  * EffectorP.py
 
 ```bash
-cp gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta prog/EffectorP/EffectorP_1.0/Scripts/
-cd prog/EffectorP/EffectorP_1.0/Scripts/
-python EffectorP.py -i final_genes_combined.pep.fasta -o N.ditissima_Hg199_minion_EffectorP.txt
-mv N.ditissima_Hg199_minion_EffectorP.txt ../../../../analysis/effectoP/N.ditissima/Hg199_minion
+for Strain in Hg199 R0905; do
+	for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/$Strain/*/final_genes_appended_renamed.pep.fasta); do
+		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+		BaseName="$Organism"_"$Strain"_EffectorP
+		OutDir=analysis/effectorP/Ref_Genomes/$Organism/$Strain
+		ProgDir=~/git_repos/emr_repos/tools/seq_tools/feature_annotation/fungal_effectors
+		qsub $ProgDir/pred_effectorP.sh $Proteome $BaseName $OutDir
+	done
+done
 ```
+```
+Hg199
+Number of proteins that were tested: 15087
+Number of predicted effectors: 2856
 
-Number of proteins that were tested: 14919
-Number of predicted effectors: 2777
-
------------------
-18.6 percent are predicted to be effectors.
-
+R0905
+Number of proteins that were tested: 14436
+Number of predicted effectors: 2572
+```
 ```bash
-  for File in $(ls analysis/effectorP/*/*/*_EffectorP.txt); do
+for Strain in Hg199 R0905; do
+  for File in $(ls analysis/effectorP/Ref_Genomes/*/$Strain/*_EffectorP.txt); do
     Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
     echo "$Organism - $Strain"
     Headers=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_headers.txt/g')
     cat $File | grep 'Effector' | cut -f1 > $Headers
-    Secretome=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp_no_trans_mem.aa)
+    Secretome=$(ls gene_pred/Ref_Genomes_signalp-4.1/$Organism/$Strain/*_final_sp_no_trans_mem.aa)
     OutFile=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted.aa/g')
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
     $ProgDir/extract_from_fasta.py --fasta $Secretome --headers $Headers > $OutFile
     OutFileHeaders=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted_headers.txt/g')
     cat $OutFile | grep '>' | tr -d '>' > $OutFileHeaders
     cat $OutFileHeaders | wc -l
-    Gff=$(ls gene_pred/codingquary/$Organism/$Strain/*/final_genes_appended.gff3)
+    Gff=$(ls gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/*/final_genes_appended_renamed.gff3)
     EffectorP_Gff=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted.gff/g')
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
     $ProgDir/extract_gff_for_sigP_hits.pl $OutFileHeaders $Gff effectorP ID > $EffectorP_Gff
     cat $EffectorP_Gff | grep -w 'gene' | wc -l
   done > tmp.txt
+done
 ```
-
 ## C) CAZY proteins
 
 Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
@@ -649,24 +658,23 @@ number of Secreted CAZY genes identified:
 290
 
 
-=================================
+==================================================================
 # PhiBase genes:Identifying PHIbase homologs
-=================================
+==================================================================
 
 ```bash
 cd /data/scratch/gomeza
-dbFasta=$(ls /home/groups/harrisonlab/phibase/v4.4/phi_accessions.fa)
+dbFasta=$(ls /home/groups/harrisonlab/phibase/v4.5/phi_accessions2.fa)
 dbType="prot"
-QueryFasta=$(ls gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.cdna.fasta)
+QueryFasta=$(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.cdna.fasta)
 Prefix="Hg199_phi_accessions"
 Eval="1e-30"
- # WorkDir=$TMPDIR
- OutDir=analysis/blast_homology/N.ditissima/Hg199
- mkdir -p $OutDir
+OutDir=analysis/blast_homology/Ref_Genomes/N.ditissima/Hg199
+mkdir -p $OutDir
  #-------------------------------------------------------
  # 		Step 1.		Make database
  #-------------------------------------------------------
- makeblastdb -in $dbFasta -input_type fasta -dbtype $dbType -title $Prefix.db -parse_seqids -out $OutDir/$Prefix.db
+makeblastdb -in $dbFasta -input_type fasta -dbtype $dbType -title $Prefix.db -parse_seqids -out $OutDir/$Prefix.db
  #-------------------------------------------------------
  # 		Step 2.		Blast Search
  #-------------------------------------------------------
