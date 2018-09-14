@@ -35,6 +35,12 @@ cat LDPL01.1.fsa_nt | sed 's/ Neo.*//g' > LDPL01.1.fsa_nt.fasta
   done
 ```
 
+For Hg199 and R0905, I used the genome assemblies with the best busco prediction, regardless of contig number. These were the spades assembly of Hg199 and the canu pilon5 of R0905.
+
+
+
+
+
 Three busco genes gave me unexpected multiple hits. Therefore I removed them for my analysis
 
 ```bash
