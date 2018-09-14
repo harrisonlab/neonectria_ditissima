@@ -626,7 +626,7 @@ Those proteins with a signal peptide were extracted from the list and gff files
 representing these proteins made.
 
   ```bash
-  for File in $(ls gene_pred/CAZY/N.*/*/*CAZY.out.dm); do
+  for File in $(ls gene_pred/CAZY/Ref_Genomes/N.*/*/*CAZY.out.dm); do
   Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $File)
@@ -637,12 +637,12 @@ representing these proteins made.
   cat $OutDir/"$Strain"_CAZY.out.dm.ps | cut -f3 | sort | uniq > $CazyHeaders
   echo "number of CAZY genes identified:"
   cat $CazyHeaders | wc -l
-  Gff=$(ls gene_pred/codingquary/$Organism/$Strain/final/final_genes_appended.gff3)
+  Gff=$(ls gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final/final_genes_appended_renamed.gff3)
   CazyGff=$OutDir/"$Strain"_CAZY.gff
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
   $ProgDir/extract_gff_for_sigP_hits.pl $CazyHeaders $Gff CAZyme ID > $CazyGff
 
-  SecretedProts=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
+  SecretedProts=$(ls gene_pred/Ref_Genomes_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
   SecretedHeaders=$(echo $SecretedProts | sed 's/.aa/_headers.txt/g')
   cat $SecretedProts | grep '>' | tr -d '>' > $SecretedHeaders
   CazyGffSecreted=$OutDir/"$Strain"_CAZY_secreted.gff
@@ -651,12 +651,16 @@ representing these proteins made.
   cat $CazyGffSecreted | grep -w 'gene' | cut -f9 | tr -d 'ID=' | wc -l
   done
 ```
-N.ditissima - Hg199_minion
+N.ditissima - Hg199
 number of CAZY genes identified:
-753
+754
 number of Secreted CAZY genes identified:
-290
-
+293
+N.ditissima - R0905
+number of CAZY genes identified:
+738
+number of Secreted CAZY genes identified:
+284
 
 ==================================================================
 # PhiBase genes:Identifying PHIbase homologs
@@ -704,11 +708,11 @@ mkdir -p $OutDir
 ==================================================================
 
 ```bash
-for Interpro in $(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199_minion/Hg199_minion_interproscan.tsv); do
+for Interpro in $(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/R0905/*_interproscan.tsv); do
   Organism=$(echo $Interpro | rev | cut -f3 -d '/' | rev)
   Strain=$(echo $Interpro | rev | cut -f2 -d '/' | rev)
   echo "$Organism - $Strain"
-  OutDir=analysis/transcription_factors/$Organism/$Strain
+  OutDir=analysis/transcription_factors/Ref_Genomes/$Organism/$Strain
   mkdir -p $OutDir
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transcription_factors
   $ProgDir/interpro2TFs.py --InterPro $Interpro > $OutDir/"$Strain"_TF_domains.tsv
@@ -717,14 +721,16 @@ for Interpro in $(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg1
   cat $OutDir/"$Strain"_TF_gene_headers.txt | wc -l
 done
 ```
-N.ditissima - Hg199_minion
+N.ditissima - Hg199
+total number of transcription factors
+971
 total number of transcription factors
 967
 
 Interproscan results use transcript IDs rather gene IDs. I produce an additional file with gene names
 
 ```bash
-cat analysis/transcription_factors/N.ditissima/Hg199_minion/Hg199_minion_TF_gene_headers.txt | sed -e "s/.t.*//g" > analysis/transcription_factors/N.ditissima/Hg199_minion/Hg199_minion_TF_geneid_headers.txt
+cat analysis/transcription_factors/Ref_Genomes/N.ditissima/R0905/R0905_TF_gene_headers.txt | sed -e "s/.t.*//g" > analysis/transcription_factors/Ref_Genomes/N.ditissima/R0905/R0905_TF_geneid_headers.txt
 ```
 
 ==================================================================
