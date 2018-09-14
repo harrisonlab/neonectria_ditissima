@@ -34,7 +34,7 @@ For R0905, I used R0905_all.
 ## Rename input mapping files in each folder by prefixing with the strain ID
 
 ```bash
-for filename in $(ls -d analysis/genome_alignment/bowtie/N.*/*); do
+for filename in $(ls -d analysis/genome_alignment/bowtie/N.*/R68-17-C*); do
 Organism=$(echo $filename | rev | cut -f2 -d '/' | rev)
 Strain=$(echo $filename | rev | cut -f1 -d '/' | rev)
 echo "$Organism - $Strain"
@@ -50,7 +50,8 @@ done
 Convention used: qsub $scripts/sub_pre_snp_calling.sh <SAMPLE_ID> This needs to use samtools 0.1.18 - hash out 1.5 from profile while this is run
 
 ```bash
-for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17 SVK1 SVK2 NMaj; do
+for Strain in R68-17-C2 R68-17-C3; do
+#for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17 SVK1 SVK2 NMaj; do
     Jobs=$(qstat | grep 'sub_pre_sn' | wc -l)
     while [ $Jobs -gt 5 ]
     do
@@ -65,7 +66,8 @@ done
 ## Copy outputs from cleanup to alignment folder
 
 ```bash
-for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17 SVK1 SVK2 NMaj; do
+for Strain in R68-17-C2 R68-17-C3; do
+#for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17 SVK1 SVK2 NMaj; do
   #Bam="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup.bam
   rgBam="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam
   Bai="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam.bai
