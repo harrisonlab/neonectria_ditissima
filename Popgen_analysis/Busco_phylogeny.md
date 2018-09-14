@@ -51,7 +51,7 @@ Three busco genes gave me unexpected multiple hits. Therefore I removed them for
 Create a list of all BUSCO IDs
 
 ```bash
-OutDir=analysis/popgen/busco_phylogeny
+OutDir=analysis/popgen/busco_phylogeny2
 mkdir -p $OutDir
 BuscoDb="sordariomyceta_odb9"
 ls -1 /home/groups/harrisonlab/dbBusco/$BuscoDb/hmms/*hmm | rev | cut -f1 -d '/' | rev | sed -e 's/.hmm//' > $OutDir/all_buscos_"$BuscoDb".txt
@@ -62,12 +62,12 @@ each assembly to the folder.
 Then create a fasta file containing all the aligned reads for each busco gene for alignment later.
 
 ```bash
-printf "" > analysis/popgen/busco_phylogeny/single_hits.txt
-  for Busco in $(cat analysis/popgen/busco_phylogeny/all_buscos_*.txt); do
+printf "" > analysis/popgen/busco_phylogeny2/single_hits.txt
+  for Busco in $(cat analysis/popgen/busco_phylogeny2/all_buscos_*.txt); do
   echo $Busco
-  OutDir=analysis/popgen/busco_phylogeny/$Busco
+  OutDir=analysis/popgen/busco_phylogeny2/$Busco
   mkdir -p $OutDir
-  for Fasta in $(ls gene_pred/busco/N.ditissima/*/assembly/*/single_copy_busco_sequences/$Busco*.fna); do
+  for Fasta in $(ls gene_pred/busco/N.*/*/*/*/single_copy_busco_sequences/$Busco*.fna); do
   Strain=$(echo $Fasta | rev | cut -f5 -d '/' | rev)
   Organism=$(echo $Fasta | rev | cut -f6 -d '/' | rev)
   FileName=$(basename $Fasta)
