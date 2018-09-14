@@ -222,8 +222,7 @@ Sequence data for isolates with a data from a single sequencing run was aligned 
 This was done again using the newest version of the Hg199 genome.
 
 ```bash
-#for Strain in R0905_all R0905_v2 R68-17-C2 NMaj SVK1 SVK2; do
-for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905 Hg199; do
+for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17 SVK1 SVK2 NMaj; do
 #Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
 #New genome version was copied to the REFERENCE folder.
 Reference=$(ls REFERENCE/Hg199_contigs_unmasked.fa)
