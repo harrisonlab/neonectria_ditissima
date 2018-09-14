@@ -16,8 +16,9 @@ Quality of genome assemblies was assessed by looking for the gene space in the a
 Busco has replaced CEGMA and was run to check gene space in assemblies
 
 ```bash
-	for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
-		for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*unmasked.fa); do
+	for Strain in R68-17-C2 SVK1 SVK2 NMaj; do
+	#for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
+		for Assembly in $(ls repeat_masked/N.*/$Strain/*unmasked.fa); do
 		Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
 		Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
 		echo "$Organism - $Strain"
