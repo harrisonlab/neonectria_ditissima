@@ -10,7 +10,7 @@ scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_ana
 Sequence data for isolates with a data from a single sequencing run was aligned against the Nd genome
 
 ```bash
-for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905 R0905_v2 R0905_all R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17 SVK1 SVK2 NMaj; do
+for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905 R0905_v2 R0905_all R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17-C2 R68-17-C3 SVK1 SVK2 NMaj; do
 #Reference=$(ls repeat_masked/N.*/*/Hg199_minion/*/*_contigs_unmasked.fa)
 #New genome version was copied to the REFERENCE folder.
 Reference=$(ls REFERENCE/Hg199_contigs_unmasked.fa)
@@ -70,7 +70,7 @@ for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 
   rgBam="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam
   Bai="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam.bai
   Txt="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup.txt
-  Directory=analysis/genome_alignment/bowtie/*/$Strain/vs_Hg199_minion/
+  Directory=analysis/genome_alignment/bowtie/*/$Strain/
   #mv $Bam $Directory
   mv $rgBam $Directory
   mv $Bai $Directory
