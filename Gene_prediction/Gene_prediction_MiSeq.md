@@ -77,11 +77,11 @@ Cufflinks was run to produce the fragment length and stdev statistics:
 screen -a
 
 ```bash
-for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 P112 OPC304 R0905_canu_2017_v2 R37-15 R39-15 R41-15 R42-15 R45-15 R68-17 R6-17-2 R6-17-3; do
+#for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 P112 OPC304 R0905_canu_2017_v2 R37-15 R39-15 R41-15 R42-15 R45-15 R68-17 R6-17-2 R6-17-3; do
+for Strain in R68-17-C2 NMaj SVK1 SVK2; do
 for Assembly in $(ls repeat_masked/*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
 Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
-# AcceptedHits=alignment/$Organism/$Strain/concatenated/concatenated.bam
 AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
 OutDir=gene_pred/cufflinks/$Organism/$Strain/vs_Hg199reads/concatenated_prelim
 echo "$Organism - $Strain"
