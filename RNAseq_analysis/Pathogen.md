@@ -271,7 +271,7 @@ dds$Condition<-factor(dds$Condition, levels=c("Control","Infected"))
 dds<-DESeq(dds)
 resultsNames(dds)
 ###
-[1] "Intercept"                      "Condition_Infection_vs_Control"
+[1] "Intercept"                     "Condition_Infected_vs_Control"
 ###
 
 #===============================================================================
@@ -283,10 +283,12 @@ res
 summary(res)
 
 alpha <- 0.05
-
-res= results(dds, alpha=alpha,contrast=c("Condition","Infection","Control"))
+res= results(dds, alpha=alpha,contrast=c("Condition","Infected","Control"))
 sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
+
 summary(sig.res)
 ###
 out of 4288 with nonzero total read count
@@ -296,7 +298,11 @@ LFC < 0 (down)   : 2330, 54%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 ###
+
 write.table(sig.res,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/Infection_vs_Control.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/Infection_vs_Control_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/Infection_vs_Control_down.txt",sep="\t",na="",quote=F)
+
 
 #===============================================================================
 #       Exploring and exporting results
@@ -363,4 +369,71 @@ xlab(paste0("PC1: ",percentVar[1],"% variance")) +
 ylab(paste0("PC2: ",percentVar[2],"% variance")) + geom_text_repel(aes(label=colnames(rld)))
 coord_fixed()
 ggsave("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/PCA_sample_names.pdf", pca_plot, dpi=300, height=10, width=12)
+```
+
+#Make a table of raw counts, normalised counts and fpkm values:
+
+```R
+raw_counts <- data.frame(counts(dds, normalized=FALSE))
+colnames(raw_counts) <- paste(colData$Group)
+write.table(raw_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/raw_counts.txt",sep="\t",na="",quote=F)
+norm_counts <- data.frame(counts(dds, normalized=TRUE))
+colnames(norm_counts) <- paste(colData$Group)
+write.table(norm_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/normalised_counts.txt",sep="\t",na="",quote=F)
+
+#robust may be better set at false to normalise based on total counts rather than 'library normalisation factors'
+
+fpkm_counts <- data.frame(fpkm(dds, robust = TRUE))
+colnames(fpkm_counts) <- paste(colData$Group)
+write.table(fpkm_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/fpkm_norm_counts.txt",sep="\t",na="",quote=F)
+fpkm_counts <- data.frame(fpkm(dds, robust = FALSE))
+colnames(fpkm_counts) <- paste(colData$Group)
+write.table(fpkm_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/fpkm_counts.txt",sep="\t",na="",quote=F)
+```
+
+
+#Analysis of DeSeq2 output
+
+```bash
+for UpFile in $(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/*_up.txt); do
+  DownFile=$(echo $UpFile | sed 's/_up.txt/_down.txt/g')
+  DegFile=$(echo $UpFile | sed 's/_up.txt/_DEGs.txt/g')
+  cat $UpFile $DownFile | grep -v 'baseMean' | cut -f1 | sort -u > $DegFile
+  echo $DegFile
+  cat $DegFile | wc -l
+done
+```
+```
+alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/Infection_vs_Control_DEGs.txt
+4200
+```
+
+##Produce a more detailed table of analyses
+
+```bash
+for GeneGff in $(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3); do
+Strain=Hg199_minion
+Organism=N.ditissima
+Assembly=$(ls /data/scratch/gomeza/Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/*_contigs_unmasked.fa)
+InterPro=$(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199_minion/Hg199_minion_interproscan.tsv)
+SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/N.ditissima/Hg199_minion/swissprot_vJul2016_tophit_parsed.tbl)
+OutDir=gene_pred/annotation/v5/$Organism/$Strain
+mkdir -p $OutDir
+GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta)
+TFs=$(ls analysis/transcription_factors/N.ditissima/Hg199_minion/Hg199_minion_TF_domains.tsv)
+#Antismash=$(ls /data/scratch/gomeza/analysis/secondary_metabolites/antismash/Hg199_minion/fungi-dfc734cf-18aa-414d-b034-0da05c627613/Hg199_minion_antismash_secmet_genes.tsv)
+SigP4=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/Hg199_minion_final_sp_no_trans_mem.aa)
+effector_total=$(ls analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_headers.txt)
+CAZY_total=$(ls gene_pred/CAZY/N.ditissima/Hg199_minion/Hg199_minion_CAZY_headers.txt)
+TMHMM_headers=$(ls gene_pred/trans_mem/$Organism/$Strain/*_TM_genes_pos_headers.txt)
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/annotation_tables
+Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5)
+DEG_Files=$(ls \
+$Dir1/Infection_vs_Control.txt \
+| sed -e "s/$/ /g" | tr -d "\n")
+RawCount=$(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/raw_counts.txt)
+FPKM=$(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/fpkm_counts.txt)
+$ProgDir/Nd_annotation_tables.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
+done
+done
 ```
