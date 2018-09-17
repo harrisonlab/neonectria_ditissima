@@ -35,8 +35,8 @@ ap.add_argument('--trans_mem', required=True, type=str,
                 transmembrane proteins by TMHMM')
 ap.add_argument('--TFs',required=True,type=str,
 		        help='Tab seperated of putative transcription factors and their domains as identified by interpro2TFs.py')
-ap.add_argument('--Antismash',required=True,type=str,
-		        help='Output of Antismash parsed into a tsv file of gene names, contig, secmet function and cluster ID')
+#ap.add_argument('--Antismash',required=True,type=str,
+		        #help='Output of Antismash parsed into a tsv file of gene names, contig, secmet function and cluster ID')
 ap.add_argument('--effector_total', required=True, type=str,
                 help='txt file of all transcripts considered low confidence \
                 effector')
@@ -70,8 +70,8 @@ with open(conf.TFs) as f:
 with open(conf.InterPro) as f:
     InterPro_lines = f.readlines()
 
-with open(conf.Antismash) as f:
-    antismash_lines = f.readlines()
+#with open(conf.Antismash) as f:
+    #antismash_lines = f.readlines()
 
 with open(conf.SigP4) as f:
     sigP4_lines = f.readlines()
@@ -252,18 +252,18 @@ for line in InterPro_lines:
 # Build a dictionary of Secondary Metabolite annotations
 #-----------------------------------------------------
 #
-i = 0
-antismash_dict = defaultdict(list)
-for line in antismash_lines:
-    i += 1
-    cluster = "cluster_" + str(i)
-    line = line.rstrip("\n")
-    split_line = line.split("\t")
-    secmet_func = split_line[2]
-    cluster_genes = split_line[4].split(";")
-    for gene in cluster_genes:
-        gene = re.sub("_\d$", "", gene)
-        antismash_dict[gene].extend([secmet_func, cluster])
+#i = 0
+#antismash_dict = defaultdict(list)
+#for line in antismash_lines:
+    #i += 1
+    #cluster = "cluster_" + str(i)
+    #line = line.rstrip("\n")
+    #split_line = line.split("\t")
+    #secmet_func = split_line[2]
+    #cluster_genes = split_line[4].split(";")
+    #for gene in cluster_genes:
+        #gene = re.sub("_\d$", "", gene)
+        #antismash_dict[gene].extend([secmet_func, cluster])
         #print "\t".join([gene, secmet_func, cluster])
 
 # -----------------------------------------------------
@@ -337,7 +337,7 @@ header_line.append('prot_seq')
 #header_line.append('CDS_seq')
 header_line.append('TFs')
 header_line.append('Interpro')
-header_line.append('Antismash')
+#header_line.append('Antismash')
 print ("\t".join(header_line))
 
 transcript_lines = []
@@ -466,13 +466,13 @@ for line in transcript_lines:
         TFs_cols.append("")
 
     #Add Antismash info
-    if antismash_dict[transcript_id]:
-        antismash_cols = antismash_dict[transcript_id]
-        secmet_func = antismash_cols[0]
-        cluster = antismash_cols[1]
-        antismash_cols = [cluster, secmet_func]
-    else:
-        antismash_cols = ["",""]
+    #if antismash_dict[transcript_id]:
+        #antismash_cols = antismash_dict[transcript_id]
+        #secmet_func = antismash_cols[0]
+        #cluster = antismash_cols[1]
+        #antismash_cols = [cluster, secmet_func]
+    #else:
+        #antismash_cols = ["",""]
 
     # Add in interproscan info
     if interpro_dict[transcript_id]:
@@ -498,6 +498,6 @@ for line in transcript_lines:
     outline.append(prot_seq)
     outline.extend(TFs_cols)
     outline.append(interpro_col)
-    outline.extend(antismash_cols)
+    #outline.extend(antismash_cols)
     outline.extend(swissprot_cols)
     print "\t".join(outline)
