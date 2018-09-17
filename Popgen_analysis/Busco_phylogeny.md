@@ -91,14 +91,14 @@ If all isolates have a single copy of a busco gene, move the appended fasta to
 a new folder
 
 ```bash
-  OutDir=analysis/popgen/busco_phylogeny/alignments
+  OutDir=analysis/popgen/busco_phylogeny2/alignments
   mkdir -p $OutDir
-  OrganismNum=$(cat analysis/popgen/busco_phylogeny/single_hits.txt | cut -f2 | sort -nr | head -n1)
-  for Busco in $(cat analysis/popgen/busco_phylogeny/all_buscos_*.txt); do
+  OrganismNum=$(cat analysis/popgen/busco_phylogeny2/single_hits.txt | cut -f2 | sort -nr | head -n1)
+  for Busco in $(cat analysis/popgen/busco_phylogeny2/all_buscos_*.txt); do
   echo $Busco
-  HitNum=$(cat analysis/popgen/busco_phylogeny/single_hits.txt | grep "$Busco" | cut -f2)
+  HitNum=$(cat analysis/popgen/busco_phylogeny2/single_hits.txt | grep "$Busco" | cut -f2)
   if [ $HitNum == $OrganismNum ]; then
-    cp analysis/popgen/busco_phylogeny/$Busco/"$Busco"_appended.fasta $OutDir/.
+    cp analysis/popgen/busco_phylogeny2/$Busco/"$Busco"_appended.fasta $OutDir/.
   fi
   done
 ```
@@ -107,7 +107,7 @@ Submit alignment for single copy busco genes with a hit in each organism
 
 
 ```bash
-AlignDir=analysis/popgen/busco_phylogeny/alignments
+AlignDir=analysis/popgen/busco_phylogeny2/alignments
 CurDir=$PWD
 cd $AlignDir
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
