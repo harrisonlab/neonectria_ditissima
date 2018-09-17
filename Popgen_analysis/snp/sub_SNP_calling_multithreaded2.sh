@@ -19,8 +19,8 @@ input=analysis/genome_alignment/bowtie
 reference=REFERENCE/Hg199_contigs_unmasked.fa
 
 filename=$(basename "$reference")
-output="${filename%.*}_temp.vcf"
-output2="${filename%.*}.vcf"
+output=analysis/popgen/SNP_calling/"${filename%.*}_temp.vcf"
+output2=analysis/popgen/SNP_calling/"${filename%.*}.vcf"
 
 gatk=/home/sobczm/bin/GenomeAnalysisTK-3.6
 
