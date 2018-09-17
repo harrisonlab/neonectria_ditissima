@@ -15,8 +15,8 @@
 # read group added) are to be used in SNP calling, use the -I argument with full path to each file following after that.
 # Each new BAM file has to be specified after a separate -I
 
-input=/data/scratch/gomeza/analysis/genome_alignment/bowtie
-reference=/data/scratch/gomeza/Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa
+input=analysis/genome_alignment/bowtie
+reference=REFERENCE/Hg199_contigs_unmasked.fa
 
 filename=$(basename "$reference")
 output="${filename%.*}_temp.vcf"
@@ -30,28 +30,34 @@ java -jar $gatk/GenomeAnalysisTK.jar \
      -ploidy 1 \
      -nct 6 \
      --allow_potentially_misencoded_quality_scores \
-     -I $input/*/Ag02/vs_Hg199_minion/Ag02_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag04/vs_Hg199_minion/Ag04_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag05/vs_Hg199_minion/Ag05_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag06/vs_Hg199_minion/Ag06_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/ND9/vs_Hg199_minion/ND9_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/ND8/vs_Hg199_minion/ND8_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R0905/vs_Hg199_minion/R0905_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R37-15/vs_Hg199_minion/R37-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R39-15/vs_Hg199_minion/R39-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R41-15/vs_Hg199_minion/R41-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R42-15/vs_Hg199_minion/R42-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R45-15/vs_Hg199_minion/R45-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag08/vs_Hg199_minion/Ag08_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/P112/vs_Hg199_minion/P112_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/BGV344/vs_Hg199_minion/BGV344_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/OPC304/vs_Hg199_minion/OPC304_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag09_A/vs_Hg199_minion/Ag09_A_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag11_A/vs_Hg199_minion/Ag11_A_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Ag11_C/vs_Hg199_minion/Ag11_C_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/Hg199/vs_Hg199_minion/Hg199_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R6-17-2/vs_Hg199_minion/R6-17-2_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
-     -I $input/*/R6-17-3/vs_Hg199_minion/R6-17-3_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag02/Ag02_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag04/Ag04_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag05/Ag05_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag06/Ag06_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag08/Ag08_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag09_A/Ag09_A_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag11_A/Ag11_A_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag11_B/Ag11_B_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Ag11_C/Ag11_C_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/BGV344/BGV344_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/Hg199/Hg199_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/ND8/ND8_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/ND9/ND9_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/OPC304/OPC304_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/P112/P112_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R0905/R0905_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R37-15/R37-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R39-15/R39-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R41-15/R41-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R42-15/R42-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R45-15/R45-15_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R6-17-2/R6-17-2_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R6-17-3/R6-17-3_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R68-17-C2/R68-17-C2_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/R68-17-C3/R68-17-C3_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/SVK1/SVK1_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/SVK2/SVK2_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
+     -I $input/*/NMaj/NMaj_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
      -o $output
 
 #Break down complex SNPs into primitive ones with VariantsToAllelicPrimitives
