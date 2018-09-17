@@ -495,3 +495,33 @@ This section details the commands used and the results observed.
   mkdir -p $OutDir
   $ProgDir/orthoMCLgroups2fasta.py --orthogroups $OrthogroupsTxt --fasta $GoodProts --out_dir $OutDir
 ```
+
+
+# Identification of orthologs amongst reference genomes using the OrthoFinder.
+
+## Get whole-genome protein sequences and rename the files
+
+```bash
+Taxon_code=199R
+Fasta_file=$(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.pep.fasta )
+Id_field=1
+orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+mv "$Taxon_code".fasta analysis/orthology/OrthoFinderRef/"$Taxon_code".fasta
+
+Taxon_code=R09R
+Fasta_file=$(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/R0905/final/final_genes_appended_renamed.pep.fasta )
+Id_field=1
+orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+mv "$Taxon_code".fasta analysis/orthology/OrthoFinderRef/"$Taxon_code".fasta
+```
+
+## Run orthofinder using qlogin
+
+```bash
+scripts=/home/sobczm/bin/popgen/clock/motif_discovery
+#login in a node with 16 threads and give 1G of memory to each. This is going to take a while, so try to avoid using blacklace11 and leave it for other users.
+qlogin -pe smp 16 -l virtual_free=1G
+cd analysis/orthology/OrthoFinder2/formatted
+#16 threads used
+orthofinder -f ./ -t 3 -a 3
+```
