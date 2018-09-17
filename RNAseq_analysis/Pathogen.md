@@ -2,6 +2,8 @@
 
 This analysis was done repeating the salmon alignment with the option --keepduplicates.
 
+## Episode 1. Gene expression of Nd. GD vs M9. t1 vs t2.
+
 ```bash
 /home/deakig/R3.4/bin/R
 ```
@@ -193,7 +195,7 @@ coord_fixed()
 ggsave("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/PCA_sample_names.pdf", pca_plot, dpi=300, height=10, width=12)
 ```
 
-## Method 2. Gene expression of Nd. Infection vs Control.
+## Episode 2. Gene expression of Nd. Infection vs Control.
 
 /home/deakig/R3.4/bin/R
 
