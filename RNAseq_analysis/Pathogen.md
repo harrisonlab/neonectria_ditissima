@@ -28,6 +28,27 @@ echo "$Organism - $Strain"
 done
 ```
 
+Convert Salmon quasi-quanitifcations to gene counts using an awk script:
+
+https://bioconductor.org/packages/3.7/bioc/vignettes/tximport/inst/doc/tximport.html
+
+```bash
+mkdir -p alignment/salmon/N.ditissima/Hg199/DeSeq2
+for File in $(ls alignment/salmon/*/Hg199/*/*/*/quant.sf | head -n1); do
+  cat $File | awk -F"\t" '{c=$1;sub(".t.*","",$1);print c,$1}' OFS="\t" > alignment/salmon/N.ditissima/Hg199/DeSeq2/trans2gene.txt
+done
+
+# Put files in a convenient location for DeSeq.
+# Analysis was not performed on Apple control samples.
+
+for File in $(ls alignment/salmon/*/Hg199/*/*/*/quant.sf | grep -v -e 'GD_C1_3' -e 'GD_C2_3' -e 'GD_C3_3' -e 'M9_C1_3' -e 'M9_C2_3' -e 'M9_C3_3' -e 'Hg199_1' -e 'Hg199_2' -e 'Hg199_3'); do
+  Prefix=$(echo $File | cut -f7 -d '/' --output-delimiter '_')
+  mkdir -p alignment/salmon/N.ditissima/Hg199/DeSeq2/$Prefix
+  cp $PWD/$File alignment/salmon/N.ditissima/Hg199/DeSeq2/$Prefix/quant.sf
+  # rm alignment/salmon/DeSeq2/$Prefix/quant.sf
+done
+```
+
 #Gene expression of Nd.
 
 This analysis was done repeating the salmon alignment with the option --keepduplicates.
@@ -71,20 +92,19 @@ library("ggrepel")
 # First analysis. GD vs M9 and t1 vs t2. Mycelium control removed.
 
 # import transcript to gene mapping info
-tx2gene <- read.table("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/trans2gene2.txt",header=T,sep="\t")
+tx2gene <- read.table("alignment/salmon/N.ditissima/Hg199/DeSeq2/trans2gene.txt",header=T,sep="\t")
 
 # import quantification files
-txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)
+txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199/DeSeq2", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)
 
 # get the sample names from the folders
-mysamples <- list.dirs("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4",full.names=F,recursive=F)
+mysamples <- list.dirs("alignment/salmon/N.ditissima/Hg199/DeSeq2",full.names=F,recursive=F)
 
 # summarise to gene level (this can be done in the tximport step, but is easier to understand in two steps)
 txi.genes <- summarizeToGene(txi.reps,tx2gene)
 
 # set the sample names for txi.genes
 invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
-
 
 #===============================================================================
 #       Read sample metadata and annotations
@@ -95,7 +115,7 @@ invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
 # order as the samples were read into mysamples before integrating metadata and
 # and read counts
 
-unorderedColData <- read.table("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
+unorderedColData <- read.table("alignment/salmon/N.ditissima/Hg199/DeSeq2/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
 colData <- data.frame(unorderedColData[ order(unorderedColData$Sample.name),])
 
 # 1st design
@@ -128,32 +148,41 @@ alpha <- 0.05
 res= results(dds, alpha=alpha,contrast=c("Cultivar","GD","M9"))
 sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 summary(sig.res)
 ###
-out of 19 with nonzero total read count
+out of 22 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 9, 47%
-LFC < 0 (down)   : 10, 53%
+LFC > 0 (up)     : 14, 64%
+LFC < 0 (down)   : 8, 36%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
-(mean count < 13)
+(mean count < 12)
 ###
-write.table(sig.res,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/GD_vs_M9.txt",sep="\t",na="",quote=F)
+write.table(sig.res,"alignment/salmon/N.ditissima/Hg199/DeSeq2/GD_vs_M9.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Hg199/DeSeq2/GD_vs_M9_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199/DeSeq2/GD_vs_M9_down.txt",sep="\t",na="",quote=F)
+
 
 res <- results(dds, alpha=alpha,contrast=c("Timepoint","t1","t2"))
 sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
+sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
+sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 summary(sig.res)
 ###
-out of 170 with nonzero total read count
+out of 176 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 12, 7.1%
-LFC < 0 (down)   : 158, 93%
+LFC > 0 (up)     : 9, 5.1%
+LFC < 0 (down)   : 167, 95%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 0)
 ###
-write.table(sig.res,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/t1_vs_t2.txt",sep="\t",na="",quote=F)
+write.table(sig.res,"alignment/salmon/N.ditissima/Hg199/DeSeq2/t1_vs_t2.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Hg199/DeSeq2/t1_vs_t2_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199/DeSeq2/t1_vs_t2_down.txt",sep="\t",na="",quote=F)
 
 #===============================================================================
 #       Exploring and exporting results
@@ -162,7 +191,7 @@ write.table(sig.res,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/t1_vs_t
 # Sample Distances
 
 vst<-varianceStabilizingTransformation(dds)
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/heatmap_vst.pdf", width=12,height=12)
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/heatmap_vst.pdf", width=12,height=12)
 sampleDists<-dist(t(assay(vst)))
 sampleDistMatrix <- as.matrix(sampleDists)
 rownames(sampleDistMatrix) <- paste(vst$Cultivar)
@@ -179,8 +208,8 @@ dev.off()
 
 # Sample distances measured with rlog transformation:
 rld <- varianceStabilizingTransformation(dds)
-rld <- rlog( dds )
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/heatmap_rld.pdf")
+rld <- rlog(dds)
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/heatmap_rld.pdf")
 sampleDists <- dist(t(assay(rld)))
 sampleDistMatrix <- as.matrix( sampleDists )
 rownames(sampleDistMatrix) <- paste(rld$Cultivar)
@@ -190,26 +219,26 @@ heatmap( sampleDistMatrix, trace="none", col=colours, margins=c(12,12),srtCol=45
 dev.off()
 
 # MA-plot
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/plotMA_vst.pdf")
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/plotMA_vst.pdf")
 plotMA(res, ylim=c(-2,2))
 dev.off()
 
 # Plot counts
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/plotcounts_dds.pdf")
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/plotcounts_dds.pdf")
 plotCounts(dds, gene=which.min(res$padj), intgroup="Cultivar")
 dev.off()
 
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/plotcounts2_dds.pdf")
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/plotcounts2_dds.pdf")
 plotCounts(dds, gene=which.min(res$padj), intgroup=c("Cultivar","Timepoint"))
 dev.off()
 
 # PCA plots
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/PCA_vst.pdf")
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/PCA_vst.pdf")
 plotPCA(vst,intgroup=c("Cultivar","Timepoint"))
 dev.off()
 
 #Plot using rlog transformation:
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/PCA_rld.pdf")
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/PCA_rld.pdf")
 plotPCA(rld,intgroup=c("Cultivar", "Timepoint"))
 dev.off()
 
@@ -222,10 +251,31 @@ geom_point(size=3) +
 xlab(paste0("PC1: ",percentVar[1],"% variance")) +
 ylab(paste0("PC2: ",percentVar[2],"% variance")) + geom_text_repel(aes(label=colnames(rld)))
 coord_fixed()
-ggsave("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v4/PCA_sample_names.pdf", pca_plot, dpi=300, height=10, width=12)
+ggsave("alignment/salmon/N.ditissima/Hg199/DeSeq2/PCA_sample_names.pdf", pca_plot, dpi=300, height=10, width=12)
 ```
 
 ## Episode 2. Gene expression of Nd. Infection vs Control.
+
+Convert Salmon quasi-quanitifcations to gene counts using an awk script:
+
+https://bioconductor.org/packages/3.7/bioc/vignettes/tximport/inst/doc/tximport.html
+
+```bash
+mkdir -p alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC
+for File in $(ls alignment/salmon/*/Hg199/*/*/*/quant.sf | head -n1); do
+  cat $File | awk -F"\t" '{c=$1;sub(".t.*","",$1);print c,$1}' OFS="\t" > alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/trans2gene.txt
+done
+
+# Put files in a convenient location for DeSeq.
+# Analysis was not performed on Apple control samples.
+
+for File in $(ls alignment/salmon/*/Hg199/*/*/*/quant.sf | grep -v -e 'GD_C1_3' -e 'GD_C2_3' -e 'GD_C3_3' -e 'M9_C1_3' -e 'M9_C2_3' -e 'M9_C3_3'); do
+  Prefix=$(echo $File | cut -f7 -d '/' --output-delimiter '_')
+  mkdir -p alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/$Prefix
+  cp $PWD/$File alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/$Prefix/quant.sf
+  # rm alignment/salmon/DeSeq2/$Prefix/quant.sf
+done
+```
 
 /home/deakig/R3.4/bin/R
 
@@ -250,6 +300,7 @@ library(tibble)
 library(tximport)
 library(rjson)
 library(readr)
+library(genefilter)
 
 #===============================================================================
 #       Load data from SALMON quasi mapping
@@ -258,13 +309,13 @@ library(readr)
 # Second analysis. Infection vs mycelium control.
 
 # import transcript to gene mapping info
-tx2gene <- read.table("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/trans2gene2.txt",header=T,sep="\t")
+tx2gene <- read.table("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/trans2gene.txt",header=T,sep="\t")
 
 # import quantification files
-txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)
+txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)
 
 # get the sample names from the folders
-mysamples <- list.dirs("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5",full.names=F,recursive=F)
+mysamples <- list.dirs("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC",full.names=F,recursive=F)
 
 # summarise to gene level (this can be done in the tximport step, but is easier to understand in two steps)
 txi.genes <- summarizeToGene(txi.reps,tx2gene)
@@ -281,7 +332,7 @@ invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
 # order as the samples were read into mysamples before integrating metadata and
 # and read counts
 
-unorderedColData <- read.table("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
+unorderedColData <- read.table("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
 colData <- data.frame(unorderedColData[ order(unorderedColData$Sample.name),])
 
 # Group column
@@ -318,20 +369,19 @@ sig.res <- subset(res,padj<=alpha)
 sig.res <- sig.res[order(sig.res$padj),]
 sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
-
 summary(sig.res)
 ###
-out of 4288 with nonzero total read count
-adjusted p-value < 0.1
-LFC > 0 (up)     : 1958, 46%
-LFC < 0 (down)   : 2330, 54%
+out of 4201 with nonzero total read count
+adjusted p-value < 0.05
+LFC > 0 (up)     : 1998, 48%
+LFC < 0 (down)   : 2203, 52%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
+(mean count < 0)
 ###
-
-write.table(sig.res,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/Infection_vs_Control.txt",sep="\t",na="",quote=F)
-write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/Infection_vs_Control_up.txt",sep="\t",na="",quote=F)
-write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/Infection_vs_Control_down.txt",sep="\t",na="",quote=F)
+write.table(sig.res,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/Infection_vs_Control.txt",sep="\t",na="",quote=F)
+write.table(sig.res.upregulated,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/Infection_vs_Control_up.txt",sep="\t",na="",quote=F)
+write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/Infection_vs_Control_down.txt",sep="\t",na="",quote=F)
 
 
 #===============================================================================
@@ -341,7 +391,7 @@ write.table(sig.res.downregulated,"alignment/salmon/N.ditissima/Hg199_minion/DeS
 # Sample Distances
 
 vst<-varianceStabilizingTransformation(dds)
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/heatmap_vst.pdf", width=12,height=12)
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/heatmap_vst.pdf", width=12,height=12)
 sampleDists<-dist(t(assay(vst)))
 sampleDistMatrix <- as.matrix(sampleDists)
 rownames(sampleDistMatrix) <- paste(vst$Group)
@@ -359,7 +409,7 @@ dev.off()
 # Sample distances measured with rlog transformation:
 
 rld <- rlog( dds )
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/heatmap_rld.pdf")
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/heatmap_rld.pdf")
 sampleDists <- dist(t(assay(rld)))
 sampleDistMatrix <- as.matrix( sampleDists )
 rownames(sampleDistMatrix) <- paste(rld$Group)
@@ -369,27 +419,30 @@ heatmap( sampleDistMatrix, trace="none", col=colours, margins=c(12,12),srtCol=45
 dev.off()
 
 # MA-plot
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/plotMA_vst.pdf")
+
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/plotMA_vst.pdf")
 plotMA(res, ylim=c(-2,2))
 dev.off()
 
 # Plot counts
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/plotcounts_dds.pdf")
+
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/plotcounts_dds.pdf")
 plotCounts(dds, gene=which.min(res$padj), intgroup="Condition")
 dev.off()
 
 # PCA plotsPl
 
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/PCA_vst.pdf")
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/PCA_vst.pdf")
 plotPCA(vst,intgroup=c("Condition","Group"))
 dev.off()
 
-# Plot using rlog transformation:
-pdf("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/PCA_rld.pdf")
+# Plot using rlog transformation
+
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/PCA_rld.pdf")
 plotPCA(rld,intgroup=c("Condition", "Group"))
 dev.off()
 
-#Plot using rlog transformation, showing sample names:
+#Plot using rlog transformation, showing sample names
 
 data <- plotPCA(rld, intgroup=c("Condition", "Group"), returnData=TRUE)
 percentVar <- round(100 * attr(data, "percentVar"))
@@ -398,27 +451,33 @@ geom_point(size=3) +
 xlab(paste0("PC1: ",percentVar[1],"% variance")) +
 ylab(paste0("PC2: ",percentVar[2],"% variance")) + geom_text_repel(aes(label=colnames(rld)))
 coord_fixed()
-ggsave("alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/PCA_sample_names.pdf", pca_plot, dpi=300, height=10, width=12)
-```
+ggsave("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/PCA_sample_names.pdf", pca_plot, dpi=300, height=10, width=12)
 
+# Gene clustering plots
+
+topVarGenes <-head(order(rowVars(assay(rld)),decreasing=TRUE),100)
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/heatmap_new.pdf")
+heatmap.2(assay(rld)[topVarGenes,],scale='row',trace="none",dendrogram="column",pointsize = 8,col=colorRampPalette(rev(brewer.pal(9,"RdBu")))(255))
+dev.off()
+```
 #Make a table of raw counts, normalised counts and fpkm values:
 
 ```R
 raw_counts <- data.frame(counts(dds, normalized=FALSE))
-colnames(raw_counts) <- paste(colData$Group)
-write.table(raw_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/raw_counts.txt",sep="\t",na="",quote=F)
+colnames(raw_counts) <- paste(colData$Condition)
+write.table(raw_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/raw_counts.txt",sep="\t",na="",quote=F)
 norm_counts <- data.frame(counts(dds, normalized=TRUE))
-colnames(norm_counts) <- paste(colData$Group)
-write.table(norm_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/normalised_counts.txt",sep="\t",na="",quote=F)
+colnames(norm_counts) <- paste(colData$Condition)
+write.table(norm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/normalised_counts.txt",sep="\t",na="",quote=F)
 
 #robust may be better set at false to normalise based on total counts rather than 'library normalisation factors'
 
-fpkm_counts <- data.frame(fpkm(dds, robust = TRUE))
-colnames(fpkm_counts) <- paste(colData$Group)
-write.table(fpkm_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/fpkm_norm_counts.txt",sep="\t",na="",quote=F)
-fpkm_counts <- data.frame(fpkm(dds, robust = FALSE))
-colnames(fpkm_counts) <- paste(colData$Group)
-write.table(fpkm_counts,"alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/fpkm_counts.txt",sep="\t",na="",quote=F)
+tpm_counts <- data.frame(fpkm(dds, robust = TRUE))
+colnames(tpm_counts) <- paste(colData$Group)
+write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_norm_counts.txt",sep="\t",na="",quote=F)
+tpm_counts <- data.frame(fpkm(dds, robust = FALSE))
+colnames(tpm_counts) <- paste(colData$Group)
+write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_counts.txt",sep="\t",na="",quote=F)
 ```
 
 
