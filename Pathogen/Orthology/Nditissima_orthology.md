@@ -521,7 +521,7 @@ mv "$Taxon_code".fasta analysis/orthology/OrthoFinderRef/"$Taxon_code".fasta
 scripts=/home/sobczm/bin/popgen/clock/motif_discovery
 #login in a node with 16 threads and give 1G of memory to each. This is going to take a while, so try to avoid using blacklace11 and leave it for other users.
 qlogin -pe smp 16 -l virtual_free=1G
-cd analysis/orthology/OrthoFinder2/formatted
-#16 threads used
+cd /data/scratch/gomeza/analysis/orthology/OrthoFinderRef/
+#8 threads used
 orthofinder -f ./ -t 3 -a 3
 ```
