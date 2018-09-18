@@ -112,110 +112,57 @@ I have aligned every isolate with the Hg199 RNA reads.
 Output from stdout included:
 
 ```
-N.ditissima - AgN04
-tee: gene_pred/cufflinks/N.ditissima/AgN04/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
+N.ditissima - R68-17-C2
 Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[09:54:31] Inspecting reads and determining fragment length distribution.
-> Processed 18766 loci.                        [*************************] 100%
+[09:49:38] Inspecting reads and determining fragment length distribution.
+> Processed 19641 loci.                        [*************************] 100%
 > Map Properties:
->	Normalized Map Mass: 12803452.83
->	Raw Map Mass: 12803452.83
+>	Normalized Map Mass: 12192650.75
+>	Raw Map Mass: 12192650.75
 >	Fragment Length Distribution: Empirical (learned)
->	              Estimated Mean: 217.01
->	           Estimated Std Dev: 43.68
-[09:56:57] Assembling transcripts and estimating abundances.
-> Processed 18835 loci.                        [*************************] 100%
-N.ditissima - R45-15
-tee: gene_pred/cufflinks/N.ditissima/R45-15/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
-Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[10:04:15] Inspecting reads and determining fragment length distribution.
-> Processed 18553 loci.                        [*************************] 100%
-> Map Properties:
->	Normalized Map Mass: 12833084.96
->	Raw Map Mass: 12833084.96
->	Fragment Length Distribution: Empirical (learned)
->	              Estimated Mean: 217.19
+>	              Estimated Mean: 216.72
 >	           Estimated Std Dev: 43.63
-[10:06:35] Assembling transcripts and estimating abundances.
-> Processed 18638 loci.                        [*************************] 100%
-N.ditissima - Hg199
-tee: gene_pred/cufflinks/N.ditissima/Hg199/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
+[09:51:51] Assembling transcripts and estimating abundances.
+> Processed 19743 loci.                        [*************************] 100%
+N.major - NMaj
+tee: gene_pred/cufflinks/N.major/NMaj/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
 Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[10:48:22] Inspecting reads and determining fragment length distribution.
-> Processed 16497 loci.                        [*************************] 100%
+[09:12:44] Inspecting reads and determining fragment length distribution.
+> Processed 39346 loci.                        [*************************] 100%
 > Map Properties:
->	Normalized Map Mass: 13479906.07
->	Raw Map Mass: 13479906.07
->	Fragment Length Distribution: Empirical (learned)
->	              Estimated Mean: 217.62
->	           Estimated Std Dev: 43.68
-[10:51:11] Assembling transcripts and estimating abundances.
-> Processed 16537 loci.                        [*************************] 100%
-N.ditissima - R0905_canu_2017_v2
-Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[14:23:01] Inspecting reads and determining fragment length distribution.
-> Processed 18535 loci.                        [*************************] 100%
-> Map Properties:
->	Normalized Map Mass: 12759384.33
->	Raw Map Mass: 12759384.33
->	Fragment Length Distribution: Empirical (learned)
->	              Estimated Mean: 217.05
->	           Estimated Std Dev: 43.58
-[14:25:44] Assembling transcripts and estimating abundances.
-> Processed 18606 loci.                        [*************************] 100%
-
-N.ditissima - Ag02
-Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[14:23:01] Inspecting reads and determining fragment length distribution.
-> Processed 18535 loci.                        [*************************] 100%
-> Map Properties:
-tee: gene_pred/cufflinks/N.ditissima/Ag02/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
->       Normalized Map Mass: 12798695.86
->       Raw Map Mass: 12798695.86
+>       Normalized Map Mass: 3335743.25
+>       Raw Map Mass: 3335743.25
 >       Fragment Length Distribution: Empirical (learned)
->                     Estimated Mean: 216.93
->                  Estimated Std Dev: 43.61
-[08:51:51] Assembling transcripts and estimating abundances.
-> Processed 18668 loci.                        [*************************] 100%
-N.ditissima - Ag05
-tee: gene_pred/cufflinks/N.ditissima/Ag05/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
+>                     Estimated Mean: 202.79
+>                  Estimated Std Dev: 45.78
+[09:13:24] Assembling transcripts and estimating abundances.
+> Processed 39667 loci.                        [*************************] 100%
+N.ditissima - SVK1
+tee: gene_pred/cufflinks/N.ditissima/SVK1/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
 Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[08:58:47] Inspecting reads and determining fragment length distribution.
-> Processed 18519 loci.                        [*************************] 100%
+[09:15:13] Inspecting reads and determining fragment length distribution.
+> Processed 19678 loci.                        [*************************] 100%
 > Map Properties:
->       Normalized Map Mass: 12749756.54
->       Raw Map Mass: 12749756.54
+>       Normalized Map Mass: 12335740.01
+>       Raw Map Mass: 12335740.01
 >       Fragment Length Distribution: Empirical (learned)
->                     Estimated Mean: 217.18
->                  Estimated Std Dev: 43.59
-[09:01:01] Assembling transcripts and estimating abundances.
-> Processed 18590 loci.                        [*************************] 100%
-N.ditissima - ND8
-tee: gene_pred/cufflinks/N.ditissima/ND8/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
+>                     Estimated Mean: 216.69
+>                  Estimated Std Dev: 43.66
+[09:17:23] Assembling transcripts and estimating abundances.
+> Processed 19771 loci.                        [*************************] 100%
+N.ditissima - SVK2
+tee: gene_pred/cufflinks/N.ditissima/SVK2/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
 Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[09:07:59] Inspecting reads and determining fragment length distribution.
-> Processed 18483 loci.                        [*************************] 100%
+[09:23:01] Inspecting reads and determining fragment length distribution.
+> Processed 19811 loci.                        [*************************] 100%
 > Map Properties:
->       Normalized Map Mass: 12795885.50
->       Raw Map Mass: 12795885.50
+>       Normalized Map Mass: 12288475.75
+>       Raw Map Mass: 12288475.75
 >       Fragment Length Distribution: Empirical (learned)
->                     Estimated Mean: 217.04
->                  Estimated Std Dev: 43.61
-[09:10:15] Assembling transcripts and estimating abundances.
-> Processed 18561 loci.                        [*************************] 100%
-N.ditissima - R37-15
-tee: gene_pred/cufflinks/N.ditissima/R37-15/vs_Hg199reads/concatenated_prelim/cufflinks/cufflinks.log: No such file or directory
-Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[09:16:51] Inspecting reads and determining fragment length distribution.
-> Processed 18491 loci.                        [*************************] 100%
-> Map Properties:
->       Normalized Map Mass: 12803072.33
->       Raw Map Mass: 12803072.33
->       Fragment Length Distribution: Empirical (learned)
->                     Estimated Mean: 217.03
->                  Estimated Std Dev: 43.65
-[09:19:09] Assembling transcripts and estimating abundances.
-> Processed 18554 loci.                        [*************************] 100%
+>                     Estimated Mean: 216.78
+>                  Estimated Std Dev: 43.63
+[09:25:13] Assembling transcripts and estimating abundances.
+> Processed 19901 loci.                        [*************************] 100%
 ```
 
 The Estimated Mean: 219.68 allowed calculation of of the mean insert gap to be
@@ -227,7 +174,7 @@ increase the accuracy of mapping.
 Then Rnaseq data was aligned to each genome assembly:
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
+for Strain in R68-17-C2 SVK1 SVK2; do
 for Assembly in $(ls repeat_masked/N*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
 Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
