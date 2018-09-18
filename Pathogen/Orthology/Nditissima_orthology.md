@@ -525,3 +525,89 @@ cd /data/scratch/gomeza/analysis/orthology/OrthoFinderRef/
 #8 threads used
 orthofinder -f ./ -t 3 -a 3
 ```
+
+
+#!/bin/bash
+scripts=/home/sobczm/bin/popgen/clock/motif_discovery
+
+# Orthology analysis between Neonectria ditissima isolates using Orthomcl
+
+```bash
+  ProjDir=/data/scratch/gomeza
+  cd $ProjDir
+  IsolateAbrv=Nd_Ref_isolates
+  WorkDir=analysis/orthology/OrthomclRef/$IsolateAbrv
+  mkdir -p $WorkDir
+  mkdir -p $WorkDir/formatted
+  mkdir -p $WorkDir/goodProteins
+  mkdir -p $WorkDir/badProteins  
+
+  cp analysis/orthology/OrthoFinderRef/*.fasta analysis/orthology/OrthomclRef/Nd_Ref_isolates/formatted/
+```
+
+## 2) Filter proteins into good and poor sets.
+
+```bash
+  Input_dir=$WorkDir/formatted
+  Min_length=10
+  Max_percent_stops=20
+  Good_proteins_file=$WorkDir/goodProteins/goodProteins.fasta
+  Poor_proteins_file=$WorkDir/badProteins/poorProteins.fasta
+  orthomclFilterFasta $Input_dir $Min_length $Max_percent_stops $Good_proteins_file $Poor_proteins_file
+```
+
+## 3.1) Perform an Hg-vs-R9 blast of the proteins
+
+```bash
+
+IsolateAbrv=Nd_Ref_isolates
+WorkDir=analysis/orthology/OrthomclRef/$IsolateAbrv
+BlastDB=$WorkDir/blastall/$IsolateAbrv.db
+
+makeblastdb -in $Good_proteins_file -dbtype prot -out $BlastDB
+BlastOut=$WorkDir/Hg-vs-R9_results.tsv
+mkdir -p $WorkDir/splitfiles
+
+SplitDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
+$SplitDir/splitfile_500.py --inp_fasta $Good_proteins_file --out_dir $WorkDir/splitfiles --out_base goodProteins
+
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Pathogen/Orthology
+for File in $(find $WorkDir/splitfiles)
+do
+Jobs=$(qstat | grep 'blast_500' | grep 'qw' | wc -l)
+while [ $Jobs -gt 1 ]; do
+sleep 10
+printf "."
+Jobs=$(qstat | grep 'blast_500' | grep 'qw' | wc -l)
+done
+printf "\n"
+echo $File
+BlastOut=$(echo $File | sed 's/.fa/.tab/g')
+qsub -h $ProgDir/blast_500.sh $BlastDB $File $BlastOut
+done
+```
+
+## 3.2) Merge the all-vs-all blast results  
+```bash
+IsolateAbrv=Nd_all_isolates
+WorkDir=analysis/orthology/Orthomcl/$IsolateAbrv
+
+  MergeHits="$IsolateAbrv"_blast.tab
+  printf "" > $MergeHits
+  for Num in $(ls $WorkDir/splitfiles/*.fa | rev | cut -f1 -d '_' | rev | sort -n); do
+    File=$(ls $WorkDir/splitfiles/*_$Num)
+    cat $File
+  done > $MergeHits
+```
+
+## 4) Perform ortholog identification
+
+```bash
+# Need to create a mysql database before run orthomcl.
+# It seems better results are shown in OrthoFinder, therefore I am running this now.
+
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/pathogen/orthology/orthoMCL
+  MergeHits="$IsolateAbrv"_blast.tab
+  GoodProts=$WorkDir/goodProteins/goodProteins.fasta
+  qsub $ProgDir/qsub_orthomcl.sh $MergeHits $GoodProts 5
+```
