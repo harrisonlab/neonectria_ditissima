@@ -207,7 +207,6 @@ heatmap( sampleDistMatrix, trace="none", col=colours, margins=c(12,12),srtCol=45
 dev.off()
 
 # Sample distances measured with rlog transformation:
-rld <- varianceStabilizingTransformation(dds)
 rld <- rlog(dds)
 pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/heatmap_rld.pdf")
 sampleDists <- dist(t(assay(rld)))
@@ -252,6 +251,43 @@ xlab(paste0("PC1: ",percentVar[1],"% variance")) +
 ylab(paste0("PC2: ",percentVar[2],"% variance")) + geom_text_repel(aes(label=colnames(rld)))
 coord_fixed()
 ggsave("alignment/salmon/N.ditissima/Hg199/DeSeq2/PCA_sample_names.pdf", pca_plot, dpi=300, height=10, width=12)
+
+# Gene clustering plots
+
+topVarGenes <-head(order(rowVars(assay(rld)),decreasing=TRUE),50)
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/heatmap_new.pdf")
+heatmap.2(assay(rld)[topVarGenes,],ColSideColors=c("grey","dodgerblue")[ rld$Timepoint ],scale='row',trace="none",dendrogram="column",col=colorRampPalette(rev(brewer.pal(9,"RdBu")))(255))
+dev.off()
+
+topVarGenes <-head(order(rowVars(assay(rld)),decreasing=TRUE),50)
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2/heatmap_new2.pdf")
+colors <- colorRampPalette( rev(brewer.pal(9, "PuOr")) )(255)
+sidecols <- c("grey","dodgerblue")[ rld$Cultivar ]
+mat <- assay(rld)[ topVarGenes, ]
+#mat <- mat - rowMeans(mat)
+#colnames(mat) <- paste0(rld$Cultivar,"-",rld$Timepoint)
+heatmap.2(mat, trace="none", col=colors, dendrogram="column",ColSideColors=sidecols,labRow=TRUE, mar=c(10,2), scale="row")
+dev.off()
+```
+
+### Make a table of raw counts, normalised counts and fpkm values:
+
+```R
+raw_counts <- data.frame(counts(dds, normalized=FALSE))
+colnames(raw_counts) <- paste(colData$Condition)
+write.table(raw_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2/raw_counts.txt",sep="\t",na="",quote=F)
+norm_counts <- data.frame(counts(dds, normalized=TRUE))
+colnames(norm_counts) <- paste(colData$Condition)
+write.table(norm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2/normalised_counts.txt",sep="\t",na="",quote=F)
+
+#robust may be better set at false to normalise based on total counts rather than 'library normalisation factors'
+
+tpm_counts <- data.frame(fpkm(dds, robust = TRUE))
+colnames(tpm_counts) <- paste(colData$Group)
+write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_norm_counts.txt",sep="\t",na="",quote=F)
+tpm_counts <- data.frame(fpkm(dds, robust = FALSE))
+colnames(tpm_counts) <- paste(colData$Group)
+write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_counts.txt",sep="\t",na="",quote=F)
 ```
 
 ## Episode 2. Gene expression of Nd. Infection vs Control.
@@ -455,12 +491,12 @@ ggsave("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/PCA_sample_names.pdf", pc
 
 # Gene clustering plots
 
-topVarGenes <-head(order(rowVars(assay(rld)),decreasing=TRUE),100)
+topVarGenes <-head(order(rowVars(assay(rld)),decreasing=TRUE),50)
 pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/heatmap_new.pdf")
-heatmap.2(assay(rld)[topVarGenes,],scale='row',trace="none",dendrogram="column",pointsize = 8,col=colorRampPalette(rev(brewer.pal(9,"RdBu")))(255))
+heatmap.2(assay(rld)[topVarGenes,],ColSideColors=c("grey","dodgerblue")[ rld$Condition ],scale='row',trace="none",dendrogram="column",col=colorRampPalette(rev(brewer.pal(9,"RdBu")))(255))
 dev.off()
 ```
-#Make a table of raw counts, normalised counts and fpkm values:
+### Make a table of raw counts, normalised counts and fpkm values:
 
 ```R
 raw_counts <- data.frame(counts(dds, normalized=FALSE))
@@ -481,7 +517,7 @@ write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_count
 ```
 
 
-#Analysis of DeSeq2 output
+## Analysis of DeSeq2 output
 
 ```bash
 for UpFile in $(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/*_up.txt); do
@@ -497,7 +533,7 @@ alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/Infection_vs_Control_DEGs.tx
 4200
 ```
 
-##Produce a more detailed table of analyses
+## Produce a more detailed table of analyses
 
 ```bash
 for GeneGff in $(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3); do
