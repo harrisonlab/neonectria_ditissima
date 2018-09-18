@@ -55,3 +55,18 @@ mv $OutDir/circos.png $OutDir/Hg_vs_R9_circos.png
 mv $OutDir/circos.svg $OutDir/Hg_vs_R9_circos.svg
 ls $PWD/$OutDir/Hg_vs_R9_circos.png
 ```
+```bash
+OutDir=analysis/circos/Hg_vs_R9_genome_alignment_circos
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/circos
+$ProgDir/orthology2circos_ribbons.py --orthology analysis/orthology/OrthoFinderRef/Results_Sep18/Orthogroups.txt --name1 Hg --gff1 gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.gff3 --name2 R9 --gff2 gene_pred/codingquary/Ref_Genomes/N.ditissima/R0905/final/final_genes_appended_renamed.gff3 \
+| sort -k4,5 -V \
+> $OutDir/Hg_vs_R9_links2.txt
+# Links to FoL LS contigs 3, 6, 14 and 15 were coloured black
+# cat $OutDir/Fp_FoL_links.txt \
+#   | sed '/4287_CM000591.1/ s/$/\tcolor=black/' \
+#   | sed '/4287_CM000594.1/ s/$/\tcolor=black/' \
+#   | sed '/4287_CM000602.2/ s/$/\tcolor=black/' \
+#   | sed '/4287_CM000603.1/ s/$/\tcolor=black/' \
+#   > $OutDir/Fp_FoL_links_edited.txt
+cat $OutDir/Fp_FoL_links.txt > $OutDir/Fp_FoL_links_edited.txt
+```
