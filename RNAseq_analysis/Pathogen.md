@@ -7,7 +7,7 @@ for Transcriptome in $(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/fi
 Strain=$(echo $Transcriptome| rev | cut -d '/' -f3 | rev)
 Organism=$(echo $Transcriptome | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
-  for RNADir in $(ls -d qc_rna/rna_seq/GD/*); do
+  for RNADir in $(ls -d qc_rna/rna_seq/*/*); do
   FileNum=$(ls $RNADir/F/*trim.fq.gz | wc -l)
   Jobs=$(qstat | grep 'sub_sta' | grep 'qw'| wc -l)
     for num in $(seq 1 $FileNum); do
