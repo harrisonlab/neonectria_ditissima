@@ -119,9 +119,9 @@ Trimming sequence alignments using Trim-Al
 * Note - automated1 mode is optimised for ML tree reconstruction
 
 ```bash
-  OutDir=analysis/popgen/busco_phylogeny/trimmed_alignments
+  OutDir=analysis/popgen/busco_phylogeny2/trimmed_alignments
   mkdir -p $OutDir
-  for Alignment in $(ls analysis/popgen/busco_phylogeny/alignments/*_appended_aligned.fasta); do
+  for Alignment in $(ls analysis/popgen/busco_phylogeny2/alignments/*_appended_aligned.fasta); do
     TrimmedName=$(basename $Alignment .fasta)"_trimmed.fasta"
     echo $Alignment
     trimal -in $Alignment -out $OutDir/$TrimmedName -keepheader -automated1
@@ -129,14 +129,15 @@ Trimming sequence alignments using Trim-Al
 ```
 Edit header name keeping BUSCO name and isolate name
 ```bash
-cd analysis/popgen/busco_phylogeny/trimmed_alignments
+cd analysis/popgen/busco_phylogeny2/trimmed_alignments
 sed -i 's/_contigs_.*//g' *_appended_aligned_trimmed.fasta
 sed -i 's/:LD.*//g' *_appended_aligned_trimmed.fasta
 sed -i 's/N.ditissima_//g' *_appended_aligned_trimmed.fasta
 ```
 
 ```bash
-for Alignment in $(ls analysis/popgen/busco_phylogeny/trimmed_alignments/*aligned_trimmed.fasta); do
+screen -a
+for Alignment in $(ls analysis/popgen/busco_phylogeny2/trimmed_alignments/*aligned_trimmed.fasta); do
 Jobs=$(qstat | grep 'sub_RAxML' | grep 'qw' | wc -l)
 while [ $Jobs -gt 2 ]; do
 sleep 2s
@@ -146,7 +147,7 @@ done
 printf "\n"
 echo $Prefix
 Prefix=$(basename $Alignment | cut -f1 -d '_')
-OutDir=analysis/popgen/busco_phylogeny/RAxML/$Prefix
+OutDir=analysis/popgen/busco_phylogeny2/RAxML/$Prefix
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/phylogenetics
 qsub $ProgDir/sub_RAxML.sh $Alignment $Prefix $OutDir
 done
