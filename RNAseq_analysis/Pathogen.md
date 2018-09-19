@@ -520,17 +520,29 @@ write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_count
 ## Analysis of DeSeq2 output
 
 ```bash
-for UpFile in $(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/*_up.txt); do
-  DownFile=$(echo $UpFile | sed 's/_up.txt/_down.txt/g')
-  DegFile=$(echo $UpFile | sed 's/_up.txt/_DEGs.txt/g')
-  cat $UpFile $DownFile | grep -v 'baseMean' | cut -f1 | sort -u > $DegFile
-  echo $DegFile
-  cat $DegFile | wc -l
+for UpFile in $(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/*_up.txt); do
+DownFile=$(echo $UpFile | sed 's/_up.txt/_down.txt/g')
+DegFile=$(echo $UpFile | sed 's/_up.txt/_DEGs.txt/g')
+cat $UpFile $DownFile | grep -v 'baseMean' | cut -f1 | sort -u > $DegFile
+echo $DegFile
+cat $DegFile | wc -l
+done
+
+for UpFile in $(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/*_up.txt); do
+DownFile=$(echo $UpFile | sed 's/_up.txt/_down.txt/g')
+DegFile=$(echo $UpFile | sed 's/_up.txt/_DEGs.txt/g')
+cat $UpFile $DownFile | grep -v 'baseMean' | cut -f1 | sort -u > $DegFile
+echo $DegFile
+cat $DegFile | wc -l
 done
 ```
 ```
-alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/Infection_vs_Control_DEGs.txt
-4200
+alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/Infection_vs_Control_DEGs.txt
+4104
+alignment/salmon/N.ditissima/Hg199/DeSeq2/GD_vs_M9_DEGs.txt
+20
+alignment/salmon/N.ditissima/Hg199/DeSeq2/t1_vs_t2_DEGs.txt
+176
 ```
 
 ## Produce a more detailed table of analyses
