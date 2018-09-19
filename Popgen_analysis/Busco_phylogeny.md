@@ -164,11 +164,11 @@ https://github.com/smirarab/ASTRAL/blob/master/astral-tutorial.md#running-with-u
 
 
 ```bash
-OutDir=analysis/popgen/busco_phylogeny/ASTRAL
+OutDir=analysis/popgen/busco_phylogeny2/ASTRAL
 mkdir -p $OutDir
 # cat analysis/popgen/busco_phylogeny/RAxML/*/RAxML_bestTree.* > $OutDir/Pcac_phylogeny.appended.tre
 # Taxa names were noted to be incorrect at this point and were corrected
-cat analysis/popgen/busco_phylogeny/RAxML/*/RAxML_bestTree.*  | sed -r "s/CTG.\w+:/:/g" > $OutDir/Nd_phylogeny.appended.tre
+cat analysis/popgen/busco_phylogeny2/RAxML/*/RAxML_bestTree.*  | sed -r "s/CTG.\w+:/:/g" > $OutDir/Nd_phylogeny.appended.tre
 # InTree=$(ls /home/armita/prog/Astral/Astral/test_data/song_primates.424.gene.tre)
 # -
 # Trimm back branches that have less than 10% bootstrap support for each tree
