@@ -1,6 +1,6 @@
-=================================
+==================================================================
 # Gene  Prediction
-=================================
+==================================================================
 
 Gene prediction followed three steps:
 	Pre-gene prediction
@@ -252,9 +252,9 @@ gene_pred/codingquary/N.ditissima/Hg199_minion/final
 14919
 
 
-=================================
+==================================================================
 # ORF Finder
-=================================
+==================================================================
 
 The genome was searched in six reading frames for any start codon and following
 translated identification of a start codon translating sequence until a stop
@@ -285,9 +285,9 @@ corrected using the following commands:
 	done
 ```
 
-=================================
+==================================================================
 # Functional annotation
-=================================
+==================================================================
 
 ## A) Interproscan
 
@@ -350,9 +350,9 @@ commands:
 	done
 ```
 
-=================================
+==================================================================
 # Effector genes
-=================================
+==================================================================
 
 ## A) From Augustus gene models - Identifying secreted proteins
 
@@ -550,9 +550,9 @@ number of Secreted CAZY genes identified:
 290
 
 
-=================================
+==================================================================
 # PhiBase genes:Identifying PHIbase homologs
-=================================
+==================================================================
 
 ```bash
 cd /data/scratch/gomeza
@@ -606,18 +606,18 @@ Interproscan results use transcript IDs rather gene IDs. I produce an additional
 cat analysis/transcription_factors/N.ditissima/Hg199_minion/Hg199_minion_TF_gene_headers.txt | sed -e "s/.t.*//g" > analysis/transcription_factors/N.ditissima/Hg199_minion/Hg199_minion_TF_geneid_headers.txt
 ```
 
-=================================
-
+==================================================================
 Secondary metabolites (Antismash and SMURF)
-=================================
+==================================================================
 
 Antismash was run to identify clusters of secondary metabolite genes within the genome. Antismash was run using the weserver at: http://antismash.secondarymetabolites.org
 
 Results of web-annotation of gene clusters within the assembly were downloaded to the following directories:
 
+
 ```bash
-for AntiSmash in $(ls analysis/secondary_metabolites/antismash/Hg199_minion/fungi-dfc734cf-18aa-414d-b034-0da05c627613/*.gbk); do
-  OutDir=analysis/secondary_metabolites/antismash/Hg199_minion/
+for AntiSmash in $(ls analysis/secondary_metabolites/antismash/Hg199/fungi-ba4407b0-8c8e-42b2-93ed-5fd189d6a914/*.gbk); do
+  OutDir=analysis/secondary_metabolites/antismash/Hg199/
   Prefix=$OutDir/Hg199_antismash
   ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/secondary_metabolites
   $ProgDir/antismash2gff.py --inp_antismash $AntiSmash --out_prefix $Prefix
@@ -626,7 +626,7 @@ done
 # Identify secondary metabolites within predicted clusters
 printf "Number of secondary metabolite detected:\t"
 cat "$Prefix"_secmet_clusters.gff | wc -l
-GeneGff=gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3
+GeneGff=gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.gff3
 bedtools intersect -u -a $GeneGff -b "$Prefix"_secmet_clusters.gff > "$Prefix"_secmet_genes.gff
 cat "$Prefix"_secmet_genes.gff | grep -w 'mRNA' | cut -f9 | cut -f2 -d '=' | cut -f1 -d ';' > "$Prefix"_secmet_genes.txt
 bedtools intersect -wo -a $GeneGff -b "$Prefix"_secmet_clusters.gff | grep 'mRNA' | cut -f9,10,12,18 | sed "s/ID=//g" | perl -p -i -e "s/;Parent=g\w+//g" | perl -p -i -e "s/;Notes=.*//g" > "$Prefix"_secmet_genes.tsv
@@ -638,7 +638,7 @@ cat "$Prefix"_secmet_genes.gff | grep -w 'gene' | wc -l
 # Identify cluster finder additional non-secondary metabolite clusters
 printf "Number of cluster finder non-SecMet clusters detected:\t"
 cat "$Prefix"_clusterfinder_clusters.gff | wc -l
-GeneGff=gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3
+GeneGff=gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.gff3
 bedtools intersect -u -a $GeneGff -b "$Prefix"_clusterfinder_clusters.gff > "$Prefix"_clusterfinder_genes.gff
 cat "$Prefix"_clusterfinder_genes.gff | grep -w 'mRNA' | cut -f9 | cut -f2 -d '=' | cut -f1 -d ';' > "$Prefix"_clusterfinder_genes.txt
 printf "Number of predicted proteins in cluster finder non-SecMet clusters:\t"
@@ -649,6 +649,15 @@ done
 
 These clusters represented the following genes. Note that these numbers just show the number of intersected genes with gff clusters and are not confirmed by function
 
+Hg199 Reference
+Number of secondary metabolite detected:	42
+Number of predicted proteins in secondary metabolite clusters:	624
+Number of predicted genes in secondary metabolite clusters:	610
+Number of cluster finder non-SecMet clusters detected:
+Number of predicted proteins in cluster finder non-SecMet clusters:
+Number of predicted genes in cluster finder non-SecMet clusters:
+
+Hg199_minion
 Number of secondary metabolite detected:	45
 Number of predicted proteins in secondary metabolite clusters:	392
 Number of predicted genes in secondary metabolite clusters:	380
