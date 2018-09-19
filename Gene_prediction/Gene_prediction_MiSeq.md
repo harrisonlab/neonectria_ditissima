@@ -237,9 +237,9 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 ```
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
-  for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-		#for Assembly in $(ls repeat_masked/N.ditissima/*/R0905_canu*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+#for Strain in Ag02 Ag05 ND8 R37-15; do
+	for Strain in R68-17-C2 NMaj SVK1 SVK2; do
+  for Assembly in $(ls repeat_masked/N.*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
     while [ $Jobs -gt 1 ]; do
     sleep 10
@@ -253,9 +253,9 @@ for Strain in Ag02 Ag05 ND8 R37-15; do
     OutDir=gene_pred/braker/$Organism/$Strain
 		#OutDir=gene_pred/braker/$Organism/"$Strain"_braker_Nov2017
     AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
-    GeneModelName="$Organism"_"$Strain"_braker_Jan2018
+    GeneModelName="$Organism"_"$Strain"_braker
 		#GeneModelName="$Organism"_"$Strain"_braker_Nov2017
-    rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker_Jan2018
+    #rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
     qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
   done
