@@ -286,12 +286,14 @@ done
 Fasta and gff files were extracted from Braker1 output.
 
 ```bash
-  for File in $(ls gene_pred/braker/N.*/*/*/augustus.gff); do
-    getAnnoFasta.pl $File
-    OutDir=$(dirname $File)
-    echo "##gff-version 3" > $OutDir/augustus_extracted.gff
-    cat $File | grep -v '#' >> $OutDir/augustus_extracted.gff
-  done
+for Strain in R68-17-C2 NMaj SVK1 SVK2; do
+for File in $(ls gene_pred/braker/N.*/$Strain/*/augustus.gff); do
+getAnnoFasta.pl $File
+OutDir=$(dirname $File)
+echo "##gff-version 3" > $OutDir/augustus_extracted.gff
+cat $File | grep -v '#' >> $OutDir/augustus_extracted.gff
+done
+done
 ```
 
 ## Supplimenting Braker gene models with CodingQuary genes
@@ -305,7 +307,8 @@ Note - cufflinks doesn't always predict direction of a transcript and
 therefore features can not be restricted by strand when they are intersected.
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
+for Strain in R68-17-C2 NMaj SVK1 SVK2; do
+#for Strain in Ag02 Ag05 ND8 R37-15; do
     for Assembly in $(ls repeat_masked/N*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
