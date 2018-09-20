@@ -742,9 +742,9 @@ Antismash was run to identify clusters of secondary metabolite genes within the 
 Results of web-annotation of gene clusters within the assembly were downloaded to the following directories:
 
 ```bash
-for AntiSmash in $(ls analysis/secondary_metabolites/antismash/Hg199_minion/fungi-dfc734cf-18aa-414d-b034-0da05c627613/*.gbk); do
-  OutDir=analysis/secondary_metabolites/antismash/Hg199_minion/
-  Prefix=$OutDir/Hg199_antismash
+for AntiSmash in $(ls analysis/secondary_metabolites/antismash/Ref_Genomes/N.ditissima/Hg199/fungi-53d0a8b2-dbf2-4597-a579-b96c3030b2a9/*.gbk); do
+  OutDir=analysis/secondary_metabolites/antismash/Ref_Genomes/N.ditissima/Hg199
+  Prefix=$OutDir/Hg199
   ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/secondary_metabolites
   $ProgDir/antismash2gff.py --inp_antismash $AntiSmash --out_prefix $Prefix
 done
@@ -752,7 +752,7 @@ done
 # Identify secondary metabolites within predicted clusters
 printf "Number of secondary metabolite detected:\t"
 cat "$Prefix"_secmet_clusters.gff | wc -l
-GeneGff=gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3
+GeneGff=gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.gff3
 bedtools intersect -u -a $GeneGff -b "$Prefix"_secmet_clusters.gff > "$Prefix"_secmet_genes.gff
 cat "$Prefix"_secmet_genes.gff | grep -w 'mRNA' | cut -f9 | cut -f2 -d '=' | cut -f1 -d ';' > "$Prefix"_secmet_genes.txt
 bedtools intersect -wo -a $GeneGff -b "$Prefix"_secmet_clusters.gff | grep 'mRNA' | cut -f9,10,12,18 | sed "s/ID=//g" | perl -p -i -e "s/;Parent=g\w+//g" | perl -p -i -e "s/;Notes=.*//g" > "$Prefix"_secmet_genes.tsv
@@ -764,7 +764,7 @@ cat "$Prefix"_secmet_genes.gff | grep -w 'gene' | wc -l
 # Identify cluster finder additional non-secondary metabolite clusters
 printf "Number of cluster finder non-SecMet clusters detected:\t"
 cat "$Prefix"_clusterfinder_clusters.gff | wc -l
-GeneGff=gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3
+GeneGff=gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.gff3
 bedtools intersect -u -a $GeneGff -b "$Prefix"_clusterfinder_clusters.gff > "$Prefix"_clusterfinder_genes.gff
 cat "$Prefix"_clusterfinder_genes.gff | grep -w 'mRNA' | cut -f9 | cut -f2 -d '=' | cut -f1 -d ';' > "$Prefix"_clusterfinder_genes.txt
 printf "Number of predicted proteins in cluster finder non-SecMet clusters:\t"
@@ -774,6 +774,14 @@ cat "$Prefix"_clusterfinder_genes.gff | grep -w 'gene' | wc -l
 done
 
 These clusters represented the following genes. Note that these numbers just show the number of intersected genes with gff clusters and are not confirmed by function
+
+Number of secondary metabolite detected:	43
+Number of predicted proteins in secondary metabolite clusters:	603
+Number of predicted genes in secondary metabolite clusters:	589
+Number of cluster finder non-SecMet clusters detected:	109
+Number of predicted proteins in cluster finder non-SecMet clusters:	3137
+Number of predicted genes in cluster finder non-SecMet clusters:	3077
+
 
 Number of secondary metabolite detected:	45
 Number of predicted proteins in secondary metabolite clusters:	392
