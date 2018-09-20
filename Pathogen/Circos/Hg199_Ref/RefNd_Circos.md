@@ -15,7 +15,11 @@ $ProgDir/fasta2gff_windows.py --genome $Nd_genome --size 20 > $OutDir/Hg199_20kb
 
 # Convert FoC MiSeq reads aligning in 100kb windows into coverage stats
 # NOTE - this step must not be  run on the head node as it uses a lot of RAM.
-for Strain in Ag04 Ag05 BGV344 OPC304 R68-17-C2 SVK1 SVK2 NMaj; do
+
+qlogin -pe smp 16 -l virtual_free=1G
+
+#for Strain in Ag04 Ag05 BGV344 OPC304 R68-17-C2 SVK1 SVK2 NMaj; do
+for Strain in R6-17-2 R37-15 R6-17-3; do
 for ReadsBam in $(ls ../../../home/groups/harrisonlab/project_files/neonectria_ditissima/analysis/genome_alignment/bowtie/N.*/$Strain/"$Strain"_unmasked.fa_aligned.bam); do
 Organism=$(echo $ReadsBam | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $ReadsBam | rev | cut -f2 -d '/' | rev)
