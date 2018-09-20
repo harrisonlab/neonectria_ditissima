@@ -36,5 +36,5 @@ GffEffP=analysis/effectorP/Ref_Genomes/N.ditissima/Hg199/N.ditissima_Hg199_Effec
 ProgDir=~/git_repos/emr_repos/scripts/fusarium/pathogen/identify_LS_chromosomes/circos
 $ProgDir/gff2circos_scatterplot.py --gff $GffEffP --feature gene --value 0.5 > $OutDir/Hg199_effectorP_plot.txt
 
-circos -conf /home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/circos/circos.conf -outputdir ./$OutDir
+circos -conf /home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Pathogen/Circos/Hg199_Ref/circos.conf -outputdir ./$OutDir
 ```
