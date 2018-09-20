@@ -251,7 +251,7 @@ for line in InterPro_lines:
 #-----------------------------------------------------
 # Build a dictionary of Secondary Metabolite annotations
 #-----------------------------------------------------
-#
+
 #i = 0
 #antismash_dict = defaultdict(list)
 #for line in antismash_lines:
