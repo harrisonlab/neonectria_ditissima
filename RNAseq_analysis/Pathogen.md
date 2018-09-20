@@ -118,6 +118,9 @@ invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
 unorderedColData <- read.table("alignment/salmon/N.ditissima/Hg199/DeSeq2/N.dit_Hg199_RNAseq_design.txt",header=T,sep="\t")
 colData <- data.frame(unorderedColData[ order(unorderedColData$Sample.name),])
 
+# Group column
+colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
+
 # 1st design
 design <- ~ Cultivar + Timepoint
 dds <- DESeqDataSetFromTximport(txi.genes,colData,design)
@@ -274,10 +277,10 @@ dev.off()
 
 ```R
 raw_counts <- data.frame(counts(dds, normalized=FALSE))
-colnames(raw_counts) <- paste(colData$Condition)
+colnames(raw_counts) <- paste(colData$Group)
 write.table(raw_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2/raw_counts.txt",sep="\t",na="",quote=F)
 norm_counts <- data.frame(counts(dds, normalized=TRUE))
-colnames(norm_counts) <- paste(colData$Condition)
+colnames(norm_counts) <- paste(colData$Group)
 write.table(norm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2/normalised_counts.txt",sep="\t",na="",quote=F)
 
 #robust may be better set at false to normalise based on total counts rather than 'library normalisation factors'
@@ -548,28 +551,29 @@ alignment/salmon/N.ditissima/Hg199/DeSeq2/t1_vs_t2_DEGs.txt
 ## Produce a more detailed table of analyses
 
 ```bash
-for GeneGff in $(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3); do
-Strain=Hg199_minion
+for GeneGff in $(ls /data/scratch/gomeza/gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.gff3); do
+Strain=Hg199
 Organism=N.ditissima
-Assembly=$(ls /data/scratch/gomeza/Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/*_contigs_unmasked.fa)
-InterPro=$(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199_minion/Hg199_minion_interproscan.tsv)
-SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/N.ditissima/Hg199_minion/swissprot_vJul2016_tophit_parsed.tbl)
-OutDir=gene_pred/annotation/v5/$Organism/$Strain
+Assembly=$(ls /data/scratch/gomeza/repeat_masked/Ref_Genomes/N.ditissima/Hg199/*/*_contigs_unmasked.fa)
+InterPro=$(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199/Hg199_interproscan.tsv)
+SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/Ref_Genomes/N.ditissima/Hg199/swissprot_vMar2018_tophit_parsed.tbl)
+OutDir=gene_pred/annotation/R2/$Organism/$Strain
 mkdir -p $OutDir
-GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta)
-TFs=$(ls analysis/transcription_factors/N.ditissima/Hg199_minion/Hg199_minion_TF_domains.tsv)
-#Antismash=$(ls /data/scratch/gomeza/analysis/secondary_metabolites/antismash/Hg199_minion/fungi-dfc734cf-18aa-414d-b034-0da05c627613/Hg199_minion_antismash_secmet_genes.tsv)
-SigP4=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/Hg199_minion_final_sp_no_trans_mem.aa)
-effector_total=$(ls analysis/effectorP/N.ditissima/Hg199_minion/N.ditissima_Hg199_minion_EffectorP_headers.txt)
-CAZY_total=$(ls gene_pred/CAZY/N.ditissima/Hg199_minion/Hg199_minion_CAZY_headers.txt)
-TMHMM_headers=$(ls gene_pred/trans_mem/$Organism/$Strain/*_TM_genes_pos_headers.txt)
+GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.pep.fasta)
+TFs=$(ls analysis/transcription_factors/Ref_Genomes/N.ditissima/Hg199/Hg199_TF_domains.tsv)
+Antismash=$(ls /data/scratch/gomeza/analysis/secondary_metabolites/antismash/Ref_Genomes/N.ditissima/Hg199/Hg199_secmet_genes.tsv)
+SigP4=$(ls gene_pred/Ref_Genomes_signalp-4.1/$Organism/$Strain/Hg199_final_sp_no_trans_mem.aa)
+effector_total=$(ls analysis/effectorP/Ref_Genomes/N.ditissima/Hg199/N.ditissima_Hg199_EffectorP_headers.txt)
+CAZY_total=$(ls gene_pred/CAZY/Ref_Genomes/N.ditissima/Hg199/Hg199_CAZY_headers.txt)
+TMHMM_headers=$(ls gene_pred/trans_mem/N.ditissima/Hg199/Hg199_TM_genes_pos.txt)
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/annotation_tables
-Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5)
+Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199/DeSeq2)
 DEG_Files=$(ls \
-$Dir1/Infection_vs_Control.txt \
+$Dir1/GD_vs_M9.txt \
+$Dir1/t1_vs_t2.txt \
 | sed -e "s/$/ /g" | tr -d "\n")
-RawCount=$(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/raw_counts.txt)
-FPKM=$(ls alignment/salmon/N.ditissima/Hg199_minion/DeSeq2_v5/fpkm_counts.txt)
+RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/raw_counts.txt)
+FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_counts.txt)
 $ProgDir/Nd_annotation_tables.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
 done
 done
