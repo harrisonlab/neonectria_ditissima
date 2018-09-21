@@ -122,7 +122,7 @@ colData <- data.frame(unorderedColData[ order(unorderedColData$Sample.name),])
 colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
 
 # 1st design
-design <- ~ Cultivar + Timepoint
+design <- ~ Timepoint + Cultivar
 dds <- DESeqDataSetFromTximport(txi.genes,colData,design)
 
 # Library normalisation
@@ -381,6 +381,10 @@ colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
 design <- ~ Condition
 dds <- DESeqDataSetFromTximport(txi.genes,colData,design)
 
+#Pre-filtering
+#keep <- rowSums(counts(dds)) >= 10
+#dds <- dds[keep,]
+
 # Library normalisation
 dds <- estimateSizeFactors(dds)
 
@@ -410,9 +414,9 @@ sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 summary(sig.res)
 ###
-out of 4201 with nonzero total read count
+out of 4197 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 1998, 48%
+LFC > 0 (up)     : 1994, 48%
 LFC < 0 (down)   : 2203, 52%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
@@ -459,8 +463,16 @@ dev.off()
 
 # MA-plot
 
-pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/plotMA_vst.pdf")
-plotMA(res, ylim=c(-2,2))
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/plotMA_res.pdf")
+plotMA(res,ylim=c(-25,25))
+dev.off()
+
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/plotDispEst.pdf")
+plotDispEsts(dds,ylim=c(1e-6,1e1))
+dev.off()
+
+pdf("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/histpvalue.pdf")
+hist(res$pvalue,breaks=20,col="grey")
 dev.off()
 
 # Plot counts
@@ -503,7 +515,7 @@ dev.off()
 
 ```R
 raw_counts <- data.frame(counts(dds, normalized=FALSE))
-colnames(raw_counts) <- paste(colData$Condition)
+colnames(raw_counts) <- paste(colData$Group)
 write.table(raw_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/raw_counts.txt",sep="\t",na="",quote=F)
 norm_counts <- data.frame(counts(dds, normalized=TRUE))
 colnames(norm_counts) <- paste(colData$Condition)
@@ -512,10 +524,10 @@ write.table(norm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/normalis
 #robust may be better set at false to normalise based on total counts rather than 'library normalisation factors'
 
 tpm_counts <- data.frame(fpkm(dds, robust = TRUE))
-colnames(tpm_counts) <- paste(colData$Group)
+colnames(tpm_counts) <- paste(colData$Condition)
 write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_norm_counts.txt",sep="\t",na="",quote=F)
 tpm_counts <- data.frame(fpkm(dds, robust = FALSE))
-colnames(tpm_counts) <- paste(colData$Group)
+colnames(tpm_counts) <- paste(colData$Condition)
 write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_counts.txt",sep="\t",na="",quote=F)
 ```
 
@@ -541,7 +553,7 @@ done
 ```
 ```
 alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/Infection_vs_Control_DEGs.txt
-4104
+4100
 alignment/salmon/N.ditissima/Hg199/DeSeq2/GD_vs_M9_DEGs.txt
 20
 alignment/salmon/N.ditissima/Hg199/DeSeq2/t1_vs_t2_DEGs.txt
@@ -567,14 +579,13 @@ effector_total=$(ls analysis/effectorP/Ref_Genomes/N.ditissima/Hg199/N.ditissima
 CAZY_total=$(ls gene_pred/CAZY/Ref_Genomes/N.ditissima/Hg199/Hg199_CAZY_headers.txt)
 TMHMM_headers=$(ls gene_pred/trans_mem/N.ditissima/Hg199/Hg199_TM_genes_pos.txt)
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/annotation_tables
-Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199/DeSeq2)
+Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC)
 DEG_Files=$(ls \
-$Dir1/GD_vs_M9.txt \
-$Dir1/t1_vs_t2.txt \
+$Dir1/Infection_vs_Control.txt \
 | sed -e "s/$/ /g" | tr -d "\n")
-RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/raw_counts.txt)
-FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_counts.txt)
-$ProgDir/Nd_annotation_tables.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
+RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/raw_counts.txt)
+FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_counts.txt)
+$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
 done
 done
 ```
