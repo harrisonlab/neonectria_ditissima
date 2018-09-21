@@ -424,7 +424,7 @@ for line in transcript_lines:
     #gene_id = transcript_id.split(".")[0]
     DEG_out = []
     for DEG_file in DEG_files:
-        entryname = "_".join([DEG_file, transcrip_id])
+        entryname = "_".join([DEG_file, transcript_id])
         if DEG_dict[entryname]:
             DEG_out.append(DEG_dict[entryname][0])
             DEG_out.append(DEG_dict[entryname][1])
