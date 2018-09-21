@@ -317,7 +317,7 @@ for Strain in R68-17-C2 NMaj SVK1 SVK2; do
     mkdir -p $OutDir
     AcceptedHits=alignment/$Organism/$Strain/Hg199/accepted_hits.bam
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-    qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
+    qsub -R y $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
     done
 	done
 
