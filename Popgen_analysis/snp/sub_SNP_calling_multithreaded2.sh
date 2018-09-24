@@ -28,7 +28,7 @@ java -jar $gatk/GenomeAnalysisTK.jar \
      -R $reference \
      -T HaplotypeCaller \
      -ploidy 1 \
-     -nct 6 \
+     -nct 24 \
      --allow_potentially_misencoded_quality_scores \
      -I $input/*/Ag02/Ag02_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
      -I $input/*/Ag04/Ag04_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
