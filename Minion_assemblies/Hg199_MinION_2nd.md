@@ -1623,15 +1623,15 @@ Quast
 I used the pilon_5 genome because busco prediction was slightly better than racon genome.
 
 ```bash
-  for PacBioAssembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/polished/pilon_5.fasta); do
-    HybridAssembly=$(ls assembly/spades_pacbio/$Organism/R0905_v2/filtered_contigs_min_500bp/contigs_min_500bp.fasta)
-    Organism=$(echo $HybridAssembly | rev | cut -f4 -d '/' | rev)
-    Strain=$(echo $HybridAssembly | rev | cut -f3 -d '/' | rev)
-    AnchorLength=5000
-    OutDir=assembly/merged_canu_spades/$Organism/$Strain/"$Strain"_pacbio_5k
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
-    qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
-  done
+for PacBioAssembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/Original_v3/polished/pilon_5.fasta); do
+  HybridAssembly=assembly/spades_pacbio/*/R0905_all/filtered_contigs_min_500bp/contigs_min_500bp.fasta
+  Organism=$(echo $HybridAssembly | rev | cut -f4 -d '/' | rev)
+  Strain=$(echo $HybridAssembly | rev | cut -f3 -d '/' | rev)
+  AnchorLength=500000
+  OutDir=assembly/merged_canu_spades/$Organism/$Strain/"$Strain"_pacbio_500k
+  ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/quickmerge
+  qsub $ProgDir/sub_quickmerge.sh $PacBioAssembly $HybridAssembly $OutDir $AnchorLength
+done
 ```
 
 
