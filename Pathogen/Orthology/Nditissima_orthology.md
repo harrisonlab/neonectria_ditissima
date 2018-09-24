@@ -17,152 +17,175 @@ scripts=/home/sobczm/bin/popgen/clock/motif_discovery
 ## 1.a) Format fasta files
 
 ```bash
+
+  #Working directory used for OrthoFinder
+  WorkDir=analysis/orthology/OrthoFinder
+  mkdir -p $WorkDir
+
+  #Taxon_code=199R
+  #Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta)
+  #Id_field=1
+  #orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+  #mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
+
   Taxon_code=199R
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.pep.fasta)
+  Id_field=1
+  orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+  mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
+
+  Taxon_code=R09R
+  Fasta_file=$(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/R0905/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=Ag02
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag02/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag02/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=Ag04
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag04/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag04/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=Ag05
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag05/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag05/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=Ag06
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag06/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag06/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=Ag08
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag08/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag08/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=A09A
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag09_A/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag09_A/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=A11A
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag11_A/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag11_A/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=A11B
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag11_B/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag11_B/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=A11C
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag11_C/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Ag11_C/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=BGV3
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/BGV344/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/BGV344/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
-  Taxon_code=H199
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Hg199/final/final_genes_combined.pep.fasta)
-  Id_field=1
-  orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
-  mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
+  #Taxon_code=H199
+  #Fasta_file=$(ls gene_pred/codingquary/N.ditissima/Hg199/final/final_genes_combined.pep.fasta)
+  #Id_field=1
+  #orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+  #mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=ND8
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/ND8/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/ND8/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=ND9
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/ND9/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/ND9/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=OPC3
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/OPC304/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/OPC304/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=P112
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/P112/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/P112/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
-  Taxon_code=R09
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R0905_canu_2017_v2/final/final_genes_combined.pep.fasta)
-  Id_field=1
-  orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
-  mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
+  #Taxon_code=R09
+  #Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R0905_canu_2017_v2/final/final_genes_combined.pep.fasta)
+  #Id_field=1
+  #orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+  #mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=R37
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R37-15/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R37-15/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=R39
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R39-15/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R39-15/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=R41
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R41-15/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R41-15/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=R42
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R42-15/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R42-15/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=R45
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R45-15/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R45-15/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=R602
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R6-17-2/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R6-17-2/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
   Taxon_code=R603
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R6-17-3/final/final_genes_combined.pep.fasta)
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R6-17-3/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
 
-  Taxon_code=R68
-  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R68-17/final/final_genes_combined.pep.fasta)
+  Taxon_code=68C2
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R68-17-C2/final/final_genes_appended_renamed.pep.fasta)
+  Id_field=1
+  orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+  mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
+
+  Taxon_code=68C3
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/R68-17-C3/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
@@ -175,6 +198,24 @@ scripts=/home/sobczm/bin/popgen/clock/motif_discovery
 
   Taxon_code=R324
   Fasta_file=$(ls gene_pred/codingquary/N.ditissima/RS324p/final/final_genes_combined.pep.fasta)
+  Id_field=1
+  orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+  mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
+
+  Taxon_code=SKV1
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/SVK1/final/final_genes_appended_renamed.pep.fasta)
+  Id_field=1
+  orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+  mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
+
+  Taxon_code=SVK2
+  Fasta_file=$(ls gene_pred/codingquary/N.ditissima/SVK2/final/final_genes_appended_renamed.pep.fasta)
+  Id_field=1
+  orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
+  mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
+
+  Taxon_code=NMAJ
+  Fasta_file=$(ls gene_pred/codingquary/N.major/NMaj/final/final_genes_appended_renamed.pep.fasta)
   Id_field=1
   orthomclAdjustFasta $Taxon_code $Fasta_file $Id_field
   mv "$Taxon_code".fasta $WorkDir/formatted/"$Taxon_code".fasta
@@ -332,10 +373,10 @@ cp -r ../orthology/Orthomcl/Nd_all_isolates/formatted/ OrthoFinder2/
 screen -a
 
 #login in a node with 16 threads and give 1G of memory to each. This is going to take a while, so try to avoid using blacklace11 and leave it for other users.
-qlogin -pe smp 16 -l virtual_free=1G
+qlogin -pe smp 23 -l virtual_free=1G
 cd analysis/orthology/OrthoFinder2/formatted
 #16 threads used
-orthofinder -f ./ -t 3 -a 3
+orthofinder -f ./ -t 16
 ```
 
 ## Orthofinder results:
@@ -462,9 +503,7 @@ $ProgDir/orthoMCLgroups2tab.py $GoodProts $WorkDir/formatted/Results_Jul25/Ortho
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Pathogen/Orthology
 $ProgDir/Ndit_Ortholog_venn.r --inp $WorkDir/formatted/Results_Jul25/"$IsolateAbrv"_orthogroups.tab --out $WorkDir/formatted/Results_Jul25/"$IsolateAbrv"_orthogroups.pdf
 ```
-
-
-
+```
 Output was a pdf file of the venn diagram.
 
 The following additional information was also provided. The format of the
@@ -474,8 +513,6 @@ Isolate name
 total number of orthogroups
 number of unique singleton genes
 number of unique groups of inparalogs
-
-```
 ```
 
 # 6) Downstream analysis
