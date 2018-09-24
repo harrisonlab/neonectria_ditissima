@@ -338,7 +338,8 @@ for Strain in R68-17-C2 NMaj SVK1 SVK2; do
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
+for Strain in R68-17-C2 NMaj SVK1 SVK2; do
+#for Strain in Ag02 Ag05 ND8 R37-15; do
     for Assembly in $(ls repeat_masked/N*/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev)
     Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
@@ -368,9 +369,10 @@ genes were predicted in regions of the genome, not containing Braker gene
 models:
 
 ```bash
-for Strain in Ag02 Ag05 ND8 R37-15; do
-for BrakerGff in $(ls gene_pred/braker/$Organism/$Strain/*/augustus.gff3); do
-#Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
+for Strain in R68-17-C2 NMaj SVK1 SVK2; do
+#for Strain in Ag02 Ag05 ND8 R37-15; do
+for BrakerGff in $(ls gene_pred/braker/N*/$Strain/*/augustus.gff3); do
+Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
 Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 echo "$Organism - $Strain"
 Assembly=$(ls repeat_masked/$Organism/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
@@ -582,7 +584,12 @@ gene_pred/codingquary/N.ditissima/R6-17-3/final
 772
 14201
 
-gene_pred/codingquary/N.ditissima/R68-17/final
+gene_pred/codingquary/N.ditissima/R68-17-C2/final
+13220
+756
+13976
+
+gene_pred/codingquary/N.ditissima/R68-17-C3/final
 14232
 745
 14977
@@ -597,6 +604,48 @@ gene_pred/codingquary/N.ditissima/RS324p/final
 1132
 14524
 
+gene_pred/codingquary/N.ditissima/SVK1/final
+13260
+740
+14000
+
+gene_pred/codingquary/N.ditissima/SVK2/final
+13253
+720
+13973
+
+gene_pred/codingquary/N.major/NMaj/final
+12180
+135
+12315
+```
+
+
+## Rename and remove duplicate genes
+
+```bash
+for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 ND8 ND9 OPC304 P112 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17-C2 R68-17-C3 SVK1 SVK2 NMaj; do
+for GffAppended in $(ls gene_pred/codingquary/N*/$Strain/final/final_genes_appended.gff3); do
+Strain=$(echo $GffAppended | rev | cut -d '/' -f3 | rev)
+Organism=$(echo $GffAppended | rev | cut -d '/' -f4 | rev)
+echo "$Organism - $Strain"
+FinalDir=gene_pred/codingquary/$Organism/$Strain/final
+GffFiltered=$FinalDir/filtered_duplicates.gff
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary/
+$ProgDir/remove_dup_features.py --inp_gff $GffAppended --out_gff $GffFiltered
+GffRenamed=gene_pred/codingquary/N.*/$Strain/final/final_genes_appended_renamed.gff3
+Strain=$(echo $GffAppended | rev | cut -d '/' -f3 | rev)
+Organism=$(echo $GffAppended | rev | cut -d '/' -f4 | rev)
+LogFile=$FinalDir/final_genes_appended_renamed.log
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
+$ProgDir/gff_rename_genes.py --inp_gff $GffFiltered --conversion_log $LogFile > $GffRenamed
+rm $GffFiltered
+Assembly=$(ls repeat_masked/$Organism/$Strain/*_softmasked_repeatmasker_TPSI_appended.fa)
+$ProgDir/gff2fasta.pl $Assembly $GffRenamed gene_pred/codingquary/$Organism/$Strain/final/final_genes_appended_renamed
+# The proteins fasta file contains * instead of Xs for stop codons, these should be changed
+sed -i 's/\*/X/g' gene_pred/codingquary/$Organism/$Strain/final/final_genes_appended_renamed.pep.fasta
+done
+done
 ```
 
 ## ORF finder
