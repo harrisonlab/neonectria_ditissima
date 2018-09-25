@@ -6,18 +6,18 @@
 ####Run BWA-mem
 
 ```bash
-Reference=Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa
-for Strain in Ag11_C BGV344 ND9 OPC304 P112 Ag06 Ag09_A Ag11_A R39-15 R42-15 R68-17 Ag11_B R41-15 R6-17-2 R6-17-3 Ag02 Ag05 ND8 R37-15 Ag04 R45-15 R0905_canu_2017_v2 Hg199; do
-for Reads in $(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.ditissima/*)
+Reference=repeat_masked/Ref_Genomes/N.ditissima/Hg199/filtered_contigs/Hg199_contigs_unmasked.fa
+for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 ND8 ND9 OPC304 P112 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17-C2 R68-17-C3 SVK1 SVK2 NMaj R0905_all Hg199; do
+for Reads in $(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.*/$Strain)
 do
   Strain=$(echo $Reads | rev | cut -f1 -d '/' | rev)
   Organism=$(echo $Reads | rev | cut -f2 -d '/' | rev)
     echo "$Organism - $Strain"
     FRead=$Reads/F/*.fq.gz
     RRead=$Reads/R/*.fq.gz
-    OutDir=alignment
+    OutDir=alignment/bwa
     mkdir -p $OutDir
-    ProgDir=/home/gomeza/git_repos/tools/seq_tools/genome_alignment/bwa
+    ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment/bwa
     qsub $ProgDir/sub_bwa.sh $Strain $Reference $FRead $RRead $OutDir
 done
 done
