@@ -27,7 +27,7 @@ done
 
 ```bash
 Prefix=Nd_svaba
-Reference=Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa
+Reference=repeat_masked/Ref_Genomes/N.ditissima/Hg199/filtered_contigs/Hg199_contigs_unmasked.fa
 AlignDir=alignment/bwa
 OutDir=svaba
 mkdir -p $OutDir
