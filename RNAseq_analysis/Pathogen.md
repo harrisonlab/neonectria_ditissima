@@ -361,7 +361,11 @@ library(tibble)
 library(tximport)
 library(rjson)
 library(readr)
-library(genefilter)
+require("pheatmap")
+require(data.table)
+library("RColorBrewer")
+library("gplots", Sys.getenv("R_LIBS_USER"))
+library("ggrepel")
 
 #===============================================================================
 #       Load data from SALMON quasi mapping
@@ -379,10 +383,11 @@ txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199/DeSeq2_
 mysamples <- list.dirs("alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC",full.names=F,recursive=F)
 
 # summarise to gene level (this can be done in the tximport step, but is easier to understand in two steps)
-txi.genes <- summarizeToGene(txi.reps,tx2gene)
+#txi.genes <- summarizeToGene(txi.reps,tx2gene)
 
-# set the sample names for txi.genes
-invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
+# set the sample names for txi.genes. txi.reps will be used keeping transcript_id
+#invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
+invisible(sapply(seq(1,3), function(i) {colnames(txi.reps[[i]])<<-mysamples}))
 
 #===============================================================================
 #       Read sample metadata and annotations
@@ -401,14 +406,19 @@ colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
 
 # design
 design <- ~ Condition
-dds <- DESeqDataSetFromTximport(txi.genes,colData,design)
+
+# create DESeq object from featureCounts counts and sample metadata
+dds <- DESeqDataSetFromTximport(txi.reps,colData,design)
 
 #Pre-filtering
-#keep <- rowSums(counts(dds)) >= 10
-#dds <- dds[keep,]
+keep <- rowSums(counts(dds)) >= 20
+dds <- dds[keep,]
 
 # Library normalisation
-dds <- estimateSizeFactors(dds)
+# featureCounts only!!!- normalise counts for different library size (do after collapsing replicates)
+# NOTE: need to work out what to do if there are technical replicates for salmon workflow
+# probably take average of avgTxLength for the summed samples
+#dds <- estimateSizeFactors(dds)
 
 # Set reference factor level
 dds$Condition<-factor(dds$Condition, levels=c("Control","Infected"))
@@ -428,6 +438,10 @@ res <- results(dds)
 res
 summary(res)
 
+# write tables of results
+#write.table(res.merged,"results.txt",quote=F,na="",row.names=F,sep="\t") - No row names.
+write.table(res,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/results.txt",quote=F,na="",sep="\t")
+
 alpha <- 0.05
 res= results(dds, alpha=alpha,contrast=c("Condition","Infected","Control"))
 sig.res <- subset(res,padj<=alpha)
@@ -436,10 +450,10 @@ sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 summary(sig.res)
 ###
-out of 4197 with nonzero total read count
+out of 4226 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 1994, 48%
-LFC < 0 (down)   : 2203, 52%
+LFC > 0 (up)     : 1971, 47%
+LFC < 0 (down)   : 2255, 53%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 0)
@@ -537,7 +551,7 @@ dev.off()
 
 ```R
 raw_counts <- data.frame(counts(dds, normalized=FALSE))
-colnames(raw_counts) <- paste(colData$Group)
+colnames(raw_counts) <- paste(colData$Condition)
 write.table(raw_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/raw_counts.txt",sep="\t",na="",quote=F)
 norm_counts <- data.frame(counts(dds, normalized=TRUE))
 colnames(norm_counts) <- paste(colData$Condition)
@@ -575,11 +589,7 @@ done
 ```
 ```
 alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/Infection_vs_Control_DEGs.txt
-4100
-alignment/salmon/N.ditissima/Hg199/DeSeq2/GD_vs_M9_DEGs.txt
-20
-alignment/salmon/N.ditissima/Hg199/DeSeq2/t1_vs_t2_DEGs.txt
-176
+4133
 ```
 
 ## Produce a more detailed table of analyses
@@ -601,14 +611,19 @@ effector_total=$(ls analysis/effectorP/Ref_Genomes/N.ditissima/Hg199/N.ditissima
 CAZY_total=$(ls gene_pred/CAZY/Ref_Genomes/N.ditissima/Hg199/Hg199_CAZY_headers.txt)
 TMHMM_headers=$(ls gene_pred/trans_mem/N.ditissima/Hg199/Hg199_TM_genes_pos.txt)
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/annotation_tables
-Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199/DeSeq2)
+
+Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC)
 DEG_Files=$(ls \
-$Dir1/GD_vs_M9.txt \
-$Dir1/t1_vs_t2.txt \
+$Dir1/Infection_vs_Control.txt \
+#$Dir1/GD_vs_M9.txt \
+#$Dir1/t1_vs_t2.txt \
 | sed -e "s/$/ /g" | tr -d "\n")
-RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/raw_counts.txt)
-FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_counts.txt)
+RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/normalised_counts.txt)
+FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_counts.txt)
 $ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
+
+
+$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
 done
 done
 ```
