@@ -70,10 +70,11 @@ for DEG_file in DEG_files:
             else:
                 split_line = line.split()
                 gene_name = split_line[0]
+                base = split_line [1]
                 log_change = split_line[2]
                 P_val = split_line[6]
                 entryname = "_".join([filename, gene_name])
-                DEG_dict[entryname].extend([log_change, P_val])
+                DEG_dict[entryname].extend([base, log_change, P_val])
 
 with open(conf.raw_counts) as f:
     raw_count_lines = f.readlines()
@@ -235,6 +236,7 @@ for treatment in sorted(set(fpkm_treatment_list)):
 
 for DEG_file in DEG_files:
     file_name = DEG_file.split('/')[-1]
+    header_line.append("baseMean_" + file_name)
     header_line.append("LFC_" + file_name)
     header_line.append("P-val_" + file_name)
 header_line.append('prot_seq')
@@ -324,7 +326,9 @@ for line in transcript_lines:
         if DEG_dict[entryname]:
             DEG_out.append(DEG_dict[entryname][0])
             DEG_out.append(DEG_dict[entryname][1])
+            DEG_out.append(DEG_dict[entryname][2])
         else:
+            DEG_out.append('0')
             DEG_out.append('0')
             DEG_out.append('0')
 

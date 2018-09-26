@@ -450,10 +450,10 @@ sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 summary(sig.res)
 ###
-out of 4226 with nonzero total read count
+out of 4032 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 1971, 47%
-LFC < 0 (down)   : 2255, 53%
+LFC > 0 (up)     : 1892, 47%
+LFC < 0 (down)   : 2140, 53%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 0)
@@ -618,12 +618,11 @@ $Dir1/Infection_vs_Control.txt \
 #$Dir1/GD_vs_M9.txt \
 #$Dir1/t1_vs_t2.txt \
 | sed -e "s/$/ /g" | tr -d "\n")
-RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/normalised_counts.txt)
+RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/raw_counts.txt)
 FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_counts.txt)
 $ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
 
 
 $ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
-done
 done
 ```
