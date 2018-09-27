@@ -55,22 +55,6 @@ for File in $(ls alignment/salmon/*/Hg199/*/*/*/quant.sf | grep -v -e 'GD_C1_3' 
 done
 ```
 
-
-```bash
-mkdir -p alignment/salmon/N.ditissima/Cultivar/DeSeq2
-for File in $(ls alignment/salmon/*/Cultivar/*/*/*/quant.sf | head -n1); do
-  cat $File | awk -F"\t" '{c=$1;sub("\..*","",$1);print c,$1}' OFS="\t" > alignment/salmon/N.ditissima/Cultivar/DeSeq2/trans2gene.txt  
-done
-# Put files in a convenient location for DeSeq. Analysis was not performed on
-# mycelium control samples.
-for File in $(ls alignment/salmon/N.ditissima/Cultivar/*/*/*/quant.sf | grep -v -e 'Hg199_1' -e 'Hg199_2' -e 'Hg199_3'); do
-  Prefix=$(echo $File | cut -f7 -d '/' --output-delimiter '_')
-  mkdir -p alignment/salmon/*/Cultivar/DeSeq2/$Prefix
-  cp $PWD/$File alignment/salmon/N.ditissima/Cultivar/DeSeq2/$Prefix/quant.sf
-  # rm alignment/salmon/DeSeq2/$Prefix/quant.sf
-done
-```
-
 #Gene expression of Nd.
 
 This analysis was done repeating the salmon alignment with the option --keepduplicates.
@@ -114,7 +98,7 @@ library("ggrepel")
 # First analysis. GD vs M9 and t1 vs t2. Mycelium control removed.
 
 # import transcript to gene mapping info
-tx2gene <- read.table("alignment/salmon/N.ditissima/Hg199/DeSeq2/trans2gene3.txt",header=T,sep="\t")
+tx2gene <- read.table("alignment/salmon/N.ditissima/Hg199/DeSeq2/trans2gene.txt",header=T,sep="\t")
 
 # import quantification files
 txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199/DeSeq2", full.names=T,recursive=F),"/quant.sf",sep=""),type="salmon",tx2gene=tx2gene,txOut=T)
@@ -123,7 +107,7 @@ txi.reps <- tximport(paste(list.dirs("alignment/salmon/N.ditissima/Hg199/DeSeq2"
 mysamples <- list.dirs("alignment/salmon/N.ditissima/Hg199/DeSeq2",full.names=F,recursive=F)
 
 # summarise to gene level (this can be done in the tximport step, but is easier to understand in two steps)
-txi.genes <- summarizeToGene(txi.reps,tx2gene)
+#txi.genes <- summarizeToGene(txi.reps,tx2gene)
 
 # set the sample names for txi.genes
 invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
@@ -145,10 +129,10 @@ colData$Group <- paste0(colData$Cultivar,'_', colData$Timepoint)
 
 # 1st design
 design <- ~ Timepoint + Cultivar
-dds <- DESeqDataSetFromTximport(txi.genes,colData,design)
+dds <- DESeqDataSetFromTximport(txi.reps,colData,design)
 
 # Library normalisation
-dds <- estimateSizeFactors(dds)
+#dds <- estimateSizeFactors(dds)
 
 # Set reference factor level
 #dds$Cultivar<-factor(dds$Cultivar, levels=c("mycelium","GD","M9"))
@@ -177,10 +161,10 @@ sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 summary(sig.res)
 ###
-out of 22 with nonzero total read count
+out of 19 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 14, 64%
-LFC < 0 (down)   : 8, 36%
+LFC > 0 (up)     : 12, 63%
+LFC < 0 (down)   : 7, 37%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 12)
@@ -197,10 +181,10 @@ sig.res.upregulated <- sig.res[sig.res$log2FoldChange >=1, ]
 sig.res.downregulated <- sig.res[sig.res$log2FoldChange <=-1, ]
 summary(sig.res)
 ###
-out of 176 with nonzero total read count
+out of 192 with nonzero total read count
 adjusted p-value < 0.05
-LFC > 0 (up)     : 9, 5.1%
-LFC < 0 (down)   : 167, 95%
+LFC > 0 (up)     : 11, 5.7%
+LFC < 0 (down)   : 181, 94%
 outliers [1]     : 0, 0%
 low counts [2]   : 0, 0%
 (mean count < 0)
@@ -313,6 +297,53 @@ write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_norm_count
 tpm_counts <- data.frame(fpkm(dds, robust = FALSE))
 colnames(tpm_counts) <- paste(colData$Group)
 write.table(tpm_counts,"alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_counts.txt",sep="\t",na="",quote=F)
+```
+## Analysis of DeSeq2 output
+
+```bash
+for UpFile in $(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/*_up.txt); do
+DownFile=$(echo $UpFile | sed 's/_up.txt/_down.txt/g')
+DegFile=$(echo $UpFile | sed 's/_up.txt/_DEGs.txt/g')
+cat $UpFile $DownFile | grep -v 'baseMean' | cut -f1 | sort -u > $DegFile
+echo $DegFile
+cat $DegFile | wc -l
+done
+```
+```
+alignment/salmon/N.ditissima/Hg199/DeSeq2/GD_vs_M9_DEGs.txt
+16
+alignment/salmon/N.ditissima/Hg199/DeSeq2/t1_vs_t2_DEGs.txt
+192
+```
+
+## Produce a more detailed table of analyses
+
+```bash
+for GeneGff in $(ls /data/scratch/gomeza/gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.gff3); do
+Strain=Hg199
+Organism=N.ditissima
+Assembly=$(ls /data/scratch/gomeza/repeat_masked/Ref_Genomes/N.ditissima/Hg199/*/*_contigs_unmasked.fa)
+InterPro=$(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199/Hg199_interproscan.tsv)
+SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/Ref_Genomes/N.ditissima/Hg199/swissprot_vMar2018_tophit_parsed.tbl)
+OutDir=gene_pred/annotation/R2/$Organism/$Strain
+mkdir -p $OutDir
+GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.pep.fasta)
+TFs=$(ls analysis/transcription_factors/Ref_Genomes/N.ditissima/Hg199/Hg199_TF_domains.tsv)
+Antismash=$(ls /data/scratch/gomeza/analysis/secondary_metabolites/antismash/Ref_Genomes/N.ditissima/Hg199/Hg199_secmet_genes.tsv)
+SigP4=$(ls gene_pred/Ref_Genomes_signalp-4.1/$Organism/$Strain/Hg199_final_sp_no_trans_mem.aa)
+effector_total=$(ls analysis/effectorP/Ref_Genomes/N.ditissima/Hg199/N.ditissima_Hg199_EffectorP_headers.txt)
+CAZY_total=$(ls gene_pred/CAZY/Ref_Genomes/N.ditissima/Hg199/Hg199_CAZY_headers.txt)
+TMHMM_headers=$(ls gene_pred/trans_mem/N.ditissima/Hg199/Hg199_TM_genes_pos.txt)
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/annotation_tables
+Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199/DeSeq2)
+DEG_Files=$(ls \
+$Dir1/GD_vs_M9.txt \
+$Dir1/t1_vs_t2.txt \
+| sed -e "s/$/ /g" | tr -d "\n")
+RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/normalised_counts.txt)
+FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_norm_counts.txt)
+$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp_v2.tsv
+done
 ```
 
 ## Episode 2. Gene expression of Nd. Infection vs Control.
@@ -578,14 +609,6 @@ cat $UpFile $DownFile | grep -v 'baseMean' | cut -f1 | sort -u > $DegFile
 echo $DegFile
 cat $DegFile | wc -l
 done
-
-for UpFile in $(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/*_up.txt); do
-DownFile=$(echo $UpFile | sed 's/_up.txt/_down.txt/g')
-DegFile=$(echo $UpFile | sed 's/_up.txt/_DEGs.txt/g')
-cat $UpFile $DownFile | grep -v 'baseMean' | cut -f1 | sort -u > $DegFile
-echo $DegFile
-cat $DegFile | wc -l
-done
 ```
 ```
 alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/Infection_vs_Control_DEGs.txt
@@ -611,18 +634,14 @@ effector_total=$(ls analysis/effectorP/Ref_Genomes/N.ditissima/Hg199/N.ditissima
 CAZY_total=$(ls gene_pred/CAZY/Ref_Genomes/N.ditissima/Hg199/Hg199_CAZY_headers.txt)
 TMHMM_headers=$(ls gene_pred/trans_mem/N.ditissima/Hg199/Hg199_TM_genes_pos.txt)
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/annotation_tables
-
 Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC)
 DEG_Files=$(ls \
 $Dir1/Infection_vs_Control.txt \
 #$Dir1/GD_vs_M9.txt \
 #$Dir1/t1_vs_t2.txt \
 | sed -e "s/$/ /g" | tr -d "\n")
-RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/raw_counts.txt)
-FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_counts.txt)
+RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/normalised_counts.txt)
+FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_norm_counts.txt)
 $ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
-
-
-$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
 done
 ```
