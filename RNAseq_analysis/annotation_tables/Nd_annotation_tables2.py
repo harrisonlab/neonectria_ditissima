@@ -29,6 +29,13 @@ ap.add_argument('--SigP4', required=True, type=str,
 ap.add_argument('--trans_mem', required=True, type=str,
                 help='txt file of headers from gene testing positive for \
                 transmembrane proteins by TMHMM')
+ap.add_argument('--TFs',required=True,type=str,
+		        help='Tab seperated of putative transcription factors and their domains as identified by interpro2TFs.py')
+ap.add_argument('--effector_total', required=True, type=str,
+                help='txt file of all transcripts considered low confidence \
+                effector')
+ap.add_argument('--CAZY_total', required=True, type=str,
+                help='txt file of all transcripts considered CAZY')
 ap.add_argument('--DEG_files', required=True, nargs='+', type=str,
                 help='space seperated list of files \
                 containing DEG information')
@@ -52,11 +59,20 @@ with open(conf.gene_gff) as f:
 with open(conf.gene_fasta) as f:
     prot_lines = f.readlines()
 
+with open(conf.TFs) as f:
+    TF_lines = f.readlines()
+
 with open(conf.SigP4) as f:
     sigP4_lines = f.readlines()
 
 with open(conf.trans_mem) as f:
     trans_mem_lines = f.readlines()
+
+with open(conf.effector_total) as f:
+    effector_total_lines = f.readlines()
+
+with open(conf.CAZY_total) as f:
+    CAZY_total_lines = f.readlines()
 
 DEG_files = conf.DEG_files
 DEG_dict = defaultdict(list)
@@ -120,6 +136,36 @@ trans_mem_set = Set()
 for line in trans_mem_lines:
     header = line.rstrip()
     trans_mem_set.add(header)
+
+# -----------------------------------------------------
+# Load Effector total protein into a set
+# -----------------------------------------------------
+
+effector_total_set = Set()
+for line in effector_total_lines:
+    header = line.rstrip()
+    effector_total_set.add(header)
+    # line = line.rstrip()
+    # if line.startswith('>'):
+    #     split_line = line.split()
+    #     header = split_line[0].replace('>', '')
+    #     RxLR_total_set.add(header)
+
+# -----------------------------------------------------
+# Load CAZY total proteins into a set
+# -----------------------------------------------------
+
+CAZY_total_set = Set()
+for line in CAZY_total_lines:
+    header = line.rstrip()
+    if 'contig' in header:
+        header = header + '.t1'
+    CAZY_total_set.add(header)
+     #line = line.rstrip()
+     #if line.startswith('>'):
+         #split_line = line.split()
+         #header = split_line[0].replace('>', '')
+         #CAZY_total_set.add(header)
 
 # -----------------------------------------------------
 #
@@ -213,6 +259,19 @@ for line in swissprot_lines:
 
     swissprot_dict[gene_id].extend(swissprot_columns)
 
+#-----------------------------------------------------
+# Build a dictionary of TF gene homologs
+#-----------------------------------------------------
+
+TF_dict = defaultdict(list)
+for line in TF_lines:
+    line = line.rstrip("\n")
+    split_line = line.split("\t")
+    gene_id = split_line[0]
+    gene_id = gene_id.replace('.p', '.t')
+    TF_function = split_line[2]
+    TF_dict[gene_id].append(TF_function)
+
 # -----------------------------------------------------
 # Step 3
 # Iterate through genes in file, identifying if
@@ -225,7 +284,7 @@ header_line.extend(['contig', 'start', 'stop', 'strand'])
 # header_line.extend(['sigP2', 'sigP4', 'phobius', 'RxLR_motif', 'RxLR_hmm',
 #                     'WY_hmm', 'RxLR_total', 'CRN_LFLAK', 'CRN_DWL',
 #                     'CRN_total', 'orthogroup'])
-header_line.extend(['sigP4', 'TMHMM', 'secreted'])
+header_line.extend(['sigP4', 'TMHMM', 'secreted', 'effector_total', 'CAZY_total'])
 for treatment in sorted(set(count_treatment_list)):
     treatment = "raw_count_" + treatment
     header_line.append(treatment)
@@ -240,6 +299,7 @@ for DEG_file in DEG_files:
     header_line.append("LFC_" + file_name)
     header_line.append("P-val_" + file_name)
 header_line.append('prot_seq')
+header_line.append('TFs')
 header_line.append('swissprot_org')
 header_line.append('swissprot_gene')
 header_line.append('swissprot_function')
@@ -302,6 +362,8 @@ for line in transcript_lines:
     # Set defaults
     sigP4 = ''
     trans_mem = ''
+    effector_total = ''
+    CAZY_total = ''
     prot_seq = ''
     swissprot_cols = []
     interpro_col = []
@@ -320,6 +382,10 @@ for line in transcript_lines:
         secreted = 'Yes'
     else:
         secreted = ''
+    if transcript_id in effector_total_set:
+        effector_total = 'Yes'
+    if transcript_id in CAZY_total_set:
+        CAZY_total = 'Yes'
     DEG_out = []
     for DEG_file in DEG_files:
         entryname = "_".join([DEG_file, transcript_id])
@@ -354,6 +420,14 @@ for line in transcript_lines:
         mean_fpkm_cols.append(mean_fpkm.astype(str))
         # print mean_fpkm_cols
 
+    # Add TFs info
+    TFs_cols = []
+    if TF_dict[transcript_id]:
+        TF_functions = TF_dict[transcript_id]
+        TFs_cols.append(";".join(TF_functions))
+    else:
+        TFs_cols.append("")
+
     # # Add in Swissprot info
     if swissprot_dict[transcript_id]:
         swissprot_cols = swissprot_dict[transcript_id]
@@ -375,6 +449,7 @@ for line in transcript_lines:
     #                 orthogroup])
     outline.extend([sigP4])
     outline.extend([trans_mem, secreted])
+    outline.extend([effector_total, CAZY_total])
     outline.extend(mean_count_cols)
     outline.extend(mean_fpkm_cols)
     outline.extend(DEG_out)
