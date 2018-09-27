@@ -645,3 +645,38 @@ FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_norm_counts.txt)
 $ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
 done
 ```
+
+#Investigate enriched functional annotations in DEGs vs all genes
+
+```bash
+OutDir=analysis/enrichment/N.ditissima/Hg199/Pathogen/
+mkdir -p $OutDir
+InterProTSV=gene_pred/interproscan/N.ditissima/Hg199/Hg199_interproscan.tsv
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Gene_enrichment/
+$ProgDir/GO_prep_table.py --interpro $InterProTSV > $OutDir/experiment_all_gene_GO_annots.tsv
+cat $OutDir/experiment_all_gene_GO_annots.tsv | sed 's/.t.*//g' > $OutDir/temp1.tsv
+cat $OutDir/experiment_all_gene_GO_annots.tsv | cut -f2 > $OutDir/temp2.tsv
+paste $OutDir/temp1.tsv $OutDir/temp2.tsv > $OutDir/experiment_all_gene_GO_annots_geneid.tsv
+rm $OutDir/temp1.tsv
+rm $OutDir/temp2.tsv
+```
+
+##Infection vs Control
+
+```bash
+  OutDir=analysis/enrichment/N.ditissima/Hg199/Pathogen/v1
+  mkdir -p $OutDir
+  cp analysis/enrichment/N.ditissima/Hg199/Pathogen/experiment_all_gene_GO_annots.tsv $OutDir
+  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Gene_enrichment/
+  AnnotTable=gene_pred/annotation/R2/Hg199_gene_table_incl_exp_final.tsv
+  DEGs=alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/Infection_vs_Control_DEGs.txt
+  AllGenes=$OutDir/IvsC_genes.txt
+  cat $AnnotTable | tail -n+2  | cut -f1 > $AllGenes
+  Set1Genes=$OutDir/IvsC_DEGs.txt
+  Set2Genes=$OutDir/IvsC_genes2.txt
+  AllGenes=$OutDir/IvsC_genes.txt
+  cat $DEGs | sed -e 's/$/\t0.001/g' > $Set1Genes
+  cat $AnnotTable | tail -n+2 | cut -f1 | grep -v $Set1Genes | sed -e 's/.t.*//g' | sed -e 's/$/\t1.00/g' > $Set2Genes
+  cat $Set1Genes $Set2Genes > $AllGenes
+  $ProgDir/GO_enrichment_allGO.r --all_genes $AllGenes --GO_annotations $OutDir/experiment_all_gene_GO_annots.tsv --out_dir $OutDir > $OutDir/output.txt
+```
