@@ -1,9 +1,9 @@
 #!/bin/bash
 #$ -S /bin/bash
 #$ -cwd
-#$ -pe smp 6
+#$ -pe smp 24
 #$ -l h_vmem=4G
-#$ -l h=blacklace01.blacklace|blacklace02.blacklace|blacklace04.blacklace|blacklace05.blacklace|blacklace06.blacklace|blacklace07.blacklace|blacklace08.blacklace|blacklace09.blacklace|blacklace10.blacklace|blacklace12.blacklace
+#$ -l h=blacklace11.blacklace
 
 # Testing parallelisation of GATk HaplotypeCaller - may crash. (It did not! Resulted in 2x speedup)
 # NOTE: this is a haploid organism. For diploid organism, change "ploidy" argument to 2.
@@ -15,12 +15,12 @@
 # read group added) are to be used in SNP calling, use the -I argument with full path to each file following after that.
 # Each new BAM file has to be specified after a separate -I
 
-input=analysis/genome_alignment/bowtie
-reference=REFERENCE/Hg199_contigs_unmasked.fa
+input=/home/groups/harrisonlab/project_files/neonectria_ditissima/analysis/genome_alignment/bowtie
+reference=/home/groups/harrisonlab/project_files/neonectria_ditissima/REFERENCE/Hg199_contigs_unmasked.fa
 
 filename=$(basename "$reference")
-output=analysis/popgen/SNP_calling/"${filename%.*}_temp.vcf"
-output2=analysis/popgen/SNP_calling/"${filename%.*}.vcf"
+output=analysis/popgen/SNP_calling3/"${filename%.*}_temp.vcf"
+output2=analysis/popgen/SNP_calling3/"${filename%.*}.vcf"
 
 gatk=/home/sobczm/bin/GenomeAnalysisTK-3.6
 
