@@ -16,12 +16,12 @@ cluster to keep may also need to be modified
 All columns MUST have headers
 
 ```bash
-OutDir=analysis/coexpression2
+OutDir=analysis/coexpression
 mkdir -p $OutDir
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Co-Expression_Analysis
-gene_table=gene_pred/annotation/salmon/N.ditissima/Hg199_minion/Hg199_minion_gene_table_incl_exp.tsv
-FPKM_start=16
-FPKM_end=20
+gene_table=gene_pred/annotation/Ref_annotation/Hg199_gene_table_incl_exp_final.tsv
+FPKM_start=13
+FPKM_end=14
 qsub $ProgDir/sub_WGCNA_input_clean.sh $gene_table $OutDir $FPKM_start $FPKM_end
 ```
 
@@ -33,7 +33,7 @@ Listed in analysis/coexpression/removed_genes.txt
 Test various values of soft thresholding for building the network
 
 ```bash
-OutDir=analysis/coexpression2
+OutDir=analysis/coexpression
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Co-Expression_Analysis
 max_SFT=60
 qsub $ProgDir/sub_choose_softthreshold.sh $OutDir 60
