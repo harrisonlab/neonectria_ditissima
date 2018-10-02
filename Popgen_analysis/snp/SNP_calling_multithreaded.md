@@ -31,8 +31,8 @@ done
 ##Move to the directory where the output of SNP calling should be placed
 
 ```bash
-mkdir -p analysis/popgen/SNP_calling
-cd analysis/popgen/SNP_calling
+mkdir -p analysis/popgen/SNP_calling3
+cd analysis/popgen/SNP_calling3
 #mkdir -p /home/groups/harrisonlab/project_files/neonectria_ditissima/SNP_calling
 #cd /home/groups/harrisonlab/project_files/neonectria_ditissima/SNP_calling
 ```
