@@ -5,7 +5,7 @@ This uses only biallelic SNP sites
 ###Set up initial variables
 
 ```bash
-input=/data/scratch/gomeza/analysis/fastStructure
+input=/data/scratch/gomeza/analysis/fastStructure2
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 ```
 
@@ -14,8 +14,8 @@ scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_ana
 ```bash
 mkdir -p $input
 cd $input
-cp analysis/popgen/SNP_calling/N.ditissima_contigs_unmasked_filtered.recode_annotated.vcf .
-input_file=N.ditissima_contigs_unmasked_filtered.recode_annotated.vcf
+cp ../popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.recode_annotated.vcf  .
+input_file=Hg199_contigs_unmasked_filtered.recode_annotated.vcf
 #plink --allow-extra-chr --const-fid 0 --vcf $input_file --recode --make-bed --out ${input_file%.vcf} > ${input_file%.vcf}.log
 plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input_file --make-bed --recode --out ${input_file%.vcf} > ${input_file%.vcf}.log
 ```
