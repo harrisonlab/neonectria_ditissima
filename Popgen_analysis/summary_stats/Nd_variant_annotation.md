@@ -3,7 +3,7 @@
 ##Copy input for the analysis into a new directory
 
 ```bash
-input=/data/scratch/gomeza/analysis/summary_stats
+input=/data/scratch/gomeza/analysis/summary_stats2
 snpeff=/home/gomeza/bin/snpEff
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
 ```
@@ -11,10 +11,10 @@ scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_ana
 ##All individuals
 
 ```bash
-cp /data/scratch/gomeza/analysis/popgen/SNP_calling/N.ditissima_contigs_unmasked.vcf $input
-cp /data/scratch/gomeza/analysis/popgen/SNP_calling/N.ditissima_contigs_unmasked_filtered.vcf  $input
-cp /data/scratch/gomeza/Hg199_genome/repeat_masked/N.ditissima/Hg199_minion/N.ditissima_contigs_unmasked.fa $input
-cp /data/scratch/gomeza/gene_pred/codingquary/N.ditissima/Hg199_minion/final/final_genes_appended.gff3 $input
+cp /data/scratch/gomeza/analysis/popgen/SNP_calling3/Hg199_contigs_unmasked.vcf $input
+cp /data/scratch/gomeza/analysis/popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.vcf  $input
+cp /data/scratch/gomeza/repeat_masked/Ref_Genomes/N.ditissima/Hg199/filtered_contigs/Hg199_contigs_unmasked.fa $input
+cp /data/scratch/gomeza/gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.gff3 $input
 cd $input
 ```
 
@@ -24,15 +24,17 @@ cd $input
 vcftools=/home/sobczm/bin/vcftools/bin
 vcflib=/home/sobczm/bin/vcflib/bin
 
-#All, without R68/17
+#All N.ditissima
 #First argument: unfiltered input VCF file with all SNPs
 #Subsequent arguments: Sample names of individuals to be removed
-$vcflib/vcfremovesamples N.ditissima_contigs_unmasked.vcf R68-17 > N.ditissima_contigs_unmasked_noR68.vcf
+$vcflib/vcfremovesamples Hg199_contigs_unmasked.vcf NMaj > Hg199_contigs_unmasked_allNd.vcf
 #Filter the SNPs
-$scripts/vcf_parser_haploid.py --i N.ditissima_contigs_unmasked_noR68.vcf
+$scripts/snp/vcf_parser_haploid.py --i Hg199_contigs_unmasked_allNd.vcf
 
 #Remove monomorphic sites (minor allele count minimum 1). Argument --vcf is the filtered VCF file, and --out is the suffix to be used for the output file.
-$vcftools/vcftools --vcf N.ditissima_contigs_unmasked_noR68_filtered.vcf --mac 1 --recode --out N.ditissima_contigs_unmasked_noR68_filtered
+$vcftools/vcftools --vcf Hg199_contigs_unmasked_allNd_filtered.vcf --mac 1 --recode --out N.ditissima_contigs_unmasked_allNd_filtered
+
+After filtering, kept 88126 out of a possible 493419 Sites
 
 #Only Northwestern countries pathogens
 $vcflib/vcfremovesamples N.ditissima_contigs_unmasked.vcf BGV344 ND8 ND9 OPC304 P112 R68-17 > N.ditissima_contigs_unmasked_NorthWest.vcf
