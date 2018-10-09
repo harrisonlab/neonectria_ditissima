@@ -45,7 +45,7 @@ This file contains smaller indels
 
 ```bash
 scripts=/home/sobczm/bin/popgen/summary_stats
-input=/data/scratch/gomeza/analysis/sv_calling
+input=/data/scratch/gomeza/analysis/sv_calling2/svaba
 ```
 
 ##### Create a cut-down VCF and filter it
@@ -54,18 +54,10 @@ input=/data/scratch/gomeza/analysis/sv_calling
 cd $input
 
 vcflib=/home/sobczm/bin/vcflib/bin
-$vcflib/vcfremovesamples Nd_svaba_sv.svaba.indel.vcf Ag02_sorted.bam Ag04_sorted.bam Ag05_sorted.bam Ag06_sorted.bam Ag08_sorted.bam Ag09_A_sorted.bam Ag11_A_sorted.bam Ag11_B_sorted.bam Ag11_C_sorted.bam BGV344_sorted.bam Hg199_sorted.bam ND8_sorted.bam ND9_sorted.bam OPC304_sorted.bam P112_sorted.bam R0905_sorted.bam R37-15_sorted.bam R39-15_sorted.bam R41-15_sorted.bam R42-15_sorted.bam R45-15_sorted.bam R6-17-2_sorted.bam R6-17-3_sorted.bam R68-17_sorted.bam > Nd_svaba_sv.svaba.indel_cut.vcf
-
-vcflib=/home/sobczm/bin/vcflib/bin
-$vcflib/vcfremovesamples Nd_svaba_sv.svaba.indel.vcf BGV344_sorted.bam OPC304_sorted.bam P112_sorted.bam > Nd_svaba_sv.svaba.indel_cut_E.vcf
-
-
+$vcflib/vcfremovesamples Nd_svaba_sv.svaba.indel.vcf NMaj_sorted.bam > Nd_svaba_sv.svaba.indel_cut.vcf
 
 vcftools=/home/sobczm/bin/vcftools/bin
 $vcftools/vcftools --vcf Nd_svaba_sv.svaba.indel_cut.vcf  --max-missing 0.95 --recode --out Nd_svaba_sv.svaba.indel_cut_filtered
-
-vcftools=/home/sobczm/bin/vcftools/bin
-$vcftools/vcftools --vcf Nd_svaba_sv.svaba.indel.vcf  --max-missing 0.95 --recode --out Nd_svaba_sv.svaba.indel_filtered
 ```
 
 No sites removed by filtering
@@ -75,11 +67,11 @@ No sites removed by filtering
 ##### Set UK isolates as pop1
 
 ```bash
-python $scripts/vcf_find_difference_pop.py --vcf Nd_svaba_sv.svaba.indel_filtered.recode.vcf --out Nd_svaba_sv.svaba.indel_filtered_UKvsES.vcf --ply 1 --pop1 Ag02_sorted.bam,,Ag04_sorted.bam,,Ag05_sorted.bam,,Ag06_sorted.bam,,Hg199_sorted.bam,,R0905_sorted.bam,,R6-17-2_sorted.bam,,R6-17-3_sorted.bam --pop2 BG344_sorted.bam,,OPC304_sorted.bam,,P112_sorted.bam --thr 0.95
+python $scripts/vcf_find_difference_pop.py --vcf Nd_svaba_sv.svaba.indel_cut_filtered.recode.vcf --out Nd_svaba_sv.svaba.indel_filtered_UKvsIT.vcf --ply 1 --pop1 Ag02_sorted.bam,,Ag04_sorted.bam,,Ag05_sorted.bam,,Ag06_sorted.bam,,Hg199_sorted.bam,,R0905_sorted.bam,,R6-17-2_sorted.bam,,R6-17-3_sorted.bam --pop2 R68-17-C2_sorted.bam,,R68-17-C3_sorted.bam --thr 0.95
 ```
 
 ```bash
-python $scripts/vcf_find_difference_pop.py --vcf Nd_svaba_sv.svaba.indel_filtered.recode.vcf --out Nd_svaba_sv.svaba.indel_filtered_BRvsES.vcf --ply 1 --pop1 ND8_sorted.bam,,ND9_sorted.bam --pop2 BG344_sorted.bam,,OPC304_sorted.bam,,P112_sorted.bam --thr 0.95
+python $scripts/vcf_find_difference_pop.py --vcf Nd_svaba_sv.svaba.indel_cut_filtered.recode.vcf --out Nd_svaba_sv.svaba.indel_filtered_Pop1vsPop2.vcf --ply 1 --pop1 Ag02_sorted.bam,,Ag04_sorted.bam,,Ag05_sorted.bam,,Ag06_sorted.bam,,Ag08_sorted.bam,,Ag09_A_sorted.bam,,Ag11_A_sorted.bam,,Ag11_B_sorted.bam,,Ag11_C_sorted.bam,,BGV344_sorted.bam,,Hg199_sorted.bam,,ND8_sorted.bam,,ND9_sorted.bam,,OPC304_sorted.bam,,P112_sorted.bam,,R0905_sorted.bam,,R37-15_sorted.bam,,R39-15_sorted.bam,,R41-15_sorted.bam,,R42-15_sorted.bam,,R45-15_sorted.bam,,R6-17-2_sorted.bam,,R6-17-3_sorted.bam --pop2 R68-17-C2_sorted.bam,,R68-17-C3_sorted.bam,,SVK1_sorted.bam,,SVK2_sorted.bam --thr 0.95
 ```
 
 ## lumpy: a general probabilistic framework for structural variant discovery
