@@ -7,3 +7,4 @@ Tools for population genetics analyses. The order in which main bash scripts in 
 2. SNP_calling_multithreaded.md - Runs the core SNP calling pipeline
 3. sub_SNP_calling_multithreaded.md - Script that is qsubbed for core SNP calling
 4. SNP_analysis.md - Inital sets of analysis on resulting .vcf file
+5. fastStructure.md - Run fastStructure to give an overview of population structure
