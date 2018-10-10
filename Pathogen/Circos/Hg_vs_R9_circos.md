@@ -198,17 +198,14 @@ done
 Telomere locations on contigs:
 
 ```bash
+OutDir=analysis/circos/Hg_vs_R9_genome_alignment_hard
 cat analysis/telomere/CSAR_Hard/N.ditissima/Hg199/telomere_hits_circos.txt | sed 's/contig/Hg_contig/g' | sort -k3 -n -t'_' > $OutDir/Hg_vs_R9_telomere_hits.txt
 cat analysis/telomere/CSAR_Hard/N.ditissima/R0905/telomere_hits_circos.txt  | sed 's/contig/R9_contig/g' | sort -k3 -n -t'_' >> $OutDir/Hg_vs_R9_telomere_hits.txt
 ```
 
-
-
-
-
 ```bash
 OutDir=analysis/circos/Hg_vs_R9_genome_alignment_hard
-Coords=$(ls analysis/genome_alignment/mummer/N.ditissima/Hg199/Hg199_vs_R0905_hard/Hg199_vs_R0905_coords.tsv)
+Coords=$(ls analysis/genome_alignment/mummer/N.ditissima/Hg199/Hg199_vs_R0905_hard/Hg199_vs_R0905_hard_coords.tsv)
 ProgDir=/home/armita/git_repos/emr_repos/scripts/alternaria/pathogen/genome_alignment
 $ProgDir/nucmer_coords2circos.py --inp_coords $Coords --queery_id Hg --ref_id R9 > $OutDir/Hg_vs_R9_links.txt
 cat $OutDir/Hg_vs_R9_links.txt > $OutDir/Hg_vs_R9_links_edited.txt
@@ -228,12 +225,13 @@ cat $OutDir/Hg_vs_R9_contig_orientation.txt | grep -A1 'Order of all seen contig
 cat $OutDir/Hg_vs_R9_contig_orientation.txt | grep -A1 'Order of all seen contigs' | tail -n1
 cat $OutDir/Hg199_R0905_genome.txt | grep 'Hg' | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/Hg/, Hg/g'
 cat $OutDir/Hg199_R0905_genome.txt | grep 'R9' | cut -f3 -d ' ' | tr -d '\n' | sed 's/R9/, R9/g' >> tmp.txt
-```
-```bash
 echo "Order of unseen Hg contigs and remaining R9 contigs"
 cat $OutDir/Hg199_R0905_genome.txt | grep -w -v -f tmp.txt | cut -f3 -d ' '| tr -d '\n' | sed 's/R9/, R9/g' | sed 's/Hg/, Hg/g'
-ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Pathogen/Circos
+```
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Pathogen/Circos/Hg_vs_R9_Hard
 circos -conf $ProgDir/Hg_vs_R9_circos.conf -outputdir $OutDir
 mv $OutDir/circos.png $OutDir/Hg_vs_R9_circos.png
 mv $OutDir/circos.svg $OutDir/Hg_vs_R9_circos.svg
-ls $PWD/$OutDir/Hg_vs_R9_circos.png
+ls $OutDir/Hg_vs_R9_circos.png
+```
