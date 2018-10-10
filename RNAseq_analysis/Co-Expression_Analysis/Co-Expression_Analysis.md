@@ -19,7 +19,7 @@ All columns MUST have headers
 OutDir=analysis/coexpression
 mkdir -p $OutDir
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Co-Expression_Analysis
-gene_table=gene_pred/annotation/Ref_annotation/Hg199_gene_table_incl_exp_final.tsv
+gene_table=gene_pred/annotation/Ref_annotation/Hg199_gene_table_incl_exp_final.csv
 FPKM_start=13
 FPKM_end=14
 qsub $ProgDir/sub_WGCNA_input_clean.sh $gene_table $OutDir $FPKM_start $FPKM_end

@@ -365,6 +365,7 @@ for line in transcript_lines:
     effector_total = ''
     CAZY_total = ''
     prot_seq = ''
+    TFs = ''
     swissprot_cols = []
     interpro_col = []
     # Identify gene id
@@ -454,6 +455,7 @@ for line in transcript_lines:
     outline.extend(mean_fpkm_cols)
     outline.extend(DEG_out)
     outline.append(prot_seq)
+    outline.append(TFs_cols)
     outline.extend(swissprot_cols)
     outline.append(interpro_col)
     print "\t".join(outline)

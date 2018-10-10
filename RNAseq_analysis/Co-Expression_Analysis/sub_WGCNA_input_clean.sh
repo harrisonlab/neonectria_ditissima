@@ -7,4 +7,4 @@
 
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/Co-Expression_Analysis
 
-R --vanilla $scripts/WGCNA_input_clean.R --gene_table $1 --out_dir $2 --FPKM_start $3 --FPKM_end $4
+/home/gomeza/prog/R-3.5.1/R-3.5.1/bin/Rscript --vanilla $scripts/WGCNA_input_clean.R --gene_table $1 --out_dir $2 --FPKM_start $3 --FPKM_end $4
