@@ -33,6 +33,19 @@ cat LDPL01.1.fsa_nt | sed 's/ Neo.*//g' > LDPL01.1.fsa_nt.fasta
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
   done
+
+  for Strain in R68-17-C3; do
+    for Assembly in $(ls repeat_masked/N.ditissima/$Strain/*unmasked.fa); do
+    Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
+    Organism=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    echo "$Organism - $Strain"
+    #ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
+    ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+    BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+    OutDir=gene_pred/busco_armita/$Organism/$Strain/assembly
+    qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+    done
+  done
 ```
 
 For Hg199 and R0905, I used the genome assemblies with the best busco prediction, regardless of contig number. These were the spades assembly of Hg199 and the canu pilon5 of R0905.
@@ -40,7 +53,7 @@ For Hg199 and R0905, I used the genome assemblies with the best busco prediction
 Create a list of all BUSCO IDs
 
 ```bash
-OutDir=analysis/popgen/busco_phylogeny2
+OutDir=analysis/popgen/busco_phylogeny
 mkdir -p $OutDir
 BuscoDb="sordariomyceta_odb9"
 ls -1 /home/groups/harrisonlab/dbBusco/$BuscoDb/hmms/*hmm | rev | cut -f1 -d '/' | rev | sed -e 's/.hmm//' > $OutDir/all_buscos_"$BuscoDb".txt
@@ -51,10 +64,10 @@ each assembly to the folder.
 Then create a fasta file containing all the aligned reads for each busco gene for alignment later.
 
 ```bash
-printf "" > analysis/popgen/busco_phylogeny2/single_hits.txt
-  for Busco in $(cat analysis/popgen/busco_phylogeny2/all_buscos_*.txt); do
+printf "" > analysis/popgen/busco_phylogeny/single_hits.txt
+  for Busco in $(cat analysis/popgen/busco_phylogeny/all_buscos_*.txt); do
   echo $Busco
-  OutDir=analysis/popgen/busco_phylogeny2/$Busco
+  OutDir=analysis/popgen/busco_phylogeny/$Busco
   mkdir -p $OutDir
   for Fasta in $(ls gene_pred/busco/N.*/*/*/*/single_copy_busco_sequences/$Busco*.fna); do
   Strain=$(echo $Fasta | rev | cut -f5 -d '/' | rev)
@@ -64,16 +77,16 @@ printf "" > analysis/popgen/busco_phylogeny2/single_hits.txt
   done
   cat $OutDir/*_*_"$Busco".fasta > $OutDir/"$Busco"_appended.fasta
   SingleBuscoNum=$(cat $OutDir/"$Busco"_appended.fasta | grep '>' | wc -l)
-  printf "$Busco\t$SingleBuscoNum\n" >> analysis/popgen/busco_phylogeny2/single_hits.txt
+  printf "$Busco\t$SingleBuscoNum\n" >> analysis/popgen/busco_phylogeny/single_hits.txt
 done
 ```
 
 Check for multiple hits
 
 ```bash
-less single_hits.txt | sort -k2 -n
+less analysis/popgen/busco_phylogeny/single_hits.txt | sort -k2 -n
 ```
-Three busco genes gave me unexpected multiple hits. Therefore I removed them for my analysis
+Three busco genes gave me unexpected multiple hits in the previous analysis. Therefore I removed them.
 
 ```bash
 #These three gave multiple hits in the preliminary busco analysis.
@@ -86,19 +99,20 @@ rm gene_pred/busco/N.ditissima/*/*/*/single_copy_busco_sequences/EOG093305B4*
 rm gene_pred/busco/N.ditissima/*/*/*/single_copy_busco_sequences/EOG0933010Y*
 #These are different to the previous ones.
 ```
+This time I did not have any multiple hit.
 
 If all isolates have a single copy of a busco gene, move the appended fasta to
 a new folder
 
 ```bash
-  OutDir=analysis/popgen/busco_phylogeny2/alignments
+  OutDir=analysis/popgen/busco_phylogeny/alignments
   mkdir -p $OutDir
-  OrganismNum=$(cat analysis/popgen/busco_phylogeny2/single_hits.txt | cut -f2 | sort -nr | head -n1)
-  for Busco in $(cat analysis/popgen/busco_phylogeny2/all_buscos_*.txt); do
+  OrganismNum=$(cat analysis/popgen/busco_phylogeny/single_hits.txt | cut -f2 | sort -nr | head -n1)
+  for Busco in $(cat analysis/popgen/busco_phylogeny/all_buscos_*.txt); do
   echo $Busco
-  HitNum=$(cat analysis/popgen/busco_phylogeny2/single_hits.txt | grep "$Busco" | cut -f2)
+  HitNum=$(cat analysis/popgen/busco_phylogeny/single_hits.txt | grep "$Busco" | cut -f2)
   if [ $HitNum == $OrganismNum ]; then
-    cp analysis/popgen/busco_phylogeny2/$Busco/"$Busco"_appended.fasta $OutDir/.
+    cp analysis/popgen/busco_phylogeny/$Busco/"$Busco"_appended.fasta $OutDir/.
   fi
   done
 ```
@@ -107,7 +121,7 @@ Submit alignment for single copy busco genes with a hit in each organism
 
 
 ```bash
-AlignDir=analysis/popgen/busco_phylogeny2/alignments
+AlignDir=analysis/popgen/busco_phylogeny/alignments
 CurDir=$PWD
 cd $AlignDir
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
