@@ -8,15 +8,107 @@ This uses only biallelic SNP sites
 input=/data/scratch/gomeza/analysis/fastStructure2
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 ```
+##### Remove outgroup. Create a cut-down VCF and filter it
+
+```bash
+cd $input
+mkdir NoNMaj_logistic/
+cd NoNMaj_logistic/
+cp ../../popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.recode_annotated.vcf ./
+vcflib=/home/sobczm/bin/vcflib/bin
+$vcflib/vcfremovesamples Hg199_contigs_unmasked_filtered.recode_annotated.vcf NMaj > Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.vcf
+
+vcftools=/home/sobczm/bin/vcftools/bin
+$vcftools/vcftools --vcf Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.vcf  --max-missing 0.95 --recode --out Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj
+```
 
 ###Convert from VCF to Plink's PED format
 
 ```bash
-mkdir -p $input
+input_file=Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.recode.vcf
+plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input_file --make-bed --recode --out ${input_file%.vcf} > ${input_file%.vcf}.log
+```
+
+####Test various K values (K represents model complexity)
+
+This will run with prior logistic
+
+```bash
+# Set minimum number of considered clusters
+s=1
+# Set maximum number of considered clusters
+f=5
+for i in $(seq $s $f)
+do
+qsub $scripts/sub_fast_structure.sh ${input_file%.vcf} $i
+done
+```
+
+####Choosing model complexity (K) among all the K values tested
+
+```bash
+structure=/home/sobczm/bin/fastStructure
+input_file=N.ditissima_contigs_unmasked_filtered.recode_annotated.vcf
+input_vcf_file=${input_file%.vcf}
+
+python $structure/chooseK.py --input $input_vcf_file > ${input_file%.vcf}_K_choice
+```
+
+####Visualise expected admixture proportions with Distruct plots
+
+This uses the mean of variational posterior distribution over admixture proportions
+
+```bash
+#Generate sample lables
+cut -f2 ${input_file%.vcf}.fam | cut -d " " -f2 > ${input_file%.vcf}.lab
+
+#Draw output
+# X11 forwarding is required, set up on an OSX local machine running OSX v10.13.4 using:
+# https://stackoverflow.com/questions/39622173/cant-run-ssh-x-on-macos-sierra
+# -X option needed for ssh to allow X11 forwarding. -Y option work for me.
+
+input_file=N.ditissima_contigs_unmasked_filtered.recode_annotated.vcf
+input_vcf_file=${input_file%.vcf}
+Popfile=${input_file%.vcf}.lab
+s=1
+f=10
+structure=/home/sobczm/bin/fastStructure
+for i in $(seq $s $f)
+do
+    Output=${input_file%.vcf}_${i}.svg
+    python $structure/distruct_mod.py -K $i --input $input_vcf_file --output $Output --title K$i --popfile $Popfile
+done
+```
+Works, Throws error for being unable to load a Fontconfig file (non-critical)
+
+
+
+### No prior option used
+
+##### Set up initial variables
+
+```bash
+input=/data/scratch/gomeza/analysis/fastStructure2
+scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
+```
+
+##### Remove outgroup. Create a cut-down VCF and filter it
+
+```bash
 cd $input
-cp ../popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.recode_annotated.vcf  .
-input_file=Hg199_contigs_unmasked_filtered.recode_annotated.vcf
-#plink --allow-extra-chr --const-fid 0 --vcf $input_file --recode --make-bed --out ${input_file%.vcf} > ${input_file%.vcf}.log
+mkdir NoNMaj/
+cd NoNMaj/
+vcflib=/home/sobczm/bin/vcflib/bin
+$vcflib/vcfremovesamples ../Hg199_contigs_unmasked_filtered.recode_annotated.vcf NMaj > Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.vcf
+
+vcftools=/home/sobczm/bin/vcftools/bin
+$vcftools/vcftools --vcf Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.vcf  --max-missing 0.95 --recode --out Hg199_filtered_recode_noNMaj
+```
+
+##### Convert from VCF to Plink's PED format
+
+```bash
+input_file=Hg199_filtered_recode_noNMaj.recode.vcf
 plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input_file --make-bed --recode --out ${input_file%.vcf} > ${input_file%.vcf}.log
 ```
 
@@ -29,7 +121,7 @@ s=1
 f=10
 for i in $(seq $s $f)
 do
-qsub $scripts/sub_fast_structure.sh ${input_file%.vcf} $i
+qsub $scripts/sub_fast_structure_noprior.sh ${input_file%.vcf} $i
 done
 ```
 
@@ -37,7 +129,7 @@ done
 
 ```bash
 structure=/home/sobczm/bin/fastStructure
-input_file=N.ditissima_contigs_unmasked_filtered.recode_annotated.vcf
+input_file=Hg199_filtered_recode_noNMaj.recode.vcf
 input_vcf_file=${input_file%.vcf}
 
 python $structure/chooseK.py --input $input_vcf_file > ${input_file%.vcf}_K_choice
@@ -226,3 +318,22 @@ do
     python $structure/distruct_mod.py -K $i --input $input_vcf_file --output $Output --title K$i --popfile $Popfile
 done
 ```
+
+
+
+
+
+
+
+
+
+
+###Convert from VCF to Plink's PED format
+
+```bash
+mkdir -p $input
+cd $input
+cp ../popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.recode_annotated.vcf  .
+input_file=Hg199_contigs_unmasked_filtered.recode_annotated.vcf
+#plink --allow-extra-chr --const-fid 0 --vcf $input_file --recode --make-bed --out ${input_file%.vcf} > ${input_file%.vcf}.log
+plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input_file --make-bed --recode --out ${input_file%.vcf} > ${input_file%.vcf}.log
