@@ -59,9 +59,6 @@ with open(conf.gene_gff) as f:
 with open(conf.gene_fasta) as f:
     prot_lines = f.readlines()
 
-with open(conf.TFs) as f:
-    TF_lines = f.readlines()
-
 with open(conf.SigP4) as f:
     sigP4_lines = f.readlines()
 
@@ -103,6 +100,9 @@ with open(conf.InterPro) as f:
 
 with open(conf.Swissprot) as f:
     swissprot_lines = f.readlines()
+
+with open(conf.TFs) as f:
+    TF_lines = f.readlines()
 
 # -----------------------------------------------------
 # Load protein sequence data into a dictionary
@@ -299,11 +299,11 @@ for DEG_file in DEG_files:
     header_line.append("LFC_" + file_name)
     header_line.append("P-val_" + file_name)
 header_line.append('prot_seq')
-header_line.append('TFs')
 header_line.append('swissprot_org')
 header_line.append('swissprot_gene')
 header_line.append('swissprot_function')
 header_line.append('interproscan')
+header_line.append('TFs')
 print ("\t".join(header_line))
 
 transcript_lines = []
@@ -365,9 +365,9 @@ for line in transcript_lines:
     effector_total = ''
     CAZY_total = ''
     prot_seq = ''
-    TFs = ''
     swissprot_cols = []
     interpro_col = []
+    TFs_cols= ''
     # Identify gene id
     if 'ID' in split_line[8]:
         split_col9 = split_line[8].split(';')
@@ -421,14 +421,6 @@ for line in transcript_lines:
         mean_fpkm_cols.append(mean_fpkm.astype(str))
         # print mean_fpkm_cols
 
-    # Add TFs info
-    TFs_cols = []
-    if TF_dict[transcript_id]:
-        TF_functions = TF_dict[transcript_id]
-        TFs_cols.append(";".join(TF_functions))
-    else:
-        TFs_cols.append("")
-
     # # Add in Swissprot info
     if swissprot_dict[transcript_id]:
         swissprot_cols = swissprot_dict[transcript_id]
@@ -439,6 +431,14 @@ for line in transcript_lines:
         interpro_col = "|".join(interpro_dict[transcript_id])
     else:
         interpro_col = '.'
+
+    # # Add TFs info
+    TFs_cols = []
+    if TF_dict[transcript_id]:
+        TF_functions = TF_dict[transcript_id]
+        TFs_cols.append(";".join(TF_functions))
+    else:
+        TFs_cols.append("")
 
     prot_seq = "".join(prot_dict[transcript_id])
     # outline = [transcript_id, sigP2, phobius, RxLR_motif, RxLR_hmm,
@@ -455,8 +455,8 @@ for line in transcript_lines:
     outline.extend(mean_fpkm_cols)
     outline.extend(DEG_out)
     outline.append(prot_seq)
-    outline.append(TFs_cols)
     outline.extend(swissprot_cols)
     outline.append(interpro_col)
+    outline.extend(TFs_cols)
     print "\t".join(outline)
     # print DEG_out
