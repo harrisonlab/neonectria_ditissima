@@ -29,7 +29,7 @@ cat LDPL01.1.fsa_nt | sed 's/ Neo.*//g' > LDPL01.1.fsa_nt.fasta
     #ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=gene_pred/busco_armita/$Organism/$Strain/assembly
+    OutDir=gene_pred/busco/$Organism/$Strain/assembly
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
   done
@@ -42,7 +42,7 @@ cat LDPL01.1.fsa_nt | sed 's/ Neo.*//g' > LDPL01.1.fsa_nt.fasta
     #ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/busco
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
     BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
-    OutDir=gene_pred/busco_armita/$Organism/$Strain/assembly
+    OutDir=gene_pred/busco/$Organism/$Strain/assembly
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
   done
