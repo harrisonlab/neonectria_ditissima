@@ -325,7 +325,7 @@ Organism=N.ditissima
 Assembly=$(ls /data/scratch/gomeza/repeat_masked/Ref_Genomes/N.ditissima/Hg199/*/*_contigs_unmasked.fa)
 InterPro=$(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199/Hg199_interproscan.tsv)
 SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/Ref_Genomes/N.ditissima/Hg199/swissprot_vMar2018_tophit_parsed.tbl)
-OutDir=gene_pred/annotation/R2/$Organism/$Strain
+OutDir=gene_pred/annotation/Pathogen/$Organism/$Strain
 mkdir -p $OutDir
 GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.pep.fasta)
 TFs=$(ls analysis/transcription_factors/Ref_Genomes/N.ditissima/Hg199/Hg199_TF_domains.tsv)
@@ -342,7 +342,7 @@ $Dir1/t1_vs_t2.txt \
 | sed -e "s/$/ /g" | tr -d "\n")
 RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/normalised_counts.txt)
 FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_norm_counts.txt)
-$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp_v2.tsv
+$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro --TFs $TFs > $OutDir/"$Strain"_gene_table_incl_exp_Conditions.tsv
 done
 ```
 
@@ -624,7 +624,7 @@ Organism=N.ditissima
 Assembly=$(ls /data/scratch/gomeza/repeat_masked/Ref_Genomes/N.ditissima/Hg199/*/*_contigs_unmasked.fa)
 InterPro=$(ls /data/scratch/gomeza/gene_pred/interproscan/N.ditissima/Hg199/Hg199_interproscan.tsv)
 SwissProt=$(ls /data/scratch/gomeza/gene_pred/swissprot/Ref_Genomes/N.ditissima/Hg199/swissprot_vMar2018_tophit_parsed.tbl)
-OutDir=gene_pred/annotation/R2/$Organism/$Strain
+OutDir=gene_pred/annotation/Pathogen/$Organism/$Strain
 mkdir -p $OutDir
 GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.pep.fasta)
 TFs=$(ls analysis/transcription_factors/Ref_Genomes/N.ditissima/Hg199/Hg199_TF_domains.tsv)
@@ -642,7 +642,7 @@ $Dir1/Infection_vs_Control.txt \
 | sed -e "s/$/ /g" | tr -d "\n")
 RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/normalised_counts.txt)
 FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2_IvsC/tpm_norm_counts.txt)
-$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --TFs $TFs --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro > $OutDir/"$Strain"_gene_table_incl_exp.tsv
+$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro --TFs $TFs> $OutDir/"$Strain"_gene_table_incl_exp_IvsC.tsv
 done
 ```
 
