@@ -133,9 +133,9 @@ Trimming sequence alignments using Trim-Al
 * Note - automated1 mode is optimised for ML tree reconstruction
 
 ```bash
-  OutDir=analysis/popgen/busco_phylogeny2/trimmed_alignments
+  OutDir=analysis/popgen/busco_phylogeny/trimmed_alignments
   mkdir -p $OutDir
-  for Alignment in $(ls analysis/popgen/busco_phylogeny2/alignments/*_appended_aligned.fasta); do
+  for Alignment in $(ls analysis/popgen/busco_phylogeny/alignments/*_appended_aligned.fasta); do
     TrimmedName=$(basename $Alignment .fasta)"_trimmed.fasta"
     echo $Alignment
     trimal -in $Alignment -out $OutDir/$TrimmedName -keepheader -automated1
