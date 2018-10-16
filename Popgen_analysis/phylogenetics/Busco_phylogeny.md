@@ -129,6 +129,14 @@ qsub $ProgDir/sub_mafft_alignment.sh
 cd $CurDir
 ```
 
+For closely related organisms (same species etc.): identify genes with high nucleotide diversity (Pi) and average number of pairwise differences, medium number of segregating sites (avoid alignments with low homology and lots of phylogenetically uninformative singletons).
+For analyses involving cross-species comparisons involving highly diverged sequences with high nucleotide diversity (e.g. 0.1<Pi<0.4), looking for genes with the lowest number of segregating sites.
+
+```bash
+python $scripts/calculate_nucleotide_diversity.py "*aligned.fasta"
+```
+
+
 Trimming sequence alignments using Trim-Al
 * Note - automated1 mode is optimised for ML tree reconstruction
 
