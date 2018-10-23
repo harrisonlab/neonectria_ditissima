@@ -3,8 +3,8 @@
 ##Copy input for the analysis into a new directory
 
 ```bash
-input=/data/scratch/gomeza/analysis/summary_stats2
-snpeff=/home/gomeza/bin/snpEff
+input=analysis/summary_stats2
+snpeff=/home/gomeza/prog/snpEff
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
 ```
 
@@ -36,6 +36,8 @@ $vcftools/vcftools --vcf Hg199_contigs_unmasked_allNd_filtered.vcf --mac 1 --rec
 
 After filtering, kept 88126 out of a possible 493419 Sites
 
+
+not included yet
 #Only Northwestern countries pathogens
 $vcflib/vcfremovesamples N.ditissima_contigs_unmasked.vcf BGV344 ND8 ND9 OPC304 P112 R68-17 > N.ditissima_contigs_unmasked_NorthWest.vcf
 $scripts/vcf_parser_haploid.py --i N.ditissima_contigs_unmasked_NorthWest.vcf
@@ -55,7 +57,8 @@ $vcftools/vcftools --vcf N.ditissima_contigs_unmasked_nopatho_filtered.vcf --mac
 ##Create custom SnpEff genome database
 
 ```bash
-$scripts/summary_stats/build_genome_database.sh N.ditissima_contigs_unmasked.fa final_genes_appended.gff3 Hg199_minion
+cd $input
+$scripts/summary_stats/build_genome_database.sh Hg199_contigs_unmasked.fa final_genes_appended_renamed.gff3 Hg199_Ref
 ```
 
 #Annotate VCF files
@@ -63,7 +66,7 @@ $scripts/summary_stats/build_genome_database.sh N.ditissima_contigs_unmasked.fa 
 ```bash
 for a in *recode.vcf
 do
-$scripts/summary_stats/annotate_snps_genome.sh $a Hg199_minion
+$scripts/summary_stats/annotate_snps_genome.sh $a Hg199_Ref
 done
 ```
 ```bash
