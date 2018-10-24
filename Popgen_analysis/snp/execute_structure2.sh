@@ -1,6 +1,6 @@
 #$ -S /bin/bash
 #$ -cwd
-#$ -pe smp 1
+#$ -pe smp 4
 #$ -l h_vmem=1G
 #$ -l h=blacklace01.blacklace|blacklace11.blacklace
 
