@@ -37,7 +37,7 @@ This will run with prior logistic
 # Set minimum number of considered clusters
 s=1
 # Set maximum number of considered clusters
-f=5
+f=10
 for i in $(seq $s $f)
 do
 qsub $scripts/sub_fast_structure.sh ${input_file%.vcf} $i
