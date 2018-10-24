@@ -139,3 +139,145 @@ done
 #Output is a number of PostScript files showing the average proportion of each
 #individual's genome belonging to a given cluster and allowing some ancestry inference based on
 #the most likely true number of population clusters as summarised by StructureHarvester.
+
+-----------------------------------
+
+Last structure analysis.
+
+#!/bin/bash
+input=/data/scratch/gomeza/structure_analysis
+scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
+pgdspid=/home/sobczm/bin/PGDSpider_2.1.0.3
+#Move the file to the right directory
+cp analysis/popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.recode_annotated.vcf structure_analysis/
+cp analysis/popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.vcf structure_analysis2/
+#input_file=$input/Hg199_contigs_unmasked_filtered.recode_annotated.vcf
+#Remove outgroup. Create a cut-down VCF and filter it
+vcflib=/home/sobczm/bin/vcflib/bin
+cd $input
+$vcflib/vcfremovesamples Hg199_contigs_unmasked_filtered.recode_annotated.vcf NMaj > Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.vcf
+
+vcftools=/home/sobczm/bin/vcftools/bin
+$vcftools/vcftools --vcf Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.vcf  --max-missing 0.95 --recode --out Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj
+
+#Downsample SNPs for Structure analysis as enough information in 10% of the loci
+#(and more not informative because of linkage). In certain cases, when small number of markers detected,
+#this step is unnecessary and all can be retained.
+/home/sobczm/bin/vcflib/bin/vcfrandomsample \
+--rate 0.1 Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.recode.vcf > Hg199_contigs_unmasked_filtered_noNMaj_subsampled.vcf
+#Prepare STRUCTURE input (PGDSpider does not work when wrapped up in a bash script, grrr)
+#haploid (for diploid change the conversion script to vcf_to_structure_diploid.spid)
+#!!!! Need to change the path to file with population definitions !!!
+##Part of the path is missing here: should it be
+cd ../
+input_file=$input/Hg199_contigs_unmasked_filtered_noNMaj_subsampled.vcf
+#Prepare population definition file. Each individual = new population
+grep "#CHROM" $input_file | head -1 | awk '{for(i=10;i<=NF;++i)print $i " " $i "_pop"}' >"${input_file%.vcf}.lst"
+#Copy the configuration file and change the path to the population definition file.
+#For haploid organisms:
+config=vcf_to_structure_haploid_pop.spid
+#For diploid organisms:
+#config=vcf_to_structure_diploid_pop.spid
+cp $pgdspid/$config ./
+dir=$PWD
+list_file=$(echo "${input_file%.vcf}.lst")
+sed -i 's,^\(VCF_PARSER_POP_FILE_QUESTION=\).*,\1'"$list_file"',' vcf_to_structure_haploid_pop.spid
+
+#Also, create a label reference file to be used in the final step by distruct to label indidviduals in the output
+names="${input_file%.vcf}.label"
+grep "#CHROM" $input_file | head -1 | awk '{for(i=10;i<=NF;++i)print $i }' >temp
+nl temp | sed 's/^ *//' | sed 's/\t/ /g' >$names
+filename=$(basename "$input_file")
+outfile="${filename%.*}.struc"
+#Execute VCF to .struc (input format for STRUCTURE) conversion
+java -jar $pgdspid/PGDSpider2-cli.jar -inputfile $input_file \
+-inputformat VCF -outputfile $outfile -outputformat STRUCTURE -spid vcf_to_structure_haploid_pop.spid
+#dos2unix $outfile
+#Number of loci in data file. Needed to edit the mainparams file
+less Hg199_contigs_unmasked_filtered_noNMaj_subsampled.vcf | grep  -c -v "^#"
+#Move file to the right folder
+mv Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc structure_analysis
+#Note - Iteractions can be changed in the mainparams file.
+#Important note - I used BURNIN 1000 NUMREPS 10000 for the first time. This gives large variance in lnPD, inconclusive run
+# Minimum Burnin reps must be 100000. Number of reps must be between 10000 and 1000000. This will require days.
+#Run replicate STRUCTURE runs, with K from 1 to 10
+
+# BURNIN 100000 NUMREPS 10000, with K from 1 to 5
+qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 1 5
+qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 2 5
+qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 3 5
+qsub $scripts/execute_structure2.sh N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 4 5
+qsub $scripts/execute_structure2.sh N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 5 5
+
+#Analyze STRUCTURE output
+# Generate a folder containing all STRUCTURE output files for all K analyzed
+mkdir structureHarvester
+for d in $PWD/*
+do
+mv $d/*_f $PWD/structureHarvester
+done
+
+#Tidy working directory
+mv structure_* analysis/popgen/SNP_calling/structure
+
+# structureHarvester - summarise the results
+harvester=/home/sobczm/bin/structureHarvester/structureHarvester.py
+$harvester --dir=$input/analysis/popgen/SNP_calling/structure/structureHarvester --out=$input/analysis/popgen/SNP_calling/structure/structureHarvester --evanno --clumpp
+
+$harvester --dir=$input/structureHarvester --out=$input/structureHarvester --evanno --clumpp
+
+# CLUMPP - permute the results
+cd analysis/popgen/SNP_calling/structure/structureHarvester
+clumpp=/home/sobczm/bin/CLUMPP_Linux64.1.1.2
+cp $clumpp/paramfile_ind ./
+mv paramfile_ind paramfile
+#Options fed to CLUMPP
+#-i: indfile from StructureHarvester output
+#-p: popfile from StructureHarvester output
+#-o: output Q matrix for distruct input
+#-k: K value (number of clusters tested)
+
+###!!! Options to be changed in each analysis manually
+#c: number of individuals (change according to STRUCTURE mainparam file)
+#r: number of replicate runs
+#s: minimum number of population clusters (K) tested
+#f: maximum number of population clusters (K) tested
+c=24
+r=5
+s=1
+f=5
+for i in $(seq $s $f) #input range of K values tested
+do
+$clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.indivq -k $i -c $c -r $r
+done
+cp $clumpp/paramfile_pop ./
+mv paramfile_pop paramfile
+
+
+for i in $(seq $s $f) #input range of K values tested
+do
+$clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.popq -k $i -c $c -r $r
+done
+#Key options in the paramfile
+# DISTRUCT to visualise the results
+###!!!! Options to be changed in each analysis manually
+#-M number of populations assigned in the Structure input file
+#-N number of individuals
+m=24
+n=24
+#-K K value
+#-p input file (population q's)
+#-i input file (individual q's)
+#-a input file (labels atop figure)
+#-b input file (labels below figure)
+#-o output file
+distruct=/home/sobczm/bin/distruct1.1
+cp $distruct/drawparams ./
+for i in $(seq $s $f) #input range of K values tested
+do
+$distruct/distructLinux1.1 -i K$i.indivq -p K$i.popq -a $names -o K$i.ps -k $i -M $m -N $n -K $i
+done
+
+#Output is a number of PostScript files showing the average proportion of each
+#individual's genome belonging to a given cluster and allowing some ancestry inference based on
+#the most likely true number of population clusters as summarised by StructureHarvester.
