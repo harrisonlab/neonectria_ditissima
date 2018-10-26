@@ -145,12 +145,11 @@ done
 Last structure analysis.
 
 #!/bin/bash
-input=/data/scratch/gomeza/structure_analysis
+input=structure_analysis
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
 pgdspid=/home/sobczm/bin/PGDSpider_2.1.0.3
 #Move the file to the right directory
 cp analysis/popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.recode_annotated.vcf structure_analysis/
-cp analysis/popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.vcf structure_analysis2/
 #input_file=$input/Hg199_contigs_unmasked_filtered.recode_annotated.vcf
 #Remove outgroup. Create a cut-down VCF and filter it
 vcflib=/home/sobczm/bin/vcflib/bin
@@ -197,17 +196,19 @@ java -jar $pgdspid/PGDSpider2-cli.jar -inputfile $input_file \
 less Hg199_contigs_unmasked_filtered_noNMaj_subsampled.vcf | grep  -c -v "^#"
 #Move file to the right folder
 mv Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc structure_analysis
+cd structure_analysis
 #Note - Iteractions can be changed in the mainparams file.
 #Important note - I used BURNIN 1000 NUMREPS 10000 for the first time. This gives large variance in lnPD, inconclusive run
-# Minimum Burnin reps must be 100000. Number of reps must be between 10000 and 1000000. This will require days.
-#Run replicate STRUCTURE runs, with K from 1 to 10
-
+#Minimum Burnin reps must be 100000. Number of reps must be between 10000 and 1000000. This will require days.
+#mainparams file configuration: Label 1 (required), Popdata 1 (required but uninformative), Markernames 1 (required), Onerowperind 1 (possibly useless).
+#The top row of the data file contains a list of L names corresponding to the markers used.
+#Marker row and ind rows are separated in several row. This is possibly due to the large number of SNPs but I think this is consireded as a one single column for structure.
 # BURNIN 100000 NUMREPS 10000, with K from 1 to 5
 qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 1 5
 qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 2 5
 qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 3 5
-qsub $scripts/execute_structure2.sh N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 4 5
-qsub $scripts/execute_structure2.sh N.ditissima_contigs_unmasked_filtered.recode_annotated.struc 1 5 5
+qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 4 5
+qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 5 5
 
 #Analyze STRUCTURE output
 # Generate a folder containing all STRUCTURE output files for all K analyzed
