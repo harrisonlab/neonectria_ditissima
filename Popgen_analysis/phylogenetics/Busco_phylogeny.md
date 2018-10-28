@@ -133,6 +133,8 @@ For closely related organisms (same species etc.): identify genes with high nucl
 For analyses involving cross-species comparisons involving highly diverged sequences with high nucleotide diversity (e.g. 0.1<Pi<0.4), looking for genes with the lowest number of segregating sites.
 
 ```bash
+cd analysis/popgen/busco_phylogeny/alignments
+scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/phylogenetics
 python $scripts/calculate_nucleotide_diversity.py "*aligned.fasta"
 ```
 
@@ -151,7 +153,7 @@ Trimming sequence alignments using Trim-Al
 ```
 Edit header name keeping BUSCO name and isolate name
 ```bash
-cd analysis/popgen/busco_phylogeny2/trimmed_alignments
+cd analysis/popgen/busco_phylogeny/trimmed_alignments
 sed -i 's/_contigs_.*//g' *_appended_aligned_trimmed.fasta
 sed -i 's/:LD.*//g' *_appended_aligned_trimmed.fasta
 sed -i 's/N.ditissima_//g' *_appended_aligned_trimmed.fasta
@@ -159,7 +161,7 @@ sed -i 's/N.ditissima_//g' *_appended_aligned_trimmed.fasta
 
 ```bash
 screen -a
-for Alignment in $(ls analysis/popgen/busco_phylogeny2/trimmed_alignments/*aligned_trimmed.fasta); do
+for Alignment in $(ls analysis/popgen/busco_phylogeny/trimmed_alignments/*aligned_trimmed.fasta); do
 Jobs=$(qstat | grep 'sub_RAxML' | grep 'qw' | wc -l)
 while [ $Jobs -gt 2 ]; do
 sleep 2s
