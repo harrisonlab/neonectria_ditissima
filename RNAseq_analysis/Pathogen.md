@@ -329,11 +329,11 @@ OutDir=gene_pred/annotation/Pathogen/$Organism/$Strain
 mkdir -p $OutDir
 GeneFasta=$(ls /data/scratch/gomeza/gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.pep.fasta)
 TFs=$(ls analysis/transcription_factors/Ref_Genomes/N.ditissima/Hg199/Hg199_TF_domains.tsv)
-Antismash=$(ls /data/scratch/gomeza/analysis/secondary_metabolites/antismash/Ref_Genomes/N.ditissima/Hg199/Hg199_secmet_genes.tsv)
+Antismash=$(ls analysis/secondary_metabolites/antismash/Ref_Genomes/N.ditissima/Hg199/Hg199_secmet_genes.tsv )
 SigP4=$(ls gene_pred/Ref_Genomes_signalp-4.1/$Organism/$Strain/Hg199_final_sp_no_trans_mem.aa)
 effector_total=$(ls analysis/effectorP/Ref_Genomes/N.ditissima/Hg199/N.ditissima_Hg199_EffectorP_headers.txt)
 CAZY_total=$(ls gene_pred/CAZY/Ref_Genomes/N.ditissima/Hg199/Hg199_CAZY_headers.txt)
-TMHMM_headers=$(ls gene_pred/trans_mem/N.ditissima/Hg199/Hg199_TM_genes_pos.txt)
+TMHMM_headers=$(ls gene_pred/trans_mem/N.ditissima/Hg199/Hg199_TM_genes_neg_headers.txt)
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/RNAseq_analysis/annotation_tables
 Dir1=$(ls -d /data/scratch/gomeza/alignment/salmon/N.ditissima/Hg199/DeSeq2)
 DEG_Files=$(ls \
@@ -342,7 +342,9 @@ $Dir1/t1_vs_t2.txt \
 | sed -e "s/$/ /g" | tr -d "\n")
 RawCount=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/normalised_counts.txt)
 FPKM=$(ls alignment/salmon/N.ditissima/Hg199/DeSeq2/tpm_norm_counts.txt)
-$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --effector_total $effector_total --CAZY_total $CAZY_total --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro --TFs $TFs > $OutDir/"$Strain"_gene_table_incl_exp_Conditions.tsv
+OrthoName=199R
+OrthoFile=analysis/orthology/OrthoFinder/formatted/Results_Sep24/Orthogroups.txt
+$ProgDir/Nd_annotation_tables2.py --gff_format gff3 --gene_gff $GeneGff --gene_fasta $GeneFasta --SigP4 $SigP4 --trans_mem $TMHMM_headers --effector_total $effector_total --CAZY_total $CAZY_total --ortho_name $OrthoName --ortho_file $OrthoFile --DEG_files $DEG_Files --raw_counts $RawCount --fpkm $FPKM --Swissprot $SwissProt --InterPro $InterPro --TFs $TFs --Antismash $Antismash > $OutDir/"$Strain"_gene_table_incl_exp_Conditions_temp.tsv
 done
 ```
 

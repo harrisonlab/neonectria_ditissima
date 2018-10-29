@@ -30,12 +30,18 @@ ap.add_argument('--trans_mem', required=True, type=str,
                 help='txt file of headers from gene testing positive for \
                 transmembrane proteins by TMHMM')
 ap.add_argument('--TFs',required=True,type=str,
-		        help='Tab seperated of putative transcription factors and their domains as identified by interpro2TFs.py')
+		        help='Tab seperated of putative transcription factors and their \
+                domains as identified by interpro2TFs.py')
 ap.add_argument('--effector_total', required=True, type=str,
                 help='txt file of all transcripts considered low confidence \
                 effector')
 ap.add_argument('--CAZY_total', required=True, type=str,
                 help='txt file of all transcripts considered CAZY')
+ap.add_argument('--ortho_name', required=True, type=str,
+                help='the name used for the organism during orthology \
+                analysis')
+ap.add_argument('--ortho_file', required=True, type=str,
+                help='txt file of ortholog groups')
 ap.add_argument('--DEG_files', required=True, nargs='+', type=str,
                 help='space seperated list of files \
                 containing DEG information')
@@ -49,6 +55,9 @@ ap.add_argument('--Swissprot', required=True, type=str,
                 help='A parsed table of BLAST results against the Swissprot \
                 database. Note - must have been parsed with \
                 swissprot_parser.py')
+ap.add_argument('--Antismash', required=True, type=str,
+                help='Output of Antismash parsed into a tsv file of gene names, \
+                contig, secmet function and cluster ID')
 
 conf = ap.parse_args()
 
@@ -70,6 +79,9 @@ with open(conf.effector_total) as f:
 
 with open(conf.CAZY_total) as f:
     CAZY_total_lines = f.readlines()
+
+with open(conf.ortho_file) as f:
+    ortho_lines = f.readlines()
 
 DEG_files = conf.DEG_files
 DEG_dict = defaultdict(list)
@@ -103,6 +115,9 @@ with open(conf.Swissprot) as f:
 
 with open(conf.TFs) as f:
     TF_lines = f.readlines()
+
+with open(conf.Antismash) as f:
+    antismash_lines = f.readlines()
 
 # -----------------------------------------------------
 # Load protein sequence data into a dictionary
@@ -166,6 +181,23 @@ for line in CAZY_total_lines:
          #split_line = line.split()
          #header = split_line[0].replace('>', '')
          #CAZY_total_set.add(header)
+
+# -----------------------------------------------------
+# Store genes and their ortholog groups in a dictionary
+# -----------------------------------------------------
+
+organism_name = conf.ortho_name
+ortho_dict = defaultdict(list)
+for line in ortho_lines:
+    line = line.rstrip()
+    split_line = line.split()
+    orthogroup = split_line[0]
+    orthogroup = orthogroup.replace(":", "")
+    genes_in_group = [x for x in split_line if organism_name in x]
+    for gene in genes_in_group:
+        gene = gene.replace(organism_name, '').replace('|', '')
+        # print gene
+        ortho_dict[gene] = orthogroup
 
 # -----------------------------------------------------
 #
@@ -272,6 +304,26 @@ for line in TF_lines:
     TF_function = split_line[2]
     TF_dict[gene_id].append(TF_function)
 
+#-----------------------------------------------------
+# Build a dictionary of Secondary Metabolite annotations
+#-----------------------------------------------------
+
+#i = 0
+antismash_dict = defaultdict(list)
+for line in antismash_lines:
+    #i += 1
+    #cluster = "cluster_" + str(i)
+    line = line.rstrip("\n")
+    split_line = line.split("\t")
+    gene_id = split_line[0]
+    secmet_func = split_line[2]
+    cluster_genes = split_line[3]
+    #.split(";")
+    #for gene in cluster_genes:
+        #gene = re.sub("_\d$", "", gene)
+    antismash_dict[gene_id].extend([secmet_func, cluster_genes])
+        # print "\t".join([gene, secmet_func, cluster])
+
 # -----------------------------------------------------
 # Step 3
 # Iterate through genes in file, identifying if
@@ -284,7 +336,7 @@ header_line.extend(['contig', 'start', 'stop', 'strand'])
 # header_line.extend(['sigP2', 'sigP4', 'phobius', 'RxLR_motif', 'RxLR_hmm',
 #                     'WY_hmm', 'RxLR_total', 'CRN_LFLAK', 'CRN_DWL',
 #                     'CRN_total', 'orthogroup'])
-header_line.extend(['sigP4', 'TMHMM', 'secreted', 'effector_total', 'CAZY_total'])
+header_line.extend(['sigP4', 'trans_mem', 'secreted', 'effector_total', 'CAZY_total','orthogroup'])
 for treatment in sorted(set(count_treatment_list)):
     treatment = "raw_count_" + treatment
     header_line.append(treatment)
@@ -304,6 +356,8 @@ header_line.append('swissprot_gene')
 header_line.append('swissprot_function')
 header_line.append('interproscan')
 header_line.append('TFs')
+header_line.append('Antismash_type')
+header_line.append('Antismash_cluster')
 print ("\t".join(header_line))
 
 transcript_lines = []
@@ -364,10 +418,12 @@ for line in transcript_lines:
     trans_mem = ''
     effector_total = ''
     CAZY_total = ''
+    orthogroup = ''
     prot_seq = ''
     swissprot_cols = []
     interpro_col = []
     TFs_cols= ''
+    antismash_cols=[]
     # Identify gene id
     if 'ID' in split_line[8]:
         split_col9 = split_line[8].split(';')
@@ -378,6 +434,8 @@ for line in transcript_lines:
     if transcript_id in SigP4_set:
         sigP4 = 'Yes'
     if transcript_id in trans_mem_set:
+        trans_mem = ''
+    else:
         trans_mem = 'Yes'
     if any([sigP4 == 'Yes']) and all([trans_mem == '']):
         secreted = 'Yes'
@@ -387,6 +445,8 @@ for line in transcript_lines:
         effector_total = 'Yes'
     if transcript_id in CAZY_total_set:
         CAZY_total = 'Yes'
+    if ortho_dict[transcript_id]:
+        orthogroup = ortho_dict[transcript_id]
     DEG_out = []
     for DEG_file in DEG_files:
         entryname = "_".join([DEG_file, transcript_id])
@@ -440,6 +500,15 @@ for line in transcript_lines:
     else:
         TFs_cols.append("")
 
+    #Add Antismash info
+    if antismash_dict[transcript_id]:
+        antismash_cols = antismash_dict[transcript_id]
+        #secmet_func = antismash_cols[0]
+        #cluster = antismash_cols[1]
+        #antismash_cols = [cluster, secmet_func]
+    else:
+        antismash_cols = ["",""]
+
     prot_seq = "".join(prot_dict[transcript_id])
     # outline = [transcript_id, sigP2, phobius, RxLR_motif, RxLR_hmm,
     #            WY_hmm, CRN_LFLAK, CRN_DWL, orthogroup]
@@ -451,6 +520,7 @@ for line in transcript_lines:
     outline.extend([sigP4])
     outline.extend([trans_mem, secreted])
     outline.extend([effector_total, CAZY_total])
+    outline.append(orthogroup)
     outline.extend(mean_count_cols)
     outline.extend(mean_fpkm_cols)
     outline.extend(DEG_out)
@@ -458,5 +528,6 @@ for line in transcript_lines:
     outline.extend(swissprot_cols)
     outline.append(interpro_col)
     outline.extend(TFs_cols)
+    outline.extend(antismash_cols)
     print "\t".join(outline)
     # print DEG_out
