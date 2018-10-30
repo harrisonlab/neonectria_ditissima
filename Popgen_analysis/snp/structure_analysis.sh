@@ -218,17 +218,12 @@ do
 mv $d/*_f $PWD/structureHarvester
 done
 
-#Tidy working directory
-mv structure_* analysis/popgen/SNP_calling/structure
-
 # structureHarvester - summarise the results
 harvester=/home/sobczm/bin/structureHarvester/structureHarvester.py
-$harvester --dir=$input/analysis/popgen/SNP_calling/structure/structureHarvester --out=$input/analysis/popgen/SNP_calling/structure/structureHarvester --evanno --clumpp
-
-$harvester --dir=$input/structureHarvester --out=$input/structureHarvester --evanno --clumpp
+$harvester --dir=structure_analysis/structureHarvester --out=structure_analysis/structureHarvester --evanno --clumpp
 
 # CLUMPP - permute the results
-cd analysis/popgen/SNP_calling/structure/structureHarvester
+cd structure_analysis/structureHarvester
 clumpp=/home/sobczm/bin/CLUMPP_Linux64.1.1.2
 cp $clumpp/paramfile_ind ./
 mv paramfile_ind paramfile
@@ -243,7 +238,7 @@ mv paramfile_ind paramfile
 #r: number of replicate runs
 #s: minimum number of population clusters (K) tested
 #f: maximum number of population clusters (K) tested
-c=24
+c=27
 r=5
 s=1
 f=5
@@ -251,10 +246,9 @@ for i in $(seq $s $f) #input range of K values tested
 do
 $clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.indivq -k $i -c $c -r $r
 done
+
 cp $clumpp/paramfile_pop ./
 mv paramfile_pop paramfile
-
-
 for i in $(seq $s $f) #input range of K values tested
 do
 $clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.popq -k $i -c $c -r $r
@@ -264,8 +258,8 @@ done
 ###!!!! Options to be changed in each analysis manually
 #-M number of populations assigned in the Structure input file
 #-N number of individuals
-m=24
-n=24
+m=27
+n=27
 #-K K value
 #-p input file (population q's)
 #-i input file (individual q's)
