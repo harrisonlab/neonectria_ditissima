@@ -204,11 +204,11 @@ cd structure_analysis
 #The top row of the data file contains a list of L names corresponding to the markers used.
 #Marker row and ind rows are separated in several row. This is possibly due to the large number of SNPs but I think this is consireded as a one single column for structure.
 # BURNIN 100000 NUMREPS 10000, with K from 1 to 5
-qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 1 5
-qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 2 5
-qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 3 5
-qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 4 5
-qsub $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 5 5
+qsub -R y $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 1 5
+qsub -R y $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 2 5
+qsub -R y $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 3 5
+qsub -R y $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 4 5
+qsub -R y $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_subsampled.struc 1 5 5
 
 #Analyze STRUCTURE output
 # Generate a folder containing all STRUCTURE output files for all K analyzed
