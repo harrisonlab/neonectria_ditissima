@@ -25,11 +25,11 @@ Gene prediction followed three steps:
 ## Gene model training
 
 ```bash
-	for Assembly in $(ls R0905_good/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+	for Assembly in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
 	  Strain=R0905
 	  Organism=N.ditissima
 	  echo "$Organism - $Strain"
-	  for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905_all); do
+	  for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905); do
 	    Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
 	    echo "$Timepoint"
 	    FileF=$(ls $RNADir/F/*_trim.fq.gz)
@@ -39,7 +39,6 @@ Gene prediction followed three steps:
 	    qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir
 		done
 	done
-done
 ```
 
 Alignments were concatenated prior to running cufflinks:
