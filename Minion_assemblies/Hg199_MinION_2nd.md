@@ -1693,3 +1693,94 @@ This merged assembly was polished using Pilon.
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
     done
 ```
+
+
+After pilon, only two additional gene was predicted in the R0905 genome.
+Contigs were renamed in accordance with ncbi recomendations.
+
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+  touch tmp.csv
+  for Assembly in $(ls assembly/CSAR/Scaffold_v2/N.ditissima/*/polished/pilon_5.fasta); do
+    Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)  
+    Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+    OutDir=assembly/CSAR/Scaffold_v2/$Organism/$Strain/filtered_contigs
+    mkdir -p $OutDir
+    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_contigs_renamed.fasta --coord_file tmp.csv
+  done
+  rm tmp.csv
+```
+
+## R0905 pilon Repeat Masking
+
+
+Contigs were renamed in accordance with ncbi recomendations.
+
+```bash
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+  touch tmp.csv
+  for Assembly in $(ls R0905_good/pilon_5.fasta); do
+    OutDir=R0905_good/filtered_contigs
+    mkdir -p $OutDir
+    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/R0905_renamed.fasta --coord_file tmp.csv
+  done
+  rm tmp.csv
+```
+```bash
+for Assembly in $(ls R0905_good/filtered_contigs/R0905_renamed.fasta); do
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=$(dirname $Assembly)/busco
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
+```bash
+for Assembly in $(ls R0905_good/filtered_contigs/R0905_renamed.fasta); do
+Strain=R0905
+Organism=N.ditissima
+echo "$Organism - $Strain"
+OutDir=R0905_good/repeat_masked/filtered_contigs
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/repeat_masking
+qsub $ProgDir/rep_modeling.sh $Assembly $OutDir
+qsub $ProgDir/transposonPSI.sh $Assembly $OutDir
+done
+```
+The TransposonPSI masked bases were used to mask additional bases from the repeatmasker / repeatmodeller softmasked and hardmasked files.
+
+```bash
+
+for File in $(ls repeat_masked/Ref_Genomes/*/*/*/*_contigs_softmasked.fa); do
+OutDir=$(dirname $File)
+TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+echo "$OutFile"
+bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+echo "Number of masked bases:"
+cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+done
+# The number of N's in hardmasked sequence are not counted as some may be present within the assembly and were therefore not repeatmasked.
+```
+```
+repeat_masked/Ref_Genomes/N.ditissima/Hg199/filtered_contigs/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+4060878
+repeat_masked/Ref_Genomes/N.ditissima/R0905/filtered_contigs/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
+Number of masked bases:
+5516834
+```
+
+Identify Telomere repeats:
+Telomeric repeats were identified in assemblies
+
+```bash
+for Assembly in $(ls repeat_masked/Ref_Genomes/*/*/filtered_contigs/*_contigs_unmasked.fa); do
+Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+echo "$Organism - $Strain"
+OutDir=analysis/telomere/$Organism/$Strain
+mkdir -p $OutDir
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/feature_annotation/telomeres
+$ProgDir/annotate_telomeres.py --fasta $Assembly --out $OutDir/telomere_hits
+done
+cat $OutDir/telomere_hits.txt | sort -nr -k5 | less
+```
