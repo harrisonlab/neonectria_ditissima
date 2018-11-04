@@ -26,9 +26,9 @@ done
 R0905 genome as reference
 
 ```bash
-Reference=R0905_good/R0905_contigs_unmasked.fa
+Reference=R0905_good/repeat_masked/filtered_contigs/R0905_good_contigs_unmasked.fa
 for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 ND8 ND9 OPC304 P112 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17-C2 R68-17-C3 SVK1 SVK2 NMaj R0905_all Hg199; do
-for Reads in $(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.*/$Strain)
+for Reads in $(ls -d  ../../../home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.*/$Strain)
 do
   Strain=$(echo $Reads | rev | cut -f1 -d '/' | rev)
   Organism=$(echo $Reads | rev | cut -f2 -d '/' | rev)
