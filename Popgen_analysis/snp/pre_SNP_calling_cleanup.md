@@ -28,8 +28,27 @@ for StrainPath in $(ls -d qc_dna/paired/N.*/$Strain); do
 done
 done
 ```
-
 For R0905, I used R0905_all.
+
+R0905 genome as reference
+
+```bash
+for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905_all R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17-C2 R68-17-C3 SVK1 SVK2 NMaj; do
+Reference=$(ls R0905_good/R0905_contigs_unmasked.fa)
+for StrainPath in $(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/qc_dna/paired/N.*/$Strain); do
+  Organism=$(echo $StrainPath | rev | cut -f2 -d '/' | rev)
+  Strain=$(echo $StrainPath | rev | cut -f1 -d '/' | rev)
+  echo "$Organism - $Strain"
+  F_Read=$(ls $StrainPath/F/*.fq.gz)
+  R_Read=$(ls $StrainPath/R/*.fq.gz)
+  echo $F_Read
+  echo $R_Read
+  OutDir=analysis/genome_alignment/bowtie/$Organism/R0905/$Strain/
+  ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/genome_alignment
+  qsub $ProgDir/bowtie/sub_bowtie.sh $Reference $F_Read $R_Read $OutDir $Strain
+done
+done
+```
 
 ## Rename input mapping files in each folder by prefixing with the strain ID
 
