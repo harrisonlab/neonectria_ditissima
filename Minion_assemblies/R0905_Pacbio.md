@@ -749,17 +749,8 @@ done
 ```
 The TransposonPSI masked bases were used to mask additional bases from the repeatmasker / repeatmodeller softmasked and hardmasked files.
 
-
-
-
-
-
-
-
-
 ```bash
-
-for File in $(ls repeat_masked/Ref_Genomes/*/*/*/*_contigs_softmasked.fa); do
+for File in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_softmasked.fa); do
 OutDir=$(dirname $File)
 TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
 OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
@@ -768,15 +759,10 @@ bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
 echo "Number of masked bases:"
 cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
 done
-# The number of N's in hardmasked sequence are not counted as some may be present within the assembly and were therefore not repeatmasked.
 ```
 ```
-repeat_masked/Ref_Genomes/N.ditissima/Hg199/filtered_contigs/Hg199_contigs_softmasked_repeatmasker_TPSI_appended.fa
 Number of masked bases:
-4060878
-repeat_masked/Ref_Genomes/N.ditissima/R0905/filtered_contigs/R0905_contigs_softmasked_repeatmasker_TPSI_appended.fa
-Number of masked bases:
-5516834
+5785674
 ```
 
 Identify Telomere repeats:
