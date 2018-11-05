@@ -44,72 +44,50 @@ Gene prediction followed three steps:
 Alignments were concatenated prior to running cufflinks:
 Cufflinks was run to produce the fragment length and stdev statistics:
 
-screen -a
-
 ```bash
-for Strain in Hg199 R0905; do
-	for Assembly in $(ls repeat_masked/Ref_Genomes/N.*/*/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-	Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-	Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-	AcceptedHits=alignment/Ref_Genomes/$Organism/$Strain/$Strain/accepted_hits.bam
-	OutDir=gene_pred/cufflinks/Ref_Genomes/$Organism/$Strain/vs_"$Strain"reads/concatenated_prelim
-	echo "$Organism - $Strain"
-	mkdir -p $OutDir
-	cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
-	done
+screen -a
+for Assembly in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+Strain=R0905
+Organism=N.ditissima
+AcceptedHits=alignment/Ref_Genomes_v2/$Organism/$Strain/$Strain/accepted_hits.bam
+OutDir=gene_pred/cufflinks/Ref_Genomes_v2/$Organism/$Strain/vs_"$Strain"reads/concatenated_prelim
+echo "$Organism - $Strain"
+mkdir -p $OutDir
+cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
 done
 ```
+
 I have aligned every isolate with their RNA reads.
 
 Output from stdout included:
 
 ```
-N.ditissima - Hg199
-Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[16:36:09] Inspecting reads and determining fragment length distribution.
-> Processed 16735 loci.                        [*************************] 100%
+> Processed 19137 loci.                        [*************************] 100%
 > Map Properties:
->       Normalized Map Mass: 13257861.80
->       Raw Map Mass: 13257861.80
+>       Normalized Map Mass: 12113113.69
+>       Raw Map Mass: 12113113.69
 >       Fragment Length Distribution: Empirical (learned)
->                     Estimated Mean: 217.50
->                  Estimated Std Dev: 43.70
-[16:38:43] Assembling transcripts and estimating abundances.
-> Processed 16782 loci.                        [*************************] 100%
-N.ditissima - R0905
-Warning: Could not connect to update server to verify current version. Please check at the Cufflinks website (http://cufflinks.cbcb.umd.edu).
-[16:49:16] Inspecting reads and determining fragment length distribution.
-> Processed 19118 loci.                        [*************************] 100%
-> Map Properties:
->       Normalized Map Mass: 12100829.47
->       Raw Map Mass: 12100829.47
->       Fragment Length Distribution: Empirical (learned)
->                     Estimated Mean: 219.53
->                  Estimated Std Dev: 39.59
-[16:52:14] Assembling transcripts and estimating abundances.
-> Processed 19196 loci.                        [*************************] 100%
-
-The Estimated Mean: 219.68 allowed calculation of of the mean insert gap to be
--140bp 182-(180*2) where 180? was the mean read length. This was provided to tophat
-on a second run (as the -r option) along with the fragment length stdev to
-increase the accuracy of mapping.
+>                     Estimated Mean: 219.66
+>                  Estimated Std Dev: 39.56
+[09:13:49] Assembling transcripts and estimating abundances.
+> Processed 19215 loci.     
 ```
 
 Then Rnaseq data was aligned to each genome assembly:
 
 ```bash
-	for Assembly in $(ls repeat_masked/Ref_Genomes/N.ditissima/Hg199/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-		Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-		cho "$Organism - $Strain"
-		for RNADir in $(ls -d qc_rna/paired/N.ditissima/Hg199 | grep -v -e '_rep'); do
+	for Assembly in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		Strain=R0905
+		Organism=N.ditissima
+		echo "$Organism - $Strain"
+		for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905 | grep -v -e '_rep'); do
 			Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
 			echo "$Timepoint"
 			FileF=$(ls $RNADir/F/*_trim.fq.gz)
 			FileR=$(ls $RNADir/R/*_trim.fq.gz)
-			OutDir=alignment/$Organism/$Strain/$Timepoint
+			OutDir=alignment/Ref_Genomes_v2/$Organism/$Strain/$Timepoint
 			InsertGap='-140'
-			InsertStdDev='43'
+			InsertStdDev='39'
 			Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
 			while [ $Jobs -gt 1 ]; do
 			sleep 10
@@ -120,30 +98,6 @@ Then Rnaseq data was aligned to each genome assembly:
 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
 		qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
 		done
-	done
-
-	for Assembly in $(ls repeat_masked/Ref_Genomes/N.ditissima/R0905/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-	Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-	Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-	cho "$Organism - $Strain"
-	for RNADir in $(ls -d qc_rna/paired/N.ditissima/R0905 | grep -v -e '_rep'); do
-	Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
-	echo "$Timepoint"
-	FileF=$(ls $RNADir/F/*_trim.fq.gz)
-	FileR=$(ls $RNADir/R/*_trim.fq.gz)
-	OutDir=alignment/$Organism/$Strain/$Timepoint
-	InsertGap='-140'
-	InsertStdDev='40'
-	Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
-	while [ $Jobs -gt 1 ]; do
-	sleep 10
-	printf "."
-	Jobs=$(qstat | grep 'tophat' | grep 'qw' | wc -l)
-	done
-	printf "\n"
-	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
-	qsub $ProgDir/tophat_alignment.sh $Assembly $FileF $FileR $OutDir $InsertGap $InsertStdDev
-	done
 	done
 ```
 
