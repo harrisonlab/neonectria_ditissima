@@ -184,9 +184,9 @@ Read correction using Canu
 for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199/*allfiles_trim.fastq.gz); do
 Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
 Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev)
-OutDir=assembly/canu_minion/N.ditissima/"$Strain"
+OutDir=assembly/canu_minion/N.ditissima/"$Strain"_new
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-qsub $ProgDir/sub_canu_correction.sh $TrimReads 45m $Strain $OutDir
+qsub -R y $ProgDir/sub_canu_correction.sh $TrimReads 45m $Strain $OutDir
 done
 ```
 
