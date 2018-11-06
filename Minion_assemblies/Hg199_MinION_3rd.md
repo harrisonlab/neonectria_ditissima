@@ -35,16 +35,16 @@ The next 2 steps were done in the first assembly of the minion data, but repeate
 # If reads have same names or same part splited by space, fix them using rename.sh from bbtools.
 # This can only be done in blacklace11, since it needs a specific library for blasr.
 ssh blacklace11.blacklace
-/home/gomeza/prog/bbtools/bbmap/rename.sh in=Hg199.correctedReads.fasta.gz out=CorrecteOut.fasta prefix=Hg199
+/home/gomeza/prog/bbtools/bbmap/rename.sh in=Hg199.trimmedReads.fasta.gz out=trimmed_renamed.fasta prefix=Hg199
 
 # Fast all-against-all overlap of raw reads
 # Overlap for MinION reads (or use "-x ava-pb" for Pacbio read overlapping)
-/home/gomeza/prog/minimap2/minimap2 -x ava-ont -t8 CorrecteOut.fasta CorrecteOut.fasta | gzip -1 > Hg199_fastq_allfiles.paf.gz
+/home/gomeza/prog/minimap2/minimap2 -x ava-ont -t8 trimmed_renamed.fasta trimmed_renamed.fasta | gzip -1 > Hg199_fastq_allfiles.paf.gz
 
 # Concatenate pieces of read sequences to generate the final sequences.
 # Thus the per-base error rate is similar to the raw input reads. Make sure you correct your reads.
 # Layout
-/home/gomeza/prog/miniasm/miniasm -f CorrecteOut.fasta Hg199_fastq_allfiles.paf.gz > reads.gfa
+/home/gomeza/prog/minimap2/minimap2 -x ava-ont -t8 trimmed_renamed.fasta trimmed_renamed.fasta | gzip -1 > Hg199_fastq_allfiles.paf.gz
 
 # Convert gfa file to fasta file.
 awk '/^S/{print ">"$2"\n"$3}' reads.gfa | fold > Hg199_miniasm.fa
