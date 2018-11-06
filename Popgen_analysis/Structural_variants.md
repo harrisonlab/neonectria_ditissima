@@ -46,13 +46,22 @@ done
 ####Run svaba
 
 ```bash
-Prefix=Nd_svaba
-Reference=repeat_masked/Ref_Genomes/N.ditissima/Hg199/filtered_contigs/Hg199_contigs_unmasked.fa
-AlignDir=alignment/bwa
-OutDir=svaba
-mkdir -p $OutDir
-ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
-qsub $ProgDir/sub_svaba.sh $Prefix $Reference $AlignDir $OutDir
+  Prefix=Nd_svaba
+  Reference=repeat_masked/Ref_Genomes/N.ditissima/Hg199/filtered_contigs/Hg199_contigs_unmasked.fa
+  AlignDir=alignment/bwa
+  OutDir=svaba
+  mkdir -p $OutDir
+  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
+  qsub $ProgDir/sub_svaba.sh $Prefix $Reference $AlignDir $OutDir
+```
+```bash
+  Prefix=Nd_svaba
+  Reference=R0905_good/repeat_masked/filtered_contigs/R0905_good_contigs_unmasked.fa
+  AlignDir=alignment/bwa_vsR0905
+  OutDir=analysis/sv_calling/svaba/R0905_Ref
+  mkdir -p $OutDir
+  ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
+  qsub $ProgDir/sub_svaba.sh $Prefix $Reference $AlignDir $OutDir
 ```
 
 ### Analysis of files produced by svaba
