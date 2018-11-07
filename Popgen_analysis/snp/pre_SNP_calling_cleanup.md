@@ -88,15 +88,15 @@ Convention used: qsub $scripts/sub_pre_snp_calling.sh <SAMPLE_ID> This needs to 
 ## Copy outputs from cleanup to alignment folder
 
 ```bash
-for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17-C2 R68-17-C3 SVK1 SVK2 NMaj; do
-  #Bam="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup.bam
-  rgBam="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam
-  Bai="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam.bai
-  Txt="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup.txt
-  Directory=analysis/genome_alignment/bowtie/*/$Strain/
-  #mv $Bam $Directory
-  mv $rgBam $Directory
-  mv $Bai $Directory
-  mv $Txt $Directory
-done
+  for Strain in Ag02 Ag04 Ag05 Ag06 Ag08 Ag09_A Ag11_A Ag11_B Ag11_C BGV344 Hg199 ND8 ND9 OPC304 P112 R0905 R37-15 R39-15 R41-15 R42-15 R45-15 R6-17-2 R6-17-3 R68-17-C2 R68-17-C3 SVK1 SVK2 NMaj; do
+    #Bam="$Strain"_polished_contigs_unmasked.fa_aligned_nomulti_proper_sorted_nodup.bam
+    rgBam="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam
+    Bai="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam.bai
+    Txt="$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup.txt
+    Directory=analysis/genome_alignment/bowtie/*/R0905/$Strain/
+    #mv $Bam $Directory
+    mv $rgBam $Directory
+    mv $Bai $Directory
+    mv $Txt $Directory
+  done
 ```
