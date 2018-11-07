@@ -123,7 +123,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 ```
 
 ```bash
-  for Assembly in $(ls repeat_masked/Ref_Genomes/N.ditissima/Hg199/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+for Assembly in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
     Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
     while [ $Jobs -gt 1 ]; do
     sleep 10
@@ -131,31 +131,11 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
     Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
     done
     printf "\n"
-    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
+		Strain=R0905
+		Organism=N.ditissima
     echo "$Organism - $Strain"
-    OutDir=gene_pred/braker/Ref_Genomes/$Organism/$Strain
-    AcceptedHits=alignment/Ref_Genomes/N.ditissima/Hg199/Hg199/accepted_hits.bam
-    GeneModelName="$Organism"_"$Strain"_braker
-    rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
-    qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
-  done
-```
-```bash
-  for Assembly in $(ls repeat_masked/Ref_Genomes/N.ditissima/R0905/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-    while [ $Jobs -gt 1 ]; do
-    sleep 10
-    printf "."
-    Jobs=$(qstat | grep 'tophat' | grep -w 'r' | wc -l)
-    done
-    printf "\n"
-    Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f4 | rev)
-    echo "$Organism - $Strain"
-    OutDir=gene_pred/braker/Ref_Genomes/$Organism/$Strain
-    AcceptedHits=alignment/Ref_Genomes/N.ditissima/R0905/R0905/accepted_hits.bam
+    OutDir=gene_pred/braker/Ref_Genomes_v2/$Organism/$Strain
+    AcceptedHits=alignment/Ref_Genomes_v2/N.ditissima/R0905/R0905/accepted_hits.bam
     GeneModelName="$Organism"_"$Strain"_braker
     rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker
     ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
@@ -166,7 +146,7 @@ cp /home/armita/prog/genemark/gm_key_64 ~/.gm_key
 Fasta and gff files were extracted from Braker1 output.
 
 ```bash
-  for File in $(ls gene_pred/braker/Ref_Genomes/N.*/*/*/augustus.gff); do
+  for File in $(ls gene_pred/braker/Ref_Genomes_v2/N.*/*/*/augustus.gff); do
     getAnnoFasta.pl $File
     OutDir=$(dirname $File)
     echo "##gff-version 3" > $OutDir/augustus_extracted.gff
@@ -185,13 +165,13 @@ Note - cufflinks doesn't always predict direction of a transcript and
 therefore features can not be restricted by strand when they are intersected.
 
 ```bash
-  for Assembly in $(ls repeat_masked/Ref_Genomes/N.ditissima/*/*/*_contigs_unmasked.fa); do
-  Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-  Organism=$(echo $Assembly| rev | cut -d '/' -f4 | rev)
+  for Assembly in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_unmasked.fa); do
+	Strain=R0905
+	Organism=N.ditissima
   echo "$Organism - $Strain"
-  OutDir=gene_pred/cufflinks/Ref_Genomes/$Organism/$Strain/concatenated_prelim
+  OutDir=gene_pred/cufflinks/Ref_Genomes_v2/$Organism/$Strain/concatenated_prelim
   mkdir -p $OutDir
-  AcceptedHits=alignment/Ref_Genomes/N.ditissima/$Strain/$Strain/accepted_hits.bam
+  AcceptedHits=alignment/Ref_Genomes_v2/N.ditissima/$Strain/$Strain/accepted_hits.bam
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/RNAseq
   qsub $ProgDir/sub_cufflinks.sh $AcceptedHits $OutDir
   done
@@ -200,13 +180,13 @@ therefore features can not be restricted by strand when they are intersected.
 Secondly, genes were predicted using CodingQuary:
 
 ```bash
-	for Assembly in $(ls repeat_masked/Ref_Genomes/N.ditissima/*/*/*_contigs_unmasked.fa); do
-		Strain=$(echo $Assembly| rev | cut -d '/' -f3 | rev)
-	  Organism=$(echo $Assembly| rev | cut -d '/' -f4 | rev)
+	for Assembly in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_unmasked.fa); do
+		Strain=R0905
+		Organism=N.ditissima
 		echo "$Organism - $Strain"
-		OutDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/
+		OutDir=gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/
 		mkdir -p $OutDir
-		CufflinksGTF=gene_pred/cufflinks/Ref_Genomes/$Organism/$Strain/concatenated_prelim/transcripts.gtf
+		CufflinksGTF=gene_pred/cufflinks/Ref_Genomes_v2/$Organism/$Strain/concatenated_prelim/transcripts.gtf
 		ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/codingquary
 		qsub $ProgDir/sub_CodingQuary.sh $Assembly $CufflinksGTF $OutDir
 	done
