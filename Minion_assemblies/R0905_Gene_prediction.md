@@ -46,15 +46,15 @@ Cufflinks was run to produce the fragment length and stdev statistics:
 
 ```bash
 screen -a
-for Assembly in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-Strain=R0905
-Organism=N.ditissima
-AcceptedHits=alignment/Ref_Genomes_v2/$Organism/$Strain/$Strain/accepted_hits.bam
-OutDir=gene_pred/cufflinks/Ref_Genomes_v2/$Organism/$Strain/vs_"$Strain"reads/concatenated_prelim
-echo "$Organism - $Strain"
-mkdir -p $OutDir
-cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
-done
+	for Assembly in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+		Strain=R0905
+		Organism=N.ditissima
+		AcceptedHits=alignment/Ref_Genomes_v2/$Organism/$Strain/$Strain/accepted_hits.bam
+		OutDir=gene_pred/cufflinks/Ref_Genomes_v2/$Organism/$Strain/vs_"$Strain"reads/concatenated_prelim
+		echo "$Organism - $Strain"
+		mkdir -p $OutDir
+		cufflinks -o $OutDir/cufflinks -p 8 --max-intron-length 4000 $AcceptedHits 2>&1 | tee $OutDir/cufflinks/cufflinks.log
+	done
 ```
 
 I have aligned every isolate with their RNA reads.
@@ -62,6 +62,7 @@ I have aligned every isolate with their RNA reads.
 Output from stdout included:
 
 ```
+R0905 rna reads
 > Processed 19137 loci.                        [*************************] 100%
 > Map Properties:
 >       Normalized Map Mass: 12113113.69
@@ -71,6 +72,17 @@ Output from stdout included:
 >                  Estimated Std Dev: 39.56
 [09:13:49] Assembling transcripts and estimating abundances.
 > Processed 19215 loci.     
+
+Hg199 rna reads
+> Processed 18574 loci.                        [*************************] 100%
+> Map Properties:
+>       Normalized Map Mass: 12764299.79
+>       Raw Map Mass: 12764299.79
+>       Fragment Length Distribution: Empirical (learned)
+>                     Estimated Mean: 217.01
+>                  Estimated Std Dev: 43.62
+[14:52:39] Assembling transcripts and estimating abundances.
+> Processed 18643 loci.  
 ```
 
 Then Rnaseq data was aligned to each genome assembly:
