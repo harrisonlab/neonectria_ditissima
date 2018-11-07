@@ -64,3 +64,25 @@ awk '/^S/{print ">"$2"\n"$3}' reads.gfa | fold > Hg199_miniasm.fa
     qsub $ProgDir/sub_racon.sh $Assembly $ReadsFq $Iterations $OutDir
   done
 ```
+
+Quast and busco were run to assess the effects of racon on assembly quality:
+
+```bash
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
+for Assembly in $(ls Hg199_miniasm2/racon_10/*10.fasta); do
+  OutDir=$(dirname $Assembly)
+  qsub $ProgDir/sub_quast.sh $Assembly $OutDir
+done
+```
+
+```bash
+for Assembly in $(ls Hg199_miniasm2/racon_10/*10.fasta); do
+  Strain=Hg199
+  Organism=N.ditissima
+echo "$Organism - $Strain"
+ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/busco
+BuscoDB=$(ls -d /home/groups/harrisonlab/dbBusco/sordariomyceta_odb9)
+OutDir=Hg199_miniasm2/racon_10/busco
+qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
+done
+```
