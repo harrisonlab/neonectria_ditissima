@@ -199,15 +199,15 @@ models:
 Note: This needs to run step by step.
 
 ```bash
-  BrakerGff=$(ls gene_pred/braker/Ref_Genomes/*/R0905/*/augustus.gff3)
+  BrakerGff=$(ls gene_pred/braker/Ref_Genomes_v2/*/R0905/*/augustus.gff3)
 	Strain=$(echo $BrakerGff| rev | cut -d '/' -f3 | rev)
 	Organism=$(echo $BrakerGff | rev | cut -d '/' -f4 | rev)
 	echo "$Organism - $Strain"
-	Assembly=$(ls repeat_masked/Ref_Genomes/N.ditissima/R0905/*/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
-	CodingQuaryGff=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/out/PredictedPass.gff3
-	PGNGff=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/out/PGN_predictedPass.gff3
-	AddDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/additional
-	FinalDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final
+	Assembly=$(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+	CodingQuaryGff=gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/out/PredictedPass.gff3
+	PGNGff=gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/out/PGN_predictedPass.gff3
+	AddDir=gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/additional
+	FinalDir=gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/final
 	AddGenesList=$AddDir/additional_genes.txt
 	AddGenesGff=$AddDir/additional_genes.gff
 	FinalGff=$AddDir/combined_genes.gff
@@ -238,7 +238,7 @@ Note: This needs to run step by step.
 
 The final number of genes per isolate was observed using:
 ```bash
-	for DirPath in $(ls -d gene_pred/codingquary/Ref_Genomes/N.*/*/final); do
+	for DirPath in $(ls -d gene_pred/codingquary/Ref_Genomes_v2/N.*/*/final); do
 	echo $DirPath;
 	cat $DirPath/final_genes_Braker.pep.fasta | grep '>' | wc -l;
 	cat $DirPath/final_genes_CodingQuary.pep.fasta | grep '>' | wc -l;
@@ -246,26 +246,29 @@ The final number of genes per isolate was observed using:
 	echo "";
 	done
 ```
+```
+gene_pred/codingquary/Ref_Genomes_v2/N.ditissima/R0905/final
+13101
+1300
+14401
 
-gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final
-13665
-1418
-15083
 
+This are the results of the previous genome (CSAR).
 gene_pred/codingquary/Ref_Genomes/N.ditissima/R0905/final
 13300
 1134
 14434
+```
 
 Remove duplicate genes
 
 ```bash
-for GffAppended in $(ls gene_pred/codingquary/Ref_Genomes/*/*/final/final_genes_appended.gff3);
+for GffAppended in $(ls gene_pred/codingquary/Ref_Genomes_v2/*/*/final/final_genes_appended.gff3);
 do
   Strain=$(echo $GffAppended | rev | cut -d '/' -f3 | rev)
   Organism=$(echo $GffAppended | rev | cut -d '/' -f4 | rev)
   echo "$Organism - $Strain"
-  FinalDir=gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final
+  FinalDir=gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/final
   GffFiltered=$FinalDir/filtered_duplicates.gff
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary/
   $ProgDir/remove_dup_features.py --inp_gff $GffAppended --out_gff $GffFiltered
@@ -274,11 +277,11 @@ do
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/codingquary
 	$ProgDir/gff_rename_genes.py --inp_gff $GffFiltered --conversion_log $LogFile > $GffRenamed
 	rm $GffFiltered
-	Assembly=$(ls repeat_masked/Ref_Genomes/$Organism/$Strain/filtered_contigs/*_softmasked_repeatmasker_TPSI_appended.fa)
-	$ProgDir/gff2fasta.pl $Assembly $GffRenamed gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final/final_genes_appended_renamed
+	Assembly=$(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+	$ProgDir/gff2fasta.pl $Assembly $GffRenamed gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/final/final_genes_appended_renamed
 	# The proteins fasta file contains * instead of Xs for stop codons, these should
 	# be changed
-	sed -i 's/\*/X/g' gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final/final_genes_appended_renamed.pep.fasta
+	sed -i 's/\*/X/g' gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/final/final_genes_appended_renamed.pep.fasta
 done
 ```
 
@@ -297,10 +300,15 @@ also printing ORFs in .gff format.
 
 ```bash
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
-for Genome in $(ls repeat_masked/Ref_Genomes/N.ditissima/Hg199/*/*_contigs_unmasked.fa); do
+for Genome in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_unmasked.fa); do
 	qsub $ProgDir/run_ORF_finder.sh $Genome
 done
 ```
+
+
+
+
+
 
 The Gff files from the the ORF finder are not in true Gff3 format. These were
 corrected using the following commands:
@@ -338,11 +346,17 @@ was redirected to a temporary output file named interproscan_submission.log .
 ```bash
 	screen -a
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-	for Genes in $(ls gene_pred/codingquary/Ref_Genomes/N.*/Hg199/*/final_genes_appended_renamed.pep.fasta); do
+	for Genes in $(ls gene_pred/codingquary/Ref_Genomes_v2/N.*/R0905/*/final_genes_appended_renamed.pep.fasta); do
 	echo $Genes
 	$ProgDir/sub_interproscan.sh $Genes
 	done 2>&1 | tee -a interproscan_submisison.log
 ```
+
+
+
+
+
+
 
 Following interproscan annotation split files were combined using the following
 commands:
@@ -362,16 +376,23 @@ done
 ## B) SwissProt
 
 ```bash
-	for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_appended_renamed.pep.fasta); do
+	for Proteome in $(ls gene_pred/codingquary/Ref_Genomes_v2/N.*/R0905/*/final_genes_appended_renamed.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-		OutDir=gene_pred/swissprot/Ref_Genomes/$Organism/$Strain
+		OutDir=gene_pred/swissprot/Ref_Genomes_v2/$Organism/$Strain
 		SwissDbDir=../../../../home/groups/harrisonlab/uniprot/swissprot
 		SwissDbName=uniprot_sprot
 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
 		qsub $ProgDir/sub_swissprot.sh $Proteome $OutDir $SwissDbDir $SwissDbName
 	done
 ```
+
+
+
+
+
+
+
 
 ```bash
 	for SwissTable in $(ls gene_pred/swissprot/Ref_*/*/*/swissprot_vMar2018_10_hits.tbl); do
@@ -399,14 +420,14 @@ done
 
  ```bash
   screen -a
-	for Strain in Hg199 R0905; do
+	for Strain in R0905; do
   SplitfileDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/signal_peptides
   CurPath=$PWD
-  for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/$Strain/*/final_genes_appended_renamed.pep.fasta); do
+  for Proteome in $(ls gene_pred/codingquary/Ref_Genomes_v2/N.*/R0905/*/final_genes_appended_renamed.pep.fasta); do
   Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
   Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-  SplitDir=gene_pred/final_genes_split/Ref_Genomes/$Organism/$Strain
+  SplitDir=gene_pred/final_genes_split/Ref_Genomes_v2/$Organism/$Strain
   mkdir -p $SplitDir
   BaseName="$Organism""_$Strain"_final_preds
   $SplitfileDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName
@@ -426,6 +447,14 @@ done
   done
   done
 ```
+
+
+
+
+
+
+
+
  The batch files of predicted secreted proteins needed to be combined into a
  single file for each strain. This was done with the following commands:
 
@@ -501,17 +530,26 @@ Required programs:
  * EffectorP.py
 
 ```bash
-for Strain in Hg199 R0905; do
-	for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/$Strain/*/final_genes_appended_renamed.pep.fasta); do
+for Strain in R0905; do
+	for Proteome in $(ls gene_pred/codingquary/Ref_Genomes_v2/N.*/R0905/*/final_genes_appended_renamed.pep.fasta); do
 		Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 		Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 		BaseName="$Organism"_"$Strain"_EffectorP
-		OutDir=analysis/effectorP/Ref_Genomes/$Organism/$Strain
+		OutDir=analysis/effectorP/Ref_Genomes_v2/$Organism/$Strain
 		ProgDir=~/git_repos/emr_repos/tools/seq_tools/feature_annotation/fungal_effectors
 		qsub $ProgDir/pred_effectorP.sh $Proteome $BaseName $OutDir
 	done
 done
 ```
+
+
+
+
+
+
+
+
+
 ```
 Hg199
 Number of proteins that were tested: 15087
@@ -550,10 +588,10 @@ Carbohydrte active enzymes were idnetified using CAZYfollowing recomendations
 at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
 
 ```bash
-  for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/R0905/*/final_genes_appended_renamed.pep.fasta); do
+  for Proteome in $(ls gene_pred/codingquary/Ref_Genomes_v2/N.*/R0905/*/final_genes_appended_renamed.pep.fasta); do
     Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
     Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
-    OutDir=gene_pred/CAZY/Ref_Genomes/$Organism/$Strain
+    OutDir=gene_pred/CAZY/Ref_Genomes_v2/$Organism/$Strain
     mkdir -p $OutDir
     Prefix="$Strain"_CAZY
     CazyHmm=dbCAN/dbCAN-fam-HMMs.txt
@@ -561,6 +599,15 @@ at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
     qsub $ProgDir/sub_hmmscan.sh $CazyHmm $Proteome $Prefix $OutDir
   done
 ```
+
+
+
+
+
+
+
+
+
 
 The Hmm parser was used to filter hits by an E-value of E1x10-5 or E 1x10-e3 if they had a hit over a length of X %.
 
