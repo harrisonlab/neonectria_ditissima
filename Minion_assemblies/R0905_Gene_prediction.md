@@ -352,18 +352,12 @@ was redirected to a temporary output file named interproscan_submission.log .
 	done 2>&1 | tee -a interproscan_submisison.log
 ```
 
-
-
-
-
-
-
 Following interproscan annotation split files were combined using the following
 commands:
 
 ```bash
 ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/interproscan
-for Proteins in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_appended_renamed.pep.fasta); do
+for Proteins in $(ls gene_pred/codingquary/Ref_Genomes_v2/N.*/R0905/*/final_genes_appended_renamed.pep.fasta); do
 	Strain=$(echo $Proteins | rev | cut -d '/' -f3 | rev)
 	Organism=$(echo $Proteins | rev | cut -d '/' -f4 | rev)
 	echo "$Organism - $Strain"
@@ -371,6 +365,9 @@ for Proteins in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_appen
 	InterProRaw=gene_pred/interproscan/$Organism/$Strain/raw
 	$ProgDir/append_interpro.sh $Proteins $InterProRaw
 done
+
+mkdir -p gene_pred/interproscan/Ref_genomes_v2/N.ditissima
+mv gene_pred/interproscan/N.ditissima/R0905/ gene_pred/interproscan/Ref_genomes_v2/N.ditissima/
 ```
 
 ## B) SwissProt
@@ -386,20 +383,12 @@ done
 		qsub $ProgDir/sub_swissprot.sh $Proteome $OutDir $SwissDbDir $SwissDbName
 	done
 ```
-
-
-
-
-
-
-
-
 ```bash
-	for SwissTable in $(ls gene_pred/swissprot/Ref_*/*/*/swissprot_vMar2018_10_hits.tbl); do
+	for SwissTable in $(ls gene_pred/swissprot/Ref_Genomes_v2/*/*/swissprot_vMar2018_10_hits.tbl); do
 		Strain=$(echo $SwissTable | rev | cut -f2 -d '/' | rev)
 		Organism=$(echo $SwissTable | rev | cut -f3 -d '/' | rev)
 		echo "$Organism - $Strain"
-		OutTable=gene_pred/swissprot/Ref_Genomes/$Organism/$Strain/swissprot_vMar2018_tophit_parsed.tbl
+		OutTable=gene_pred/swissprot/Ref_Genomes_v2/$Organism/$Strain/swissprot_vMar2018_tophit_parsed.tbl
 		ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/swissprot
 		$ProgDir/swissprot_parser.py --blast_tbl $SwissTable --blast_db_fasta /home/groups/harrisonlab/uniprot/swissprot/uniprot_sprot.fasta > $OutTable
 	done
@@ -448,38 +437,31 @@ done
   done
 ```
 
-
-
-
-
-
-
-
  The batch files of predicted secreted proteins needed to be combined into a
  single file for each strain. This was done with the following commands:
 
  ```bash
-for SplitDir in $(ls -d gene_pred/final_genes_split/Ref_Genomes/N.*/R0905); do
-Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
-Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
-for SigpDir in $(ls -d gene_pred/Ref_Genomes_signalp-4.1 | cut -f2 -d'/')
-do
-InStringAA=''
-InStringNeg=''
-InStringTab=''
-InStringTxt=''
-for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
-InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
-InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
-InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
-InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
-done
-cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
-cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
-tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
-cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
-done
-done
+	for SplitDir in $(ls -d gene_pred/final_genes_split/Ref_Genomes_v2/N.*/R0905); do
+	Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
+	Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
+		for SigpDir in $(ls -d gene_pred/Ref_Genomes_v2_signalp-4.1 | cut -f2 -d'/')
+		do
+		InStringAA=''
+		InStringNeg=''
+		InStringTab=''
+		InStringTxt=''
+		for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
+		InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
+		InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
+		InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
+		InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
+		done
+	cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
+	cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
+	tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
+	cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
+	done
+	done
 ```
 
 SigP v2 did not predict any gene. Only v4 prediction will be used.
@@ -491,15 +473,18 @@ cytoplasmic or apoplastic effectors.
 Proteins containing a transmembrane domain were identified:
 
  ```bash
-for Strain in Hg199 R0905; do
-for Proteome in $(ls gene_pred/codingquary/Ref_Genomes/N.*/*/*/final_genes_appended_renamed.pep.fasta); do
+for Proteome in $(ls gene_pred/codingquary/Ref_Genomes_v2/N.*/R0905/*/final_genes_appended_renamed.pep.fasta); do
 	Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
 	Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation/transmembrane_helices
 	qsub $ProgDir/submit_TMHMM.sh $Proteome
 done
-done
  ```
+
+
+
+
+
 
  Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
 
@@ -560,27 +545,25 @@ Number of proteins that were tested: 14436
 Number of predicted effectors: 2572
 ```
 ```bash
-for Strain in Hg199 R0905; do
-  for File in $(ls analysis/effectorP/Ref_Genomes/*/$Strain/*_EffectorP.txt); do
+  for File in $(ls analysis/effectorP/Ref_Genomes_v2/*/R0905/*_EffectorP.txt); do
     Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
     Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
     echo "$Organism - $Strain"
     Headers=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_headers.txt/g')
     cat $File | grep 'Effector' | cut -f1 > $Headers
-    Secretome=$(ls gene_pred/Ref_Genomes_signalp-4.1/$Organism/$Strain/*_final_sp_no_trans_mem.aa)
+    Secretome=$(ls gene_pred/Ref_Genomes_v2_signalp-4.1/$Organism/$Strain/*_final_sp_no_trans_mem.aa)
     OutFile=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted.aa/g')
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
     $ProgDir/extract_from_fasta.py --fasta $Secretome --headers $Headers > $OutFile
     OutFileHeaders=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted_headers.txt/g')
     cat $OutFile | grep '>' | tr -d '>' > $OutFileHeaders
     cat $OutFileHeaders | wc -l
-    Gff=$(ls gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/*/final_genes_appended_renamed.gff3)
+    Gff=$(ls gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/*/final_genes_appended_renamed.gff3)
     EffectorP_Gff=$(echo "$File" | sed 's/_EffectorP.txt/_EffectorP_secreted.gff/g')
     ProgDir=/home/armita/git_repos/emr_repos/tools/gene_prediction/ORF_finder
     $ProgDir/extract_gff_for_sigP_hits.pl $OutFileHeaders $Gff effectorP ID > $EffectorP_Gff
     cat $EffectorP_Gff | grep -w 'gene' | wc -l
   done > tmp.txt
-done
 ```
 ## C) CAZY proteins
 
