@@ -220,7 +220,7 @@ done
 
 # structureHarvester - summarise the results
 harvester=/home/sobczm/bin/structureHarvester/structureHarvester.py
-$harvester --dir=structure_analysis/structureHarvester --out=structure_analysis/structureHarvester --evanno --clumpp
+$harvester --dir=structure_analysis/ori_test/structureHarvester --out=structure_analysis/ori_test/structureHarvester --evanno --clumpp
 
 # CLUMPP - permute the results
 cd structure_analysis/structureHarvester
