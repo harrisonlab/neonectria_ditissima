@@ -115,27 +115,17 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $ReadDir/"$Strain"_concatenated_reads_filtered.fastq $OutDir/nanopolish
 ```
 
-```bash
-Assembly=$(ls assembly/canu_minion/N.ditissima/Hg199/racon_10/*10.fasta)
-Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
-echo "$Organism - $Strain"
-ReadDir=raw_dna/nanopolish/$Organism/$Strain
-OutDir=$(dirname $Assembly)
-mkdir -p $OutDir
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
-qsub $ProgDir/sub_bwa_nanopolish.sh $Assembly $ReadDir/"$Strain"_concatenated_reads_filtered.fastq $OutDir/nanopolish
-```
-
 Split the assembly into 50Kb fragments and submit each to the cluster for nanopolish correction
 
 ```bash
-Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_smartdenovo_racon_round_10.fasta)
-Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
-Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+screen -a
+
+Assembly=$(ls Hg199_miniasm2/racon_10/*10.fasta)
+Strain=Hg199
+Organism=N.ditissima
 echo "$Organism - $Strain"
 OutDir=$(dirname $Assembly)
-RawReads=$(ls raw_dna/nanopolish/$Organism/$Strain/"$Strain"_concatenated_reads_filtered.fastq)
+RawReads=$(ls raw_dna/nanopolish2/$Organism/$Strain/"$Strain"_concatenated_reads_filtered.fastq)
 AlignedReads=$(ls $OutDir/nanopolish/reads.sorted.bam)
 NanoPolishDir=/home/gomeza/prog/nanopolish/scripts
 python $NanoPolishDir/nanopolish_makerange.py $Assembly > $OutDir/nanopolish/nanopolish_range.txt
@@ -155,6 +145,11 @@ ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $RawReads $AlignedReads $Ploidy $Region $OutDir/$Region
 done
 ```
+
+
+
+
+
 
 ```bash
 Assembly=$(ls assembly/SMARTdenovo/N.ditissima/Hg199/racon_10/Hg199_smartdenovo_racon_round_10.fasta)
