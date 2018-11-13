@@ -141,7 +141,7 @@ done
 printf "\n"
 echo $Region
 echo $Region >> nanopolish_log.txt
-ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $RawReads $AlignedReads $Ploidy $Region $OutDir/$Region
 done
 ```
