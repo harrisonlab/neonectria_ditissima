@@ -1,9 +1,9 @@
 #!/bin/bash
 #$ -S /bin/bash
 #$ -cwd
-#$ -pe smp 24
+#$ -pe smp 16
 #$ -l h_vmem=4G
-#$ -l h=blacklace11.blacklace
+#$ -l h=blacklace01.blacklace
 
 # Testing parallelisation of GATk HaplotypeCaller - may crash. (It did not! Resulted in 2x speedup)
 # NOTE: this is a haploid organism. For diploid organism, change "ploidy" argument to 2.
@@ -28,7 +28,7 @@ java -jar $gatk/GenomeAnalysisTK.jar \
      -R $reference \
      -T HaplotypeCaller \
      -ploidy 1 \
-     -nct 24 \
+     -nct 16 \
      --allow_potentially_misencoded_quality_scores \
      -I $input/*/*/Ag02/Ag02_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
      -I $input/*/*/Ag04/Ag04_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam \
