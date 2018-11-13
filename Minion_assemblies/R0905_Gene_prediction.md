@@ -305,17 +305,12 @@ for Genome in $(ls R0905_good/repeat_masked/filtered_contigs/*_contigs_unmasked.
 done
 ```
 
-
-
-
-
-
 The Gff files from the the ORF finder are not in true Gff3 format. These were
 corrected using the following commands:
 
 ```bash
 	ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/feature_annotation
-	for ORF_Gff in $(ls gene_pred/ORF_finder/*/R0905/*_ORF.gff | grep -v '_F_atg_' | grep -v '_R_atg_'); do
+	for ORF_Gff in $(ls gene_pred/ORF_finder/R0905_good/R0905/*_ORF.gff | grep -v '_F_atg_' | grep -v '_R_atg_'); do
 		ORF_Gff_mod=$(echo $ORF_Gff | sed 's/_ORF.gff/_ORF_corrected.gff3/g')
 		echo ""
 		echo "Correcting the following file:"
@@ -481,21 +476,16 @@ for Proteome in $(ls gene_pred/codingquary/Ref_Genomes_v2/N.*/R0905/*/final_gene
 done
  ```
 
-
-
-
-
-
  Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
 
  ```bash
-for File in $(ls gene_pred/trans_mem/*/R0905/*_TM_genes_neg.txt); do
+for File in $(ls gene_pred/trans_mem/Ref_Genomes_v2/R0905/*_TM_genes_neg.txt); do
  Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
- Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+ Organism=N.ditissima
  echo "$Organism - $Strain"
  TmHeaders=$(echo "$File" | sed 's/neg.txt/neg_headers.txt/g')
  cat $File | cut -f1 > $TmHeaders
- SigP=$(ls gene_pred/Ref_Genomes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
+ SigP=$(ls gene_pred/Ref_Genomes_v2_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
  OutDir=$(dirname $SigP)
  ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
  $ProgDir/extract_from_fasta.py --fasta $SigP --headers $TmHeaders > $OutDir/"$Strain"_final_sp_no_trans_mem.aa
@@ -503,8 +493,10 @@ for File in $(ls gene_pred/trans_mem/*/R0905/*_TM_genes_neg.txt); do
 done
  ```
  ```
-N.ditissima - Hg199
-1034
+N.ditissima - R0905
+997
+
+This are the results of the previous genome (CSAR).
 N.ditissima - R0905
 1001
  ```
@@ -527,23 +519,6 @@ for Strain in R0905; do
 done
 ```
 
-
-
-
-
-
-
-
-
-```
-Hg199
-Number of proteins that were tested: 15087
-Number of predicted effectors: 2856
-
-R0905
-Number of proteins that were tested: 14436
-Number of predicted effectors: 2572
-```
 ```bash
   for File in $(ls analysis/effectorP/Ref_Genomes_v2/*/R0905/*_EffectorP.txt); do
     Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
@@ -583,22 +558,13 @@ at http://csbl.bmb.uga.edu/dbCAN/download/readme.txt :
   done
 ```
 
-
-
-
-
-
-
-
-
-
 The Hmm parser was used to filter hits by an E-value of E1x10-5 or E 1x10-e3 if they had a hit over a length of X %.
 
 Those proteins with a signal peptide were extracted from the list and gff files
 representing these proteins made.
 
   ```bash
-  for File in $(ls gene_pred/CAZY/Ref_Genomes/N.*/*/*CAZY.out.dm); do
+  for File in $(ls gene_pred/CAZY/Ref_Genomes_v2/N.*/*/*CAZY.out.dm); do
   Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
   Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
   OutDir=$(dirname $File)
@@ -609,12 +575,11 @@ representing these proteins made.
   cat $OutDir/"$Strain"_CAZY.out.dm.ps | cut -f3 | sort | uniq > $CazyHeaders
   echo "number of CAZY genes identified:"
   cat $CazyHeaders | wc -l
-  Gff=$(ls gene_pred/codingquary/Ref_Genomes/$Organism/$Strain/final/final_genes_appended_renamed.gff3)
+  Gff=$(ls gene_pred/codingquary/Ref_Genomes_v2/$Organism/$Strain/final/final_genes_appended_renamed.gff3)
   CazyGff=$OutDir/"$Strain"_CAZY.gff
   ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/ORF_finder
   $ProgDir/extract_gff_for_sigP_hits.pl $CazyHeaders $Gff CAZyme ID > $CazyGff
-
-  SecretedProts=$(ls gene_pred/Ref_Genomes_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
+  SecretedProts=$(ls gene_pred/Ref_Genomes_v2_signalp-4.1/$Organism/$Strain/"$Strain"_final_sp_no_trans_mem.aa)
   SecretedHeaders=$(echo $SecretedProts | sed 's/.aa/_headers.txt/g')
   cat $SecretedProts | grep '>' | tr -d '>' > $SecretedHeaders
   CazyGffSecreted=$OutDir/"$Strain"_CAZY_secreted.gff
@@ -623,11 +588,13 @@ representing these proteins made.
   cat $CazyGffSecreted | grep -w 'gene' | cut -f9 | tr -d 'ID=' | wc -l
   done
 ```
-N.ditissima - Hg199
+N.ditissima - R0905
 number of CAZY genes identified:
-754
+732
 number of Secreted CAZY genes identified:
-293
+281
+
+This are the results of the previous genome (CSAR).
 N.ditissima - R0905
 number of CAZY genes identified:
 738
@@ -642,10 +609,10 @@ number of Secreted CAZY genes identified:
 cd /data/scratch/gomeza
 dbFasta=$(ls /home/groups/harrisonlab/phibase/v4.5/phi_accessions.fa)
 dbType="prot"
-QueryFasta=$(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/Hg199/final/final_genes_appended_renamed.cdna.fasta)
-Prefix="Hg199_phi_accessions"
+QueryFasta=$(ls gene_pred/codingquary/Ref_Genomes_v2/N.ditissima/R0905/final/final_genes_appended_renamed.cdna.fasta)
+Prefix="R0905_phi_accessions"
 Eval="1e-30"
-OutDir=analysis/blast_homology/Ref_Genomes/N.ditissima/Hg199
+OutDir=analysis/blast_homology/Ref_Genomes_v2/N.ditissima/R0905
 mkdir -p $OutDir
 
 
@@ -656,24 +623,16 @@ makeblastdb -in $dbFasta -input_type fasta -dbtype $dbType -title $Prefix.db -pa
  #-------------------------------------------------------
  # 		Step 2.		Blast Search
  #-------------------------------------------------------
- blastx -num_threads 4 -db $OutDir/$Prefix.db -query $QueryFasta -outfmt 6 -num_alignments 1 -out $OutDir/${Prefix}_hits.txt -evalue $Eval
+blastx -num_threads 4 -db $OutDir/$Prefix.db -query $QueryFasta -outfmt 6 -num_alignments 1 -out $OutDir/${Prefix}_hits.txt -evalue $Eval
  #-------------------------------------------------------
  # 		Step 3.		Summarise hits
  #-------------------------------------------------------
- cat $OutDir/${Prefix}_hits.txt | grep 'effector' | cut -f1,2 | sort | uniq > $OutDir/${Prefix}_hits_headers.txt
-
-
-cd /data/scratch/gomeza
-dbFasta=$(ls /home/groups/harrisonlab/phibase/v4.5/phi_accessions.fa)
-dbType="prot"
-QueryFasta=$(ls gene_pred/codingquary/Ref_Genomes/N.ditissima/R0905/final/final_genes_appended_renamed.cdna.fasta)
-Prefix="R0905_phi_accessions"
-Eval="1e-30"
-OutDir=analysis/blast_homology/Ref_Genomes/N.ditissima/R0905
-mkdir -p $OutDir
-
-#Repeat steps 1,2 and 3.
+cat $OutDir/${Prefix}_hits.txt | grep 'effector' | cut -f1,2 | sort | uniq > $OutDir/${Prefix}_hits_headers.txt
 ```
+
+
+
+
 
 ==================================================================
 # Looking for Transcription Factors
