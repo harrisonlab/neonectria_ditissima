@@ -87,10 +87,21 @@ qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
 done
 ```
 
+```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+for Assembly in $(ls Hg199_miniasm2/racon_10/*10.fasta); do
+OutDir=$(dirname $Assembly)
+$ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/Hg199_racon10_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+done
+rm tmp.txt
+```
+
 ## Assembly correction using nanopolish
 
 ```bash
-Assembly=$(ls Hg199_miniasm2/racon_10/*10.fasta)
+screen -a
+
+Assembly=$(ls Hg199_miniasm2/racon_10/Hg199_racon10_renamed.fasta)
 Strain=Hg199
 Organism=N.ditissima
 echo "$Organism - $Strain"
@@ -100,14 +111,16 @@ mkdir -p $ReadDir
 # Event information would have been used from all of the runs, however MinKnow doesnt
 # produce event-level information and therefore just the albacore data was used.
 ReadsFq1=$(ls /home/groups/harrisonlab/project_files/neonectria_ditissima/raw_dna/minion/N.ditissima/Hg199/Hg199_fastq_allfiles.fastq.gz)
-#ReadsFq2=$(ls raw_dna/minion/fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz)
-#ReadsFq1=$(ls raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/fastq_runid_298a8dbc00c3db453901232f1ad01b11fd094980_pass.fastq.gz)
-#ReadsFq2=$(ls raw_dna/minion/N.ditissima/Hg199/25-10-17/rebasecalled/pass/fastq_runid_5832f037a56936787d17e66d1e3b8ac05572199f_pass.fastq.gz)
 cat $ReadsFq1 | gunzip -cf > $ReadDir/"$Strain"_concatenated_reads.fastq
 /home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish/nanopolish_remove_dup_reads.py --fastq $ReadDir/"$Strain"_concatenated_reads.fastq --out $ReadDir/"$Strain"_concatenated_reads_filtered.fastq
 Fast5Dir1=$(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/raw_dna/minion/N.ditissima/Hg199/03-12-17/rebasecalled/pass/Nd_Hg199_20171203)
 Fast5Dir2=$(ls -d /home/groups/harrisonlab/project_files/neonectria_ditissima/raw_dna/minion/N.ditissima/Hg199/25-10-17/rebasecalled/pass/Nd_Hg199_20171025)
 nanopolish index -d $Fast5Dir1 -d $Fast5Dir2 $ReadDir/"$Strain"_concatenated_reads_filtered.fastq
+
+Assembly=$(ls Hg199_miniasm2/racon_10/Hg199_racon10_renamed.fasta)
+Strain=Hg199
+Organism=N.ditissima
+ReadDir=raw_dna/nanopolish2/$Organism/$Strain
 OutDir=$(dirname $Assembly)
 mkdir -p $OutDir
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
@@ -127,7 +140,7 @@ echo "$Organism - $Strain"
 OutDir=$(dirname $Assembly)
 RawReads=$(ls raw_dna/nanopolish2/$Organism/$Strain/"$Strain"_concatenated_reads_filtered.fastq)
 AlignedReads=$(ls $OutDir/nanopolish/reads.sorted.bam)
-NanoPolishDir=/home/gomeza/prog/nanopolish/scripts
+NanoPolishDir=/home/armita/prog/nanopolish/scripts
 python $NanoPolishDir/nanopolish_makerange.py $Assembly > $OutDir/nanopolish/nanopolish_range.txt
 Ploidy=1
 echo "nanopolish log:" > nanopolish_log.txt
