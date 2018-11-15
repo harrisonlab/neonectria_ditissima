@@ -133,14 +133,14 @@ Split the assembly into 50Kb fragments and submit each to the cluster for nanopo
 ```bash
 screen -a
 
-Assembly=$(ls Hg199_miniasm2/racon_10/*10.fasta)
+Assembly=$(ls Hg199_miniasm2/racon_10/Hg199_racon10_renamed.fasta)
 Strain=Hg199
 Organism=N.ditissima
 echo "$Organism - $Strain"
 OutDir=$(dirname $Assembly)
 RawReads=$(ls raw_dna/nanopolish2/$Organism/$Strain/"$Strain"_concatenated_reads_filtered.fastq)
 AlignedReads=$(ls $OutDir/nanopolish/reads.sorted.bam)
-NanoPolishDir=/home/armita/prog/nanopolish/scripts
+NanoPolishDir=/home/gomeza/prog/nanopolish/scripts
 python $NanoPolishDir/nanopolish_makerange.py $Assembly > $OutDir/nanopolish/nanopolish_range.txt
 Ploidy=1
 echo "nanopolish log:" > nanopolish_log.txt
@@ -158,7 +158,8 @@ ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $RawReads $AlignedReads $Ploidy $Region $OutDir/$Region
 done
 ```
-
+ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
+qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $ReadsFq $AlignedReads $Ploidy $Region $OutDir/$Region
 
 
 
