@@ -17,7 +17,7 @@ The next 2 steps were done in the first assembly of the minion data, but repeate
     qsub $ProgDir/sub_porechop.sh $RawReads $OutDir
 ```
 
-#### Read correction using Canu
+#### Read correction using Canu (no needed with racon)
 
 ```bash
   for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199_2ndround/*allfiles_trim.fastq.gz); do
@@ -29,7 +29,7 @@ The next 2 steps were done in the first assembly of the minion data, but repeate
   done
 ```
 
-#### Assembly
+#### Assembly of corrected reads
 
 ```bash
 # If reads have same names or same part splited by space, fix them using rename.sh from bbtools.
@@ -96,7 +96,7 @@ done
 rm tmp.txt
 ```
 
-## Assembly correction using nanopolish
+## Assembly correction using nanopolish (NOT DONE)
 
 ```bash
 screen -a
@@ -160,9 +160,6 @@ done
 ```
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/nanopolish
 qsub $ProgDir/sub_nanopolish_variants.sh $Assembly $ReadsFq $AlignedReads $Ploidy $Region $OutDir/$Region
-
-
-
 
 
 ```bash

@@ -93,16 +93,6 @@ R09/05 - I will test different assembly methods. Canu in 2 steps and in 1 step.
 ```
 
 ```bash
-  for CorrectedReads in $(ls assembly/canu_minion/N.d*/Hg199/*.trimmedReads.fasta.gz); do
-    Organism=$(echo $CorrectedReads | rev | cut -f3 -d '/' | rev)
-    Strain=$(echo $CorrectedReads | rev | cut -f2 -d '/' | rev)
-    OutDir=assembly/canu_pacbio/N.ditissima/"$Strain"
-    ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/canu
-    qsub $ProgDir/sub_canu_assembly_only.sh $CorrectedReads 45m $Strain $OutDir
-  done
-```
-
-```bash
 ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
 for Assembly in $(ls assembly/canu_pacbio/N.ditissima/R0905/R0905.contigs.fasta); do
   Strain=$(echo $Assembly | rev | cut -f2 -d '/' | rev)
@@ -780,3 +770,31 @@ $ProgDir/annotate_telomeres.py --fasta $Assembly --out $OutDir/telomere_hits
 done
 cat $OutDir/telomere_hits.txt | sort -nr -k5 | less
 ```
+
+
+
+
+
+
+
+
+
+#### Assembly of uncorrected reads. Racon required after.
+
+```bash
+# If reads have same names or same part splited by space, fix them using rename.sh from bbtools.
+# This can only be done in blacklace11, since it needs a specific library for blasr.
+ssh blacklace11.blacklace
+/home/gomeza/prog/bbtools/bbmap/rename.sh in=concatenated_pacbio.fastq out=trimmed_renamed.fasta prefix=Hg199
+
+# Fast all-against-all overlap of raw reads
+# Overlap for MinION reads (or use "-x ava-pb" for Pacbio read overlapping)
+/home/gomeza/prog/minimap2/minimap2 -x ava-ont -t8 trimmed_renamed.fasta trimmed_renamed.fasta | gzip -1 > Hg199_fastq_allfiles.paf.gz
+
+# Concatenate pieces of read sequences to generate the final sequences.
+# Thus the per-base error rate is similar to the raw input reads. Make sure you correct your reads.
+# Layout
+/home/gomeza/prog/minimap2/minimap2 -x ava-ont -t8 trimmed_renamed.fasta trimmed_renamed.fasta | gzip -1 > Hg199_fastq_allfiles.paf.gz
+
+# Convert gfa file to fasta file.
+awk '/^S/{print ">"$2"\n"$3}' reads.gfa | fold > Hg199_miniasm.fa
