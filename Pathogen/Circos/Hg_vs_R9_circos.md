@@ -238,14 +238,25 @@ ls $OutDir/Hg_vs_R9_circos.png
 #6th Method.
 
 ```bash
+ProgDir=/home/gomeza/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/remove_contaminants
+touch tmp.txt
+for Assembly in $(ls /home/gomeza/NewCircos/R0905/R0905.fna ); do
+OutDir=$(dirname $Assembly)
+$ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/R0905_CSAR_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+done
+rm tmp.txt
+```
+
+
+```bash
 OutDir=analysis/circos/Hg_vs_R9_fus
 mkdir -p $OutDir
 ProgDir=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Pathogen/Circos
 
-Hg199_genome=$(ls vsNh/Hg199_contigs_renamed.fasta)
+Hg199_genome=$(ls NewCircos/Hg199_CSAR_renamed.fasta)
 $ProgDir/fasta2circos.py --genome $Hg199_genome --contig_prefix "Hg_" > $OutDir/Hg199_genome.txt
 
-R0905_genome=$(ls vsNh/R09_contigs_renamed.fasta)
+R0905_genome=$(ls NewCircos/R0905_CSAR_renamed.fasta)
 $ProgDir/fasta2circos.py --genome $R0905_genome --contig_prefix "R9_" > $OutDir/R0905_genome.txt
 
 cat $OutDir/Hg199_genome.txt > $OutDir/Hg199_R0905_genome.txt
