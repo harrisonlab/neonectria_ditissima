@@ -212,15 +212,15 @@ qsub -R y $scripts/execute_structure2.sh Hg199_contigs_unmasked_filtered_noNMaj_
 
 #Analyze STRUCTURE output
 # Generate a folder containing all STRUCTURE output files for all K analyzed
-mkdir structureHarvester
+mkdir structureHarvester2
 for d in $PWD/*
 do
-mv $d/*_f $PWD/structureHarvester
+mv $d/*_f $PWD/structureHarvester2
 done
 
 # structureHarvester - summarise the results
 harvester=/home/sobczm/bin/structureHarvester/structureHarvester.py
-$harvester --dir=structure_analysis/ori_test/structureHarvester --out=structure_analysis/ori_test/structureHarvester --evanno --clumpp
+$harvester --dir=structureHarvester2 --out=structureHarvester2 --evanno --clumpp
 
 # CLUMPP - permute the results
 cd structure_analysis/structureHarvester
@@ -241,7 +241,7 @@ mv paramfile_ind paramfile
 c=27
 r=5
 s=1
-f=5
+f=8
 for i in $(seq $s $f) #input range of K values tested
 do
 $clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.indivq -k $i -c $c -r $r
@@ -249,6 +249,7 @@ done
 
 cp $clumpp/paramfile_pop ./
 mv paramfile_pop paramfile
+c=8
 for i in $(seq $s $f) #input range of K values tested
 do
 $clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.popq -k $i -c $c -r $r
@@ -258,7 +259,7 @@ done
 ###!!!! Options to be changed in each analysis manually
 #-M number of populations assigned in the Structure input file
 #-N number of individuals
-m=27
+m=8
 n=27
 #-K K value
 #-p input file (population q's)
