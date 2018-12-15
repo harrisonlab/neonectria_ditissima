@@ -358,23 +358,20 @@ qsub -R y $scripts/execute_structure2.sh R0905_isolates_filtered.recode_subsampl
 qsub -R y $scripts/execute_structure2.sh R0905_isolates_filtered.recode_subsampled_ori.struc 1 7 5
 qsub -R y $scripts/execute_structure2.sh R0905_isolates_filtered.recode_subsampled_ori.struc 1 8 5
 
-
-
-
 #Analyze STRUCTURE output
 # Generate a folder containing all STRUCTURE output files for all K analyzed
-mkdir structureHarvester2
+mkdir structureHarvester
 for d in $PWD/*
 do
-mv $d/*_f $PWD/structureHarvester2
+mv $d/*_f $PWD/structureHarvester
 done
 
 # structureHarvester - summarise the results
 harvester=/home/sobczm/bin/structureHarvester/structureHarvester.py
-$harvester --dir=structureHarvester2 --out=structureHarvester2 --evanno --clumpp
+$harvester --dir=structureHarvester --out=structureHarvester --evanno --clumpp
 
 # CLUMPP - permute the results
-cd structure_analysis/structureHarvester
+cd structureHarvester
 clumpp=/home/sobczm/bin/CLUMPP_Linux64.1.1.2
 cp $clumpp/paramfile_ind ./
 mv paramfile_ind paramfile
@@ -389,7 +386,7 @@ mv paramfile_ind paramfile
 #r: number of replicate runs
 #s: minimum number of population clusters (K) tested
 #f: maximum number of population clusters (K) tested
-c=27
+c=26
 r=5
 s=1
 f=8
@@ -411,7 +408,7 @@ done
 #-M number of populations assigned in the Structure input file
 #-N number of individuals
 m=8
-n=27
+n=26
 #-K K value
 #-p input file (population q's)
 #-i input file (individual q's)

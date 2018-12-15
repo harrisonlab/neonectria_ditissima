@@ -320,14 +320,6 @@ done
 ```
 
 
-
-
-
-
-
-
-
-
 ###Convert from VCF to Plink's PED format
 
 ```bash
@@ -337,3 +329,63 @@ cp ../popgen/SNP_calling3/Hg199_contigs_unmasked_filtered.recode_annotated.vcf  
 input_file=Hg199_contigs_unmasked_filtered.recode_annotated.vcf
 #plink --allow-extra-chr --const-fid 0 --vcf $input_file --recode --make-bed --out ${input_file%.vcf} > ${input_file%.vcf}.log
 plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input_file --make-bed --recode --out ${input_file%.vcf} > ${input_file%.vcf}.log
+```
+
+
+#Evaluation of population structure using fastStructure
+
+R0905 genome used as reference. This uses only biallelic SNP sites
+
+###Set up initial variables
+
+```bash
+input=/data/scratch/gomeza/analysis/fastStructure/R0905
+scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
+```
+##### Remove outgroup. Create a cut-down VCF and filter it
+
+```bash
+cd $input
+mkdir logistic_prior/
+mkdir default
+cd default/
+#Outgroup and low coverage sequenced isolates were removed and non informative SNPs were filtered. This was done in the structure script.
+cp ../../../structure/R0905/R0905_isolates_filtered.recode_subsampled.vcf ./
+
+#vcflib=/home/sobczm/bin/vcflib/bin
+#$vcflib/vcfremovesamples Hg199_contigs_unmasked_filtered.recode_annotated.vcf NMaj > Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.vcf
+#vcftools=/home/sobczm/bin/vcftools/bin
+#$vcftools/vcftools --vcf Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.vcf  --max-missing 0.95 --recode --out Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj
+```
+
+###Convert from VCF to Plink's PED format
+
+```bash
+input_file=Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.recode.vcf
+plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input_file --make-bed --recode --out ${input_file%.vcf} > ${input_file%.vcf}.log
+```
+
+####Test various K values (K represents model complexity)
+
+This will run with prior logistic
+
+```bash
+# Set minimum number of considered clusters
+s=1
+# Set maximum number of considered clusters
+f=10
+for i in $(seq $s $f)
+do
+qsub $scripts/sub_fast_structure.sh ${input_file%.vcf} $i
+done
+```
+
+####Choosing model complexity (K) among all the K values tested
+
+```bash
+structure=/home/sobczm/bin/fastStructure
+input_file=N.ditissima_contigs_unmasked_filtered.recode_annotated.vcf
+input_vcf_file=${input_file%.vcf}
+
+python $structure/chooseK.py --input $input_vcf_file > ${input_file%.vcf}_K_choice
+```
