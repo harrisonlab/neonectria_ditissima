@@ -279,7 +279,7 @@ s=1
 f=10
 for i in $(seq $s $f)
 do
-qsub $scripts/sub_fast_structure.sh ${input_file%.vcf} $i --prior logistic
+qsub $scripts/sub_fast_structure.sh ${input_file%.vcf} $i
 done
 ```
 
@@ -361,7 +361,7 @@ cp ../../../structure/R0905/R0905_isolates_filtered.recode_subsampled.vcf ./
 ###Convert from VCF to Plink's PED format
 
 ```bash
-input_file=Hg199_contigs_unmasked_filtered.recode_annotated_noNMaj.recode.vcf
+input_file=R0905_isolates_filtered.recode_subsampled.vcf
 plink --indep-pairwise 100000 1 0.5 --allow-extra-chr --const-fid 0 --vcf $input_file --make-bed --recode --out ${input_file%.vcf} > ${input_file%.vcf}.log
 ```
 
