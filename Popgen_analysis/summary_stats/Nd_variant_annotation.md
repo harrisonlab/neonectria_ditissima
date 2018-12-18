@@ -90,3 +90,94 @@ python $scripts/summary_stats/vcf_to_fasta.py N.ditissima_contigs_unmasked_noR68
 mkdir silent
 mv *.fasta ./silent
 ```
+
+#Analysis of the summary stats section from Maria's github using R0905 as reference
+
+##Copy input for the analysis into a new directory
+
+```bash
+input=analysis/summary_stats
+snpeff=/home/gomeza/prog/snpEff
+scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis
+```
+
+##All individuals
+
+```bash
+cp /data/scratch/gomeza/analysis/popgen/SNP_calling_R0905/R0905_good_contigs_unmasked.vcf $input
+cp /data/scratch/gomeza/analysis/popgen/SNP_calling_R0905/R0905_good_contigs_unmasked_filtered.vcf $input
+cp /data/scratch/gomeza/R0905_good/repeat_masked/filtered_contigs/R0905_good_contigs_unmasked.fa $input
+cp /data/scratch/gomeza/gene_pred/codingquary/Ref_Genomes_v2/N.ditissima/R0905/final/final_genes_appended_renamed.gff3 $input
+cd $input
+```
+
+##Create additional subsets of VCF files with reduced number of individuals
+
+```bash
+vcftools=/home/sobczm/bin/vcftools/bin
+vcflib=/home/sobczm/bin/vcflib/bin
+
+#All N.ditissima
+#First argument: unfiltered input VCF file with all SNPs
+#Subsequent arguments: Sample names of individuals to be removed
+$vcflib/vcfremovesamples R0905_good_contigs_unmasked.vcf NMaj Ag11_B > R0905_good_contigs_unmasked_allNd.vcf
+#Filter the SNPs
+$scripts/snp/vcf_parser_haploid.py --i R0905_good_contigs_unmasked_allNd.vcf
+
+#Check number of SNPs (if you want)
+less R0905_good_contigs_unmasked.vcf | grep  -c -v "^#"
+less R0905_good_contigs_unmasked_allNd.vcf | grep  -c -v "^#"
+less R0905_good_contigs_unmasked_allNd_filtered.vcf | grep  -c -v "^#"
+
+#Remove monomorphic sites (minor allele count minimum 1). Argument --vcf is the filtered VCF file, and --out is the suffix to be used for the output file.
+$vcftools/vcftools --vcf R0905_good_contigs_unmasked_allNd_filtered.vcf --mac 1 --recode --out N.ditissima_contigs_unmasked_allNd_filtered
+
+After filtering, kept 106386 out of a possible 594856 Sites
+
+
+
+
+
+not included yet
+#Only main population
+$vcflib/vcfremovesamples N.ditissima_contigs_unmasked.vcf BGV344 ND8 ND9 OPC304 P112 R68-17 > N.ditissima_contigs_unmasked_NorthWest.vcf
+$scripts/vcf_parser_haploid.py --i N.ditissima_contigs_unmasked_NorthWest.vcf
+$vcftools/vcftools --vcf N.ditissima_contigs_unmasked_NorthWest_filtered.vcf --mac 1 --recode --out N.ditissima_contigs_unmasked_NorthWest_filtered
+```
+
+##Create custom SnpEff genome database
+
+```bash
+cd $input
+$scripts/summary_stats/build_genome_database.sh Hg199_contigs_unmasked.fa final_genes_appended_renamed.gff3 Hg199_Ref
+```
+
+#Annotate VCF files
+
+```bash
+for a in *recode.vcf
+do
+$scripts/summary_stats/annotate_snps_genome.sh $a Hg199_Ref
+done
+```
+```bash
+###Create FASTA alignment files containing only select subsets of SNPs. Required
+### for analyses in the fus_popgenome_analysis.sh script. Here, using option 1 as haploid organism, but for diploid organisms use
+### typically option 2 (for Popgenome analysis) or 3.
+### From now onwards, analysing the dataset without R68.
+cd $input/NoR68
+ref_genome=/data/scratch/gomeza/analysis/summary_stats/N.ditissima_contigs_unmasked.fa
+#All
+python $scripts/summary_stats/vcf_to_fasta.py N.ditissima_contigs_unmasked_noR68_filtered.recode_annotated.vcf $ref_genome 1
+#Moving each subset of FASTA files into a separate dir.
+mkdir all
+mv *.fasta ./all
+##coding
+python $scripts/summary_stats/vcf_to_fasta.py N.ditissima_contigs_unmasked_noR68_filtered.recode_coding.vcf $ref_genome 1
+mkdir coding
+mv *.fasta ./coding
+##silent(four-fold degenerate)
+python $scripts/summary_stats/vcf_to_fasta.py N.ditissima_contigs_unmasked_noR68_filtered.recode_syn_4fd.vcf $ref_genome 1
+mkdir silent
+mv *.fasta ./silent
+```
