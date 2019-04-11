@@ -1,4 +1,4 @@
-#!/home/gomeza/bin/Rscript
+#!/usr/bin/Rscript
 # Written making use of the informative guides at:
 # http://avrilomics.blogspot.co.uk/2015/07/using-topgo-to-test-for-go-term.html
 # http://rstudio-pubs-static.s3.amazonaws.com/6942_3214de070a324533a02c646bbbbfdb78.html
@@ -47,10 +47,8 @@ numSigGenes(GOdata)
 #resultFisher <- runTest(GOdata, algorithm="classic", statistic="fisher")
 resultFisher <- runTest(GOdata, algorithm="weight01", statistic="fisher")
 resultFisher
-allGO = usedGO(object = GOdata)
-allRes <- GenTable(GOdata, classicFisher = resultFisher, orderBy = "resultFisher", ranksOf = "classicFisher", topNodes = length(allGO))
+allRes <- GenTable(GOdata, classicFisher = resultFisher, orderBy = "resultFisher", ranksOf = "classicFisher", topNodes = 10)
 allRes
-write.table(allRes, file = "MF_GO_enrichment.tsv", sep = "\t")
 showSigOfNodes(GOdata, score(resultFisher), firstSigNodes = 10, useInfo ='all')
 out_prefix <- paste(o, "/", "TopGO_MF", sep="")
 printGraph(GOdata, resultFisher, firstSigNodes = 10, fn.prefix = out_prefix, useInfo = "all", pdfSW = TRUE)
@@ -67,10 +65,8 @@ numSigGenes(GOdata)
 #resultFisher <- runTest(GOdata, algorithm="classic", statistic="fisher")
 resultFisher <- runTest(GOdata, algorithm="weight01", statistic="fisher")
 resultFisher
-allGO = usedGO(object = GOdata)
-allRes <- GenTable(GOdata, classicFisher = resultFisher, orderBy = "resultFisher", ranksOf = "classicFisher", topNodes = length(allGO))
+allRes <- GenTable(GOdata, classicFisher = resultFisher, orderBy = "resultFisher", ranksOf = "classicFisher", topNodes = 10)
 allRes
-write.table(allRes, file = "BP_GO_enrichment.tsv", sep = "\t")
 showSigOfNodes(GOdata, score(resultFisher), firstSigNodes = 10, useInfo ='all')
 out_prefix <- paste(o, "/", "TopGO_BP", sep="")
 printGraph(GOdata, resultFisher, firstSigNodes = 10, fn.prefix = out_prefix, useInfo = "all", pdfSW = TRUE)
@@ -87,10 +83,8 @@ numSigGenes(GOdata)
 #resultFisher <- runTest(GOdata, algorithm="classic", statistic="fisher")
 resultFisher <- runTest(GOdata, algorithm="weight01", statistic="fisher")
 resultFisher
-allGO = usedGO(object = GOdata)
-allRes <- GenTable(GOdata, classicFisher = resultFisher, orderBy = "resultFisher", ranksOf = "classicFisher", topNodes = length(allGO))
+allRes <- GenTable(GOdata, classicFisher = resultFisher, orderBy = "resultFisher", ranksOf = "classicFisher", topNodes = 10)
 allRes
-write.table(allRes, file = "CC_GO_enrichment.tsv", sep = "\t")
 showSigOfNodes(GOdata, score(resultFisher), firstSigNodes = 10, useInfo ='all')
 out_prefix <- paste(o, "/", "TopGO_CC", sep="")
 printGraph(GOdata, resultFisher, firstSigNodes = 10, fn.prefix = out_prefix, useInfo = "all", pdfSW = TRUE)

@@ -22,6 +22,10 @@ ap.add_argument('--input_1', required=True, type=str, help='text file of genes \
 GD_t1')
 ap.add_argument('--input_2', required=True, type=str, help='text file of genes \
 GD_t2')
+ap.add_argument('--input_3', required=True, type=str, help='text file of genes \
+M9_t1')
+ap.add_argument('--input_4', required=True, type=str, help='text file of genes \
+M9_t2')
 ap.add_argument('--out_dir', required=True, type=str, help='the tsv file where \
 the count table is output to')
 conf = ap.parse_args()
@@ -49,6 +53,29 @@ with open(conf.input_2) as f2:
         value = float(x.split('\t')[2])
         inp2_dict[gene_name].append(value)
 
+inp3_dict = defaultdict(list)
+with open(conf.input_3) as f3:
+    inp3_lines = f3.readlines()[1:]
+    genes_list = []
+    inp3 = []
+    for x in inp3_lines:
+        genes_list.append(x.split('\t')[0])
+        inp3.append(x.split('\t')[0])
+        gene_name = x.split('\t')[0]
+        value = float(x.split('\t')[2])
+        inp3_dict[gene_name].append(value)
+
+inp4_dict = defaultdict(list)
+with open(conf.input_4) as f4:
+    inp4_lines = f4.readlines()[1:]
+    inp4 = []
+    for x in inp4_lines:
+        genes_list.append(x.split('\t')[0])
+        inp4.append(x.split('\t')[0])
+        gene_name = x.split('\t')[0]
+        value = float(x.split('\t')[2])
+        inp4_dict[gene_name].append(value)
+
 genes = set(genes_list)
 
 # -----------------------------------------------------
@@ -58,7 +85,7 @@ genes = set(genes_list)
 # change the number in the numpy.reshape() command
 # -----------------------------------------------------
 
-a = numpy.array(["Gene_Name", "GD_t1", "GD_t2"])
+a = numpy.array(["Gene_Name", "GD_Proximal", "GD_Distal", "M9_Proximal", "M9_Distal"])
 
 for x in genes:
     to_add = []
@@ -85,10 +112,32 @@ for x in genes:
                 to_add.append('1')
             else:
                 to_add.append('0')
+    try:
+        c = inp3.index(x)
+    except ValueError:
+        to_add.append('0')
+    else:
+        for y in inp3_dict[x]:
+            test = abs(y)
+            if test > 1:
+                to_add.append('1')
+            else:
+                to_add.append('0')
+    try:
+        c = inp4.index(x)
+    except ValueError:
+        to_add.append('0')
+    else:
+        for y in inp4_dict[x]:
+            test = abs(y)
+            if test > 1:
+                to_add.append('1')
+            else:
+                to_add.append('0')
     a = numpy.append(a, to_add, axis=0)
 
 z = len(genes) + 1
-a = numpy.reshape(a, (z, 3))
+a = numpy.reshape(a, (z, 5))
 
 outfile = str(conf.out_dir)
 with open(outfile, "w") as o:
