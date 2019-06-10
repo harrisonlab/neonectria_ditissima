@@ -6,4 +6,5 @@
 
 scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/summary_stats
 
-/home/adamst/prog/R/R-3.2.5/bin/Rscript --vanilla $scripts/calculate_nucleotide_diversity.R
+Rscript --vanilla $scripts/calculate_nucleotide_diversity.R
+#/home/adamst/prog/R/R-3.2.5/bin/Rscript --vanilla $scripts/calculate_nucleotide_diversity.R
