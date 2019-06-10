@@ -203,3 +203,89 @@ do
 done
 ```
 This script isn't happy with the low levels of variation I have. TODO: Investigate other tree methods - Michelle mentioned some possibilities
+
+
+#Remove low coverage samples
+
+```bash
+#Remove outgroup and low-coverage isolates. Create a cut-down VCF and filter it
+#The isolate Ag11_B has a 22X coverage, so it will be removed and new statistics calculated.
+vcflib=/home/sobczm/bin/vcflib/bin
+cd analysis/popgen/SNP_calling_R0905
+mkdir NoAg11_B/
+cp *.vcf NoAg11_B/
+$vcflib/vcfremovesamples R0905_good_contigs_unmasked.vcf Ag11_B > R0905_good_contigs_unmasked_NoAg11B.vcf
+$vcflib/vcfremovesamples R0905_good_contigs_unmasked_filtered.vcf Ag11_B > R0905_good_contigs_unmasked_NoAg11B_filtered.vcf
+```
+
+#General VCF stats (remember that vcftools needs to have the PERL library exported)
+
+```bash
+cd analysis/popgen/SNP_calling_R0905/NoAg11_B
+
+perl /home/sobczm/bin/vcftools/bin/vcf-stats \
+R0905_good_contigs_unmasked_NoAg11B.vcf > R0905_contigs_unmasked_NoAg11B.stat
+perl /home/sobczm/bin/vcftools/bin/vcf-stats \
+R0905_good_contigs_unmasked_NoAg11B_filtered.vcf > R0905_contigs_unmasked_filtered_NoAg11B.stat
+```
+#Calculate the index for percentage of shared SNP alleles between the individuals.
+
+```bash
+for vcf in $(ls R0905_good_contigs_unmasked_NoAg11B_filtered.vcf)
+do
+  scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
+  echo $vcf
+  $scripts/similarity_percentage.py $vcf
+done
+```
+
+#Remove monomorphic sites (minor allele count minimum 1). Argument --vcf is the filtered VCF file, and --out is the suffix to be used for the output file.
+
+```bash
+for vcf in $(ls R0905_good_contigs_unmasked_NoAg11B_filtered.vcf)
+do
+    echo $vcf
+    out=$(basename $vcf .vcf)
+    echo $out
+    $vcftools/vcftools --vcf $vcf --mac 1 --recode --out $out
+done
+
+After filtering, kept 248598 out of a possible 800178 Sites
+```
+
+#Visualise the output as heatmap and clustering dendrogram
+
+```bash
+for log in $(ls *distance.log)
+do
+  scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
+  Rscript --vanilla $scripts/distance_matrix.R $log
+done
+```
+
+#Carry out PCA and plot the results
+
+```bash
+for vcf in $(ls R0905_good_contigs_unmasked_NoAg11B_filtered.vcf)
+do
+    echo $vcf
+    scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
+    out=$(basename $vcf contigs_unmasked_NoAg11B_filtered.vcf)
+    echo $out
+    Rscript --vanilla $scripts/pca.R $vcf $out
+done
+```
+
+
+
+#Calculate an NJ tree based on all the SNPs. Outputs a basic display of the tree, plus a Newick file to be used for displaying the tree in FigTree and beautifying it.
+
+```bash
+  for vcf in $(ls R0905_good_contigs_unmasked_NoAg11B_filtered.vcf)
+  do
+      echo $vcf
+      scripts=/home/gomeza/git_repos/emr_repos/scripts/neonectria_ditissima/Popgen_analysis/snp
+      $scripts/nj_tree.sh $vcf 1
+  done
+```
+This script isn't happy with the low levels of variation I have. TODO: Investigate other tree methods - Michelle mentioned some possibilities
