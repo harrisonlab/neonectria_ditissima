@@ -10,19 +10,14 @@ library(ggplot2)
 ##When using diploid organisms and input FASTA files generated using vcf_to_fasta.py, each sample will be artificially
 ##split into two sequences (<sample_name> + prefix (_1 or _2), for example FOC5_1, FOC5_2), each representing
 ##one haplotype. Both need to be input below.
-ENG <- c("Ag02", "Ag04", "Ag05", "Ag06", "Hg199", "R0905", "R6-17-2","R6-17-3")
-NI <- c("Ag11_A", "Ag11_B", "Ag11")
-IRL <- c("Ag08", "Ag09_A")
-BRA <- c("ND8", "ND9")
-ESP <- c("BGV344", "P112","OPC304")
-BEL <- c("R37-15", "R39-15")
-NL <- c("R41-15", "R42-15","R45-15")
+Pop1 <- c("Ag02", "Ag04", "Ag05", "Ag06", "Ag08", "Ag09_A", "Ag11_A", "Ag11_B", "Ag11_C", "BGV344", "ND8", "ND9", "Hg199", "OPC304", "P112", "R0905", "R37-15", "R39-15", "R41-15", "R42-15", "R45-15", "R6-17-2", "R6-17-3")
+Pop2 <- c("R68-17-C2", "R68-17-C3", "SVK1", "SVK2")
 #In the output for pairwise FST, pop1, pop2 etc. refer to the order in which the populations have been listed here:
-populations <- list(ENG, NI, IRL, BRA, ESP, BEL, NL)
+populations <- list(Pop1,Pop2)
 #Number of populations assigned above.
 population_no <- length(populations)
-pairs <- choose(population_no,1)
-population_names <- c("ENG", "NI", "IRL", "BRA", "ESP", "BEL", "NL") #Given in the same order, as above.
+pairs <- choose(population_no,2)
+population_names <- c("Pop1","Pop2") #Given in the same order, as above.
 #Interval and jump size used in the sliding window analysis
 interval <-  1000
 jump_size <-  interval / 10
