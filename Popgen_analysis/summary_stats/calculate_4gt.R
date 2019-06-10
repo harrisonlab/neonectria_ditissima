@@ -1,23 +1,19 @@
 library("PopGenome")
 library(ggplot2)
 
-ENG <- c("Ag02", "Ag04", "Ag05", "Ag06", "Hg199", "R0905", "R6-17-2","R6-17-3")
-NI <- c("Ag11_A", "Ag11_B", "Ag11")
-IRL <- c("Ag08", "Ag09_A")
-BRA <- c("ND8", "ND9")
-ESP <- c("BGV344", "P112","OPC304")
-BEL <- c("R37-15", "R39-15")
-NL <- c("R41-15", "R42-15","R45-15")
-populations <- list(ENG, NI, IRL, BRA, ESP, BEL, NL)
-population_names <- c("ENG", "NI", "IRL", "BRA", "ESP", "BEL", "NL")
+Nd <- c("Ag02", "Ag04", "Ag05", "Ag06", "Ag08", "Ag09_A", "Ag11_A", "Ag11_B", "Ag11_C", "BGV344", "ND8", "ND9", "Hg199", "OPC304", "P112", "R0905", "R37-15", "R39-15", "R41-15", "R42-15", "R45-15", "R6-17-2", "R6-17-3","R68-17-C2", "R68-17-C3", "SVK1", "SVK2")
+
+populations <- list(Nd)
+population_names <- c(Nd)
 population_no <- length(populations)
-pairs <- choose(population_no, 1)
+pairs <- choose(population_no, 2)
 
 interval <-  10000
 jump_size <-  interval / 10
 
 gff <- "gff"
 all_folders <- list.dirs("contigs", full.names = FALSE)
+
 #Remove the gff folder from PopGenome contig analysis
 contig_folders <- all_folders[all_folders != "gff"]
 
