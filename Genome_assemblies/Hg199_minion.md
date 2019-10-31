@@ -6,9 +6,9 @@ This document details the commands used to assemble and annotate a reference gen
 
 Note - all this work was performed in the directory: /home/groups/harrisonlab/project_files/N.ditissima or /data/scratch/gomeza
 
-##Data management
+## Data management
 
-###First run
+### First run
 
 First MinION run date is 20170717. Data stored in 20170717_1504_Neonectria_Hg199 and 20170717_1452_Neonectria_Hg199
 
@@ -49,7 +49,7 @@ rm -rf *.fastq [0-9]*
 Rob's command to transfer the date from nanopore node to head node.
 Permission needed scp -r ./Neonectria_Hg199_2_0_2 miseq_data@192.168.1.200:/data/seq_data/minion/2017/20171025_Neonectria_Hg199_2_0_2
 
-###Second run
+### Second run
 
 Second MinION run date 20171203. Data stored in 20171203_Hg199.
 
@@ -211,9 +211,9 @@ For Minion data:
 
 Allfiles MinION coverage was: 94.14
 
-#CANU
+# CANU
 
-##Assembly using CANU. Read correction and assembly
+## Assembly using CANU. Read correction and assembly
 
 Read correction using Canu
 
@@ -258,7 +258,7 @@ Read correction using Canu
   done
 ```
 
-##Pilon error correction
+## Pilon error correction
 
 Assemblies were polished using Pilon
 Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
@@ -298,7 +298,7 @@ done
   done
 ```
 
-##Error correction using racon:
+## Error correction using racon:
 
 ```bash
   for Assembly in $(ls assembly_vAG/canu_2step/canu_minion/N.ditissima/Hg199/Hg199.contigs.fasta); do
@@ -335,7 +335,7 @@ done
   done
 ```
 
-##Pilon error correction
+## Pilon error correction
 
 Assemblies were polished using Pilon
 Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
@@ -371,7 +371,7 @@ done
     qsub $ProgDir/sub_busco3.sh $Assembly $BuscoDB $OutDir
   done
 ```
-##Assembly using CANU. Default run.
+## Assembly using CANU. Default run.
 
 ```bash
 	for Reads in $(ls qc_dna/minion/N.ditissima/Hg199_2ndround/*allfiles_trim.fastq.gz); do
@@ -406,7 +406,7 @@ done
   done
 ```
 
-##Error correction using racon: (no need to do this with canu)
+## Error correction using racon: (no need to do this with canu)
 
 ```bash
   for Assembly in $(ls assembly_vAG/canu/N.ditissima/Hg199/Hg199_canu.contigs.fasta); do
@@ -441,7 +441,7 @@ done
   done
 ```
 
-##Pilon error correction (this should be done without racon)
+## Pilon error correction (this should be done without racon)
 
 Assemblies were polished using Pilon
 Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
@@ -510,9 +510,9 @@ done
   done
 ```
 
-#SMARTdenovo
+# SMARTdenovo
 
-##Assembly using SMARTdenovo
+## Assembly using SMARTdenovo
 
 ```bash
   for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199_2ndround/*allfiles_trim.fastq.gz); do
@@ -548,7 +548,7 @@ done
   done
 ```
 
-##Error correction using racon:
+## Error correction using racon:
 
 ```bash
   for Assembly in $(ls assembly_vAG/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
@@ -595,7 +595,7 @@ Quast and busco were run to assess the effects of racon on assembly quality:
   rm tmp.txt
 ```
 
-##Pilon error correction
+## Pilon error correction
 
 Assemblies were polished using Pilon
 Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
@@ -635,9 +635,9 @@ Quast and busco were run to assess the effects of racon on assembly quality:
   done
 ```
 
-#Miniasm
+# Miniasm
 
-##Assembly of uncorrected reads. Racon required after.
+## Assembly of uncorrected reads. Racon required after.
 
 ```bash
 # If reads have same names or same part splitted by space, fix them using rename.sh from bbtools.
@@ -778,13 +778,13 @@ Quast and busco were run to assess the effects of racon on assembly quality:
   done
 ```
 
-#Merging MinION and hybrid assemblies
+# Merging MinION and hybrid assemblies
 
 Note - the anchor length is the starting point for contigs to be merged - only contigs larger than these will be extended.
 
 Note- The Python wrapper was written for MUMmer version 3.x command line. Hash out version 4 from profile while this is run.
 
-###Canu
+### Canu
 
 ```bash
   for MinIONAssembly in $(ls assembly_vAG/canu/N.ditissima/Hg199/pilon/pilon_10.fasta); do
@@ -803,7 +803,7 @@ Note- The Python wrapper was written for MUMmer version 3.x command line. Hash o
   done
 ```
 
-###Miniasm
+### Miniasm
 
 ```bash
   for MinIONAssembly in $(ls assembly_vAG/miniasm/N.ditissima/Hg199/racon_10/pilon/Hg199_pilon10_renamed.fasta); do
@@ -841,7 +841,7 @@ Note- The Python wrapper was written for MUMmer version 3.x command line. Hash o
   done
 ```
 
-##Quast and busco were run to assess the quality of hybrid assemblies:
+## Quast and busco were run to assess the quality of hybrid assemblies:
 
 ```bash
   ProgDir=/home/armita/git_repos/emr_repos/tools/seq_tools/assemblers/assembly_qc/quast
@@ -865,7 +865,7 @@ Note- The Python wrapper was written for MUMmer version 3.x command line. Hash o
   done
 ```
 
-##Pilon error correction
+## Pilon error correction
 
 Assemblies were polished using Pilon
 Note: qsub -R y 'Book blacklace11 avoiding more job in this node. Pilon requires a lot of memory'
@@ -902,7 +902,7 @@ Quast and busco were run to assess the quality of hybrid assemblies:
   done
 ```
 
-##Repeat masking. Best assembly for further analysis.
+## Repeat masking. Best assembly for further analysis.
 
 Contigs were renamed in accordance with ncbi recomendations.
 
