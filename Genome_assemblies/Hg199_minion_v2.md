@@ -9,18 +9,17 @@ Genome assembly of minion reads using new assemblers
 
 ```bash
     # This work imply testing new tools, so it will be performed in the gomez_WD folder
-    for TrimReads in $(ls ../qc_dna/minion/N.ditissima/Hg199/Hg199_fastq_allfiles_trim.fastq.gz); do
-        Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
-        Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev) 
+    for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199_2ndround/Hg199_fastq_allfiles_trim.fastq.gz); do
+        Organism=N.ditissima
+        Strain=Hg199
         Prefix="$Strain"_flye
         TypeSeq=nanoraw
-        OutDir=assembly/flye/$Organism/$Strain
+        OutDir=assembly_VP/flye/$Organism/$Strain
         mkdir -p $OutDir
         Size=45m
         ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
         sbatch $ProgDir/flye.sh $TrimReads $Prefix $OutDir $Size $TypeSeq
     done
-  done
 ```
 ```bash
     for Assembly in $(ls assembly/flye/N.ditissima/Hg199/assembly.fasta); do
@@ -32,12 +31,12 @@ Genome assembly of minion reads using new assemblers
 ```
 ```bash
     # This work imply testing new tools, so it will be performed in the gomez_WD folder
-    for TrimReads in $(ls ../qc_dna/minion/N.ditissima/Hg199/Hg199_fastq_allfiles_trim.fastq.gz); do
-        Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
-        Strain=$(echo $TrimReads | rev | cut -f2 -d '/' | rev) 
+    for TrimReads in $(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
+        Organism=$(echo $TrimReads | rev | cut -f4 -d '/' | rev)
+        Strain=$(echo $TrimReads | rev | cut -f3 -d '/' | rev) 
         Prefix="$Strain"_flye
-        TypeSeq=nanocorrected
-        OutDir=assembly/flye_corrected/$Organism/$Strain
+        TypeSeq=pacbioraw
+        OutDir=assembly_VP/flye/$Organism/$Strain
         mkdir -p $OutDir
         Size=45m
         ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
@@ -52,6 +51,127 @@ Genome assembly of minion reads using new assemblers
         sbatch $ProgDir/busco.sh $Assembly $BuscoDB $OutDir
     done
 ```
+
+### SMARTdenovo
+
+```bash
+  for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199_2ndround/Hg199_fastq_allfiles_trim.fastq.gz); do
+    Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+    Strain=Hg199
+    Prefix="$Strain"_smartdenovo
+    OutDir=assembly_VP/SMARTdenovo/$Organism/$Strain
+    mkdir -p $OutDir
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/SMARTdenovo.sh $TrimReads $Prefix $OutDir
+  done
+```
+
+```bash
+  for TrimReads in $(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
+    Organism=$(echo $TrimReads | rev | cut -f4 -d '/' | rev)
+    Strain=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+    Prefix="$Strain"_smartdenovo
+    OutDir=assembly_VP/SMARTdenovo/$Organism/$Strain
+    mkdir -p $OutDir
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/SMARTdenovo.sh $TrimReads $Prefix $OutDir
+  done
+```
+
+### Miniasm
+
+
+```bash
+  for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199_2ndround/Hg199_fastq_allfiles_trim.fastq.gz); do
+    Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev) 
+    Strain=Hg199
+    Prefix="$Strain"_miniasm
+    OutDir=assembly_VP/miniasm/$Organism/$Strain
+    mkdir -p $OutDir
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch -p himem $ProgDir/miniasm.sh $TrimReads $Prefix $OutDir
+  done
+```
+
+```bash
+  for TrimReads in $(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
+    Organism=$(echo $TrimReads | rev | cut -f4 -d '/' | rev) 
+    Strain=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+    Prefix="$Strain"_miniasm
+    OutDir=assembly_VP/miniasm/$Organism/$Strain
+    mkdir -p $OutDir
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch -p himem $ProgDir/miniasm.sh $TrimReads $Prefix $OutDir
+  done
+```
+
+### Canu
+
+
+```bash
+for TrimReads in $(ls qc_dna/minion/N.ditissima/Hg199_2ndround/Hg199_fastq_allfiles_trim.fastq.gz); do
+Organism=$(echo $TrimReads | rev | cut -f3 -d '/' | rev) 
+Strain=Hg199
+Size=45m
+Prefix="$Strain"_canu
+type=nanopore
+OutDir=assembly_VP/canu/$Organism/$Strain
+mkdir -p $OutDir
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+sbatch -p long $ProgDir/canu.sh $TrimReads $Size $Prefix $type $OutDir
+done
+```
+
+```bash
+for TrimReads in $(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq); do
+Organism=$(echo $TrimReads | rev | cut -f4 -d '/' | rev) 
+Strain=$(echo $TrimReads | rev | cut -f3 -d '/' | rev)
+Size=45m
+Prefix="$Strain"_canu
+type=pacbio
+OutDir=assembly_VP/canu/$Organism/$Strain
+mkdir -p $OutDir
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+sbatch -p himem $ProgDir/canu.sh $TrimReads $Size $Prefix $type $OutDir
+done
+```
+
+
+
+
+#### Error correction using racon:
+
+```bash
+  for Assembly in $(ls assembly_VP/miniasm/N.ditissima/Hg199/Hg199_miniasm.fa); do
+    Strain=Hg199
+    Organism=N.ditissima
+    echo "$Organism - $Strain"
+    ReadsFq=$(ls qc_dna/minion/N.ditissima/*round/*allfiles_trim.fastq.gz)
+    Iterations=10
+    OutDir=$(dirname $Assembly)"/racon_$Iterations"
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/racon.sh $Assembly $ReadsFq $Iterations $OutDir
+  done
+```
+
+```bash
+  for Assembly in $(ls assembly_VP/miniasm/N.ditissima/R0905/*_miniasm.fa); do
+    Strain=R0905
+    Organism=N.ditissima
+    echo "$Organism - $Strain"
+    ReadsFq=$(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq)
+    Iterations=10
+    OutDir=$(dirname $Assembly)"/racon_$Iterations"
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/racon2.sh $Assembly $ReadsFq $Iterations $OutDir
+  done
+```
+
+
+
+
+
+
 
 ## Medaka 
 
@@ -151,17 +271,3 @@ conda activate medaka
 
 
 
-
-```bash
-        # This work imply testing new tools, so it will be performed in the gomez_WD folder
-    for TrimReads in $(ls FAL_trim.fastq); do
-    Strain=race_1
-    Prefix="$Strain"_flye
-    TypeSeq=nanoraw
-    OutDir=assembly/flye_Akin/$Strain
-    mkdir -p $OutDir
-    Size=60m
-    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
-    sbatch $ProgDir/flye.sh $TrimReads $Prefix $OutDir $Size $TypeSeq
-    done
-```
