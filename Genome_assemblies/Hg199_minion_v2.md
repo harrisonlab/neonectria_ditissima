@@ -43,6 +43,17 @@ Genome assembly of minion reads using new assemblers
         sbatch $ProgDir/flye.sh $TrimReads $Prefix $OutDir $Size $TypeSeq
     done
 ```
+
+
+```bash
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+for Assembly in $(ls assembly_VP/flye/*/*/assembly.fasta); do
+OutDir=$(dirname $Assembly)
+sbatch $ProgDir/quast.sh $Assembly $OutDir
+done
+```
+
+
 ```bash
     for Assembly in $(ls assembly/flye_corrected/N.ditissima/Hg199/assembly.fasta); do
         ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
@@ -166,6 +177,63 @@ done
     sbatch $ProgDir/racon2.sh $Assembly $ReadsFq $Iterations $OutDir
   done
 ```
+
+```bash
+  for Assembly in $(ls assembly_VP/SMARTdenovo/N.ditissima/Hg199/Hg199_smartdenovo.dmo.lay.utg); do
+    Strain=Hg199
+    Organism=N.ditissima
+    echo "$Organism - $Strain"
+    ReadsFq=$(ls qc_dna/minion/N.ditissima/*round/*allfiles_trim.fastq.gz)
+    Iterations=10
+    OutDir=$(dirname $Assembly)"/racon_$Iterations"
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/racon.sh $Assembly $ReadsFq $Iterations $OutDir
+  done
+```
+
+```bash
+  for Assembly in $(ls assembly_VP/SMARTdenovo/N.ditissima/R0905/R0905_smartdenovo.dmo.lay.utg); do
+    Strain=R0905
+    Organism=N.ditissima
+    echo "$Organism - $Strain"
+    ReadsFq=$(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq)
+    Iterations=10
+    OutDir=$(dirname $Assembly)"/racon_$Iterations"
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/racon2.sh $Assembly $ReadsFq $Iterations $OutDir
+  done
+```
+```bash
+  for Assembly in $(ls assembly_VP/flye/N.ditissima/Hg199/assembly.fasta); do
+    Strain=Hg199
+    Organism=N.ditissima
+    echo "$Organism - $Strain"
+    ReadsFq=$(ls qc_dna/minion/N.ditissima/*round/*allfiles_trim.fastq.gz)
+    Iterations=10
+    OutDir=$(dirname $Assembly)"/racon_$Iterations"
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/racon.sh $Assembly $ReadsFq $Iterations $OutDir
+  done
+```
+
+```bash
+  for Assembly in $(ls assembly_VP/flye/N.ditissima/R0905/assembly.fasta); do
+    Strain=R0905
+    Organism=N.ditissima
+    echo "$Organism - $Strain"
+    ReadsFq=$(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq)
+    Iterations=10
+    OutDir=$(dirname $Assembly)"/racon_$Iterations"
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/racon2.sh $Assembly $ReadsFq $Iterations $OutDir
+  done
+```
+
+
+
+
+
+
 
 
 
