@@ -230,28 +230,85 @@ done
 ```
 
 
+## Quast and BUSCO 
 
+```bash
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+  for Assembly in $(ls assembly_VP/flye/N.ditissima/*/racon_10/*_racon_round_10.fasta); do
+  OutDir=$(dirname $Assembly)
+  sbatch $ProgDir/quast.sh $Assembly $OutDir
+  done
+```
 
+```bash
+  for Assembly in $(ls assembly_VP/miniasm/N.ditissima/*/racon_10/*_racon_round_10.fasta); do
+      ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+      BuscoDB=$(ls -d /projects/dbBusco/sordariomycetes_odb10)
+      OutDir=$(dirname $Assembly)/busco_sordariomycetes_obd10
+      sbatch $ProgDir/busco.sh $Assembly $BuscoDB $OutDir
+  done
+```
 
+```bash
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+  for Assembly in $(ls assembly_VP/canu/N.ditissima/*/*_canu.contigs.fasta); do
+  OutDir=$(dirname $Assembly)
+  sbatch $ProgDir/quast.sh $Assembly $OutDir
+  done
+```
 
+```bash
+  for Assembly in $(ls assembly_VP/canu/N.ditissima/*/*_canu.contigs.fasta); do
+      ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+      BuscoDB=$(ls -d /projects/dbBusco/sordariomycetes_odb10)
+      OutDir=$(dirname $Assembly)/busco_sordariomycetes_obd10
+      sbatch -p long $ProgDir/busco.sh $Assembly $BuscoDB $OutDir
+  done
+```
 
-
-
-
-
-
-
-## Medaka 
+## Medaka post racon
 
 ```bash
 conda activate medaka
-  for Assembly in $(ls assembly/fly*/N.ditissima/Hg199/assembly.fasta); do
-    ReadsFq=$(ls ../qc_dna/minion/N.ditissima/Hg199/Hg199_fastq_allfiles_trim.fastq.gz)
+  for Assembly in $(ls assembly_VP/flye/N.ditissima/Hg199/racon_10/*_racon_round_10.fasta); do
+    ReadsFq=$(ls qc_dna/minion/N.ditissima/*round/*allfiles_trim.fastq.gz)
     OutDir=$(dirname $Assembly)/medaka
     ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
     sbatch $ProgDir/medaka.sh $Assembly $ReadsFq $OutDir
   done
 ```
+
+```bash
+conda activate medaka
+  for Assembly in $(ls assembly_VP/flye/N.ditissima/R0905/racon_10/*_racon_round_10.fasta); do
+    ReadsFq=$(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq)
+    OutDir=$(dirname $Assembly)/medaka
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/medaka.sh $Assembly $ReadsFq $OutDir
+  done
+```
+```bash
+conda activate medaka
+  for Assembly in $(ls assembly_VP/canu/N.ditissima/Hg199/*_canu.contigs.fasta); do
+    ReadsFq=$(ls qc_dna/minion/N.ditissima/*round/*allfiles_trim.fastq.gz)
+    OutDir=$(dirname $Assembly)/medaka
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/medaka.sh $Assembly $ReadsFq $OutDir
+  done
+
+  for Assembly in $(ls assembly_VP/canu/N.ditissima/R0905/*_canu.contigs.fasta); do
+    ReadsFq=$(ls raw_dna/pacbio/N.ditissima/R0905/extracted/concatenated_pacbio.fastq)
+    OutDir=$(dirname $Assembly)/medaka
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+    sbatch $ProgDir/medaka.sh $Assembly $ReadsFq $OutDir
+  done
+```
+
+
+
+
+
+
 
 ## Busco
 
