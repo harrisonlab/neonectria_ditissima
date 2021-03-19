@@ -43,10 +43,6 @@ done
     done
 ```
 
-
-
-
-
 ## Salmon 
 
 
@@ -71,11 +67,8 @@ cp transcripts_modified3.fasta GDDH13_1-1_geneID.fasta
 ```
 
 ```bash
-    for Transcriptome in $(ls public_genomes/JR2/Verticillium_dahliaejr2.VDAG_JR2v.4.0.cds.all_parsed.fa); do
-        Strain=$(echo $Transcriptome| rev | cut -d '/' -f2 | rev)
-        Organism=V.dahliae
-        echo "$Organism - $Strain"
-        for RNADir in $(ls -d qc_rna/48DD_experiment2020/WT53/*/cleaned/*/*); do
+    for Transcriptome in $(ls apple_genome/GDDH13_1-1_geneID.fasta); do
+      for RNADir in $(ls -d ../../data/scratch/gomeza/qc_rna/N.ditissima/*/t*/cleaned/t*/*); do
             FileNum=$(ls $RNADir/F/*_1_cleaned.fq.gz | wc -l)
             for num in $(seq 1 $FileNum); do
                 printf "\n"
@@ -83,13 +76,13 @@ cp transcripts_modified3.fasta GDDH13_1-1_geneID.fasta
                 FileR=$(ls $RNADir/R/*cleaned.fq.gz | head -n $num | tail -n1)
                 echo $FileF
                 echo $FileR
-                Prefix=$(echo $RNADir | rev | cut -f2 -d '/' | rev)
-                Timepoint=$(echo $RNADir | rev | cut -f1 -d '/' | rev)
+                Prefix=$(echo $RNADir | rev | cut -f5 -d '/' | rev)
+                Timepoint=$(echo $RNADir | rev | cut -f2 -d '/' | rev)
                 Sample_Name=$(echo $FileF | rev | cut -d '/' -f1 | rev | sed 's/_1_cleaned.fq.gz//g')
                 echo "$Prefix"
                 echo "$Timepoint"
                 echo "$Sample_Name"
-                OutDir=alignment/salmon/48DD_experiment/$Organism/$Strain/$Prefix/$Timepoint/$Sample_Name
+                OutDir=alignment/salmon_VP/Malus/$Prefix/$Timepoint/$Sample_Name
                 ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/RNAseq_analysis
                 sbatch -p himem $ProgDir/salmon.sh $Transcriptome $FileF $FileR $OutDir
             done
