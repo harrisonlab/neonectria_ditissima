@@ -20,16 +20,10 @@ FileNum=$(ls $RNADir/F/*_1.fq.gz | wc -l)
     done
 done
 ```
-
-
-
-
-
-
 ## Decontamination of rRNA reads in RNAseq data
 
 ```bash
-    for RNADir in $(ls -d qc_rna/48DD_experiment2020/WT53/*); do
+    for RNADir in $(ls -d qc_rna/N.ditissima/*/*); do
     FileNum=$(ls $RNADir/F/*_1_trim.fq.gz | wc -l)
         for num in $(seq 1 $FileNum); do
             printf "\n"
@@ -48,6 +42,10 @@ done
         done
     done
 ```
+
+
+
+
 
 ## Salmon 
 
