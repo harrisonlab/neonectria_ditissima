@@ -68,8 +68,8 @@ cp transcripts_modified3.fasta GDDH13_1-1_geneID.fasta
 
 ```bash
     for Transcriptome in $(ls apple_genome/GDDH13_1-1_geneID.fasta); do
-      for RNADir in $(ls -d ../../data/scratch/gomeza/qc_rna/N.ditissima/*/t*/cleaned/t*/*); do
-            FileNum=$(ls $RNADir/F/*_1_cleaned.fq.gz | wc -l)
+        for RNADir in $(ls -d ../../data/scratch/gomeza/qc_rna/N.ditissima/*/t*/cleaned/t*/*); do
+        FileNum=$(ls $RNADir/F/*_1_cleaned.fq.gz | wc -l)
             for num in $(seq 1 $FileNum); do
                 printf "\n"
                 FileF=$(ls $RNADir/F/*cleaned.fq.gz | head -n $num | tail -n1)
@@ -84,11 +84,19 @@ cp transcripts_modified3.fasta GDDH13_1-1_geneID.fasta
                 echo "$Sample_Name"
                 OutDir=alignment/salmon_VP/Malus/$Prefix/$Timepoint/$Sample_Name
                 ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/RNAseq_analysis
-                sbatch -p himem $ProgDir/salmon.sh $Transcriptome $FileF $FileR $OutDir
+                sbatch $ProgDir/salmon.sh $Transcriptome $FileF $FileR $OutDir
             done
         done
     done
 ```
+
+
+
+
+
+
+
+
 
 Convert Salmon quasi-quanitifcations to gene counts using an awk script:
 
