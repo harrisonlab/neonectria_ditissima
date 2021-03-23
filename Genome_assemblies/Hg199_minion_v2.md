@@ -362,7 +362,7 @@ conda activate medaka
     OutDir=$(dirname $Assembly)/pilon
     Iterations=10
     ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers/pilon
-    sbatch $ProgDir/pilon_1_lib.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+    sbatch -p himem $ProgDir/pilon_1_lib.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
   done
 
   for Assembly in $(ls assembly_VP/canu/N.ditissima/R0905/medaka/medaka/consensus.fasta); do
