@@ -391,7 +391,37 @@ conda activate medaka
   done
 ```
 
+## Quast and Busco
 
+```bash
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+  for Assembly in $(ls assembly_VP/*/N.ditissima/*/racon_10/medaka/medaka/pilon/pilon_10.fasta); do
+      OutDir=$(dirname $Assembly)
+      sbatch $ProgDir/quast.sh $Assembly $OutDir
+  done
+
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+  for Assembly in $(ls assembly_VP/canu/N.ditissima/*/medaka/medaka/pilon/pilon_10.fasta); do
+    OutDir=$(dirname $Assembly)
+    sbatch $ProgDir/quast.sh $Assembly $OutDir
+  done
+```
+
+```bash
+  for Assembly in $(ls assembly_VP/*/N.ditissima/*/racon_10/medaka/medaka/pilon/pilon_10.fasta); do
+      ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+      BuscoDB=$(ls -d /projects/dbBusco/sordariomycetes_odb10)
+      OutDir=$(dirname $Assembly)/busco_sordariomycetes_obd10
+      sbatch $ProgDir/busco.sh $Assembly $BuscoDB $OutDir
+  done
+
+   for Assembly in $(ls assembly_VP/canu/N.ditissima/*/medaka/medaka/pilon/pilon_10.fasta); do
+      ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+      BuscoDB=$(ls -d /projects/dbBusco/sordariomycetes_odb10)
+      OutDir=$(dirname $Assembly)/busco_sordariomycetes_obd10
+      sbatch $ProgDir/busco.sh $Assembly $BuscoDB $OutDir
+  done
+```
 
 
 
