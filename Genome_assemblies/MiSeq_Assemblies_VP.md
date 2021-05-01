@@ -69,6 +69,24 @@ done
     done
     ```
 
+```bash
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+    # If split or remove contigs is needed, provide FCSreport file by NCBI.
+    touch tmp.txt
+    for Assembly in $(ls assembly_VP/hybridSPAdes/N.ditissima/R0905/scaffolds.fasta); do
+        OutDir=$(dirname $Assembly)
+        $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/R0905_hybrid_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+    done
+    rm tmp.txt
+```
+
+    ```bash
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+    for Assembly in $(ls assembly_VP/hybridSPAdes/N.ditissima/R0905/R0905_hybrid_renamed.fasta); do
+    OutDir=$(dirname $Assembly)/renamed
+    sbatch $ProgDir/quast.sh $Assembly $OutDir
+    done
+    ```
 
 # Last seq
 
