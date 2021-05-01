@@ -423,26 +423,40 @@ conda activate medaka
   done
 ```
 
-
-
-
-
-
-
-
-## Rename contigs
+# Rename contigs of best assemblies
 
 ```bash
-    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
-    # If split or remove contigs is needed, provide FCSreport file by NCBI.
-    touch tmp.txt
-    for Assembly in $(ls assembly/flye/N.ditissima/Hg199/racon_10/assembly_racon_round_10.fasta); do
-        OutDir=$(dirname $Assembly)
-        $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/Racon10_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
-    done
-    rm tmp.txt
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+  # If split or remove contigs is needed, provide FCSreport file by NCBI.
+  touch tmp.txt
+  for Assembly in $(ls assembly_VP/*/N.ditissima/*/racon_10/medaka/medaka/pilon/pilon_10.fasta); do
+      OutDir=$(dirname $Assembly)
+      $ProgDir/remove_contaminants_2.py --inp $Assembly --out $OutDir/pilon10_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+  done
+  rm tmp.txt
+
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+  # If split or remove contigs is needed, provide FCSreport file by NCBI.
+  touch tmp.txt
+  for Assembly in $(ls assembly_VP/canu/N.ditissima/*/medaka/medaka/pilon/pilon_10.fasta); do
+  OutDir=$(dirname $Assembly)
+  $ProgDir/remove_contaminants_2.py --inp $Assembly --out $OutDir/pilon10_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+  done
+  rm tmp.txt
 ```
 
+```bash
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+  for Assembly in $(ls assembly_VP/*/N.ditissima/*/racon_10/medaka/medaka/pilon/pilon10_renamed.fasta); do
+  OutDir=$(dirname $Assembly)/renamed_quast
+  sbatch $ProgDir/quast.sh $Assembly $OutDir
+  done
 
-#
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+  for Assembly in $(ls assembly_VP/canu/N.ditissima/*/medaka/medaka/pilon/pilon10_renamed.fasta); do
+  OutDir=$(dirname $Assembly)/renamed_quast
+  sbatch $ProgDir/quast.sh $Assembly $OutDir
+  done
+```
+
 
