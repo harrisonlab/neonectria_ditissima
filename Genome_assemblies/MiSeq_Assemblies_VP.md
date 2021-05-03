@@ -162,3 +162,60 @@ for Strain in 118923 118924 226-31 227-31; do
     sbatch $ProgDir/fastq-mcf.sh $Read_F $Read_R $IluminaAdapters DNA
 done
 ```
+
+```bash
+# Run fastqc
+    for Strain in 118923 118924 226-31 227-31; do
+    RawData=$(ls qc_dna/paired/*/$Strain/F/*.fq.gz)
+    echo $RawData;
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/SEQdata_qc
+    sbatch $ProgDir/fastqc.sh $RawData
+    done
+
+    for Strain in 118923 118924 226-31 227-31; do
+    RawData=$(ls qc_dna/paired/*/$Strain/R/*.fq.gz)
+    echo $RawData;
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/SEQdata_qc
+    sbatch $ProgDir/fastqc.sh $RawData
+    done
+```
+
+## SPAdes
+
+```bash
+    for Strain in 118923 118924 226-31 227-31; do
+        F_Read=$(ls ../../data/scratch/gomeza/qc_dna/paired/N.*/$Strain/F/*trim.fq.gz)
+        R_Read=$(ls ../../data/scratch/gomeza/qc_dna/paired/N.*/$Strain/R/*trim.fq.gz)
+        echo $F_Read
+        ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers
+        Outdir=assembly_VP/SPAdes/N.ditissima/$Strain
+        sbatch $ProgDir/SPAdes.sh $F_Read $R_Read $Outdir correct
+    done
+```
+
+## Rename contigs
+
+Rename the sequences in assembly fasta file to have simple names.
+
+```bash
+    for Strain in 118923 118924 226-31 227-31; do
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+    touch tmp.txt
+    for Assembly in $(ls assembly_VP/SPAdes/N.ditissima/$Strain/scaffolds.fasta); do
+    OutDir=$(dirname $Assembly)
+    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+    done
+    rm tmp.txt
+```
+
+## Repeatmask
+
+```bash
+    for Strain in 118923 118924 226-31 227-31; do
+        ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Repeat_masking
+        BestAssembly=assembly_VP/SPAdes/N.ditissima/$Strain/*renamed.fasta
+        OutDir=repeat_masked_VP/SPAdes_assembly/N.ditissima/$Strain/
+        sbatch $ProgDir/rep_modeling.sh $BestAssembly $OutDir
+        sbatch $ProgDir/transposonPSI.sh $BestAssembly $OutDir
+    done
+```
