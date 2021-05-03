@@ -33,6 +33,62 @@
 ## Polish merged genomes
 
 ```bash
+for Assembly in $(ls assembly_VP/merged_assemblies/canu_spades/N.ditissima/R0905_minion_520k/merged_pacbio_hybrid_merged.fasta); do
+    Strain=R0905
+    Organism=N.ditissima
+    IlluminaDir=$(ls -d qc_dna/paired/N.ditissima/R0905_all)
+    TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
+    TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
+    OutDir=$(dirname $Assembly)/pilon
+    Iterations=10
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers/pilon
+    sbatch -p himem $ProgDir/pilon_1_lib.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+done
+
+for Assembly in $(ls assembly_VP/merged_assemblies/flye_spades/N.ditissima/Hg199_minion_380k/merged_pacbio_hybrid_merged.fasta); do
+    Strain=Hg199
+    Organism=N.ditissima
+    IlluminaDir=$(ls -d qc_dna/paired/N.ditissima/Hg199)
+    TrimF1_Read=$(ls $IlluminaDir/F/*_trim.fq.gz | head -n1)
+    TrimR1_Read=$(ls $IlluminaDir/R/*_trim.fq.gz | head -n1)
+    OutDir=$(dirname $Assembly)/pilon
+    Iterations=10
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Genome_assemblers/pilon
+    sbatch -p himem $ProgDir/pilon_1_lib.sh $Assembly $TrimF1_Read $TrimR1_Read $OutDir $Iterations
+done
+```
+
+## Quast and Busco
+
+```bash
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+  for Assembly in $(ls assembly_VP/hybridSPAdes/N.ditissima/*/pilon/pilon_10.fasta); do
+      OutDir=$(dirname $Assembly)
+      sbatch $ProgDir/quast.sh $Assembly $OutDir
+  done
+```
+
+```bash
+  for Assembly in $(ls assembly_VP/*/N.ditissima/*/racon_10/medaka/medaka/pilon/pilon_10.fasta); do
+      ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+      BuscoDB=$(ls -d /projects/dbBusco/sordariomycetes_odb10)
+      OutDir=$(dirname $Assembly)/busco_sordariomycetes_obd10
+      sbatch $ProgDir/busco.sh $Assembly $BuscoDB $OutDir
+  done
+
+   for Assembly in $(ls assembly_VP/canu/N.ditissima/*/medaka/medaka/pilon/pilon_10.fasta); do
+      ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+      BuscoDB=$(ls -d /projects/dbBusco/sordariomycetes_odb10)
+      OutDir=$(dirname $Assembly)/busco_sordariomycetes_obd10
+      sbatch $ProgDir/busco.sh $Assembly $BuscoDB $OutDir
+  done
+```
+
+## Hybridgenomes polished
+
+```bash
+# These genomes were polished by mistake. They might be used for quickmerge.
+
 for Assembly in $(ls assembly_VP/hybridSPAdes/N.ditissima/R0905/R0905_hybrid_renamed.fasta); do
     Strain=R0905
     Organism=N.ditissima
