@@ -197,15 +197,21 @@ done
 
 Rename the sequences in assembly fasta file to have simple names.
 
+```
+Note: Old isolates were assembled before with an older version of SPAdes and masked. These assembies were not renamed before running repeatmasker, so genomes and gene models keep the contig names from SPAdes. If I need to update the annotation (probably not) I should use this renamed file.
+```
+
 ```bash
-    for Strain in 118923 118924 226-31 227-31; do
+    for Strain in 118923 118924 226-31 227-31 Ag02 Ag05 Ag08 Ag11_A Ag11_C Hg199 ND9 P112 R37-15 R41-15 R45-15 R6-17-3 R68-17-C2 SVK2 Ag04 Ag06 Ag09_A Ag11_B BGV344 ND8 OPC304 R0905 R39-15 R42-15 R6-17-2 R68-17-C3 SVK1 NMaj; do
     ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
     touch tmp.txt
-    for Assembly in $(ls assembly_VP/SPAdes/N.ditissima/$Strain/scaffolds.fasta); do
-    OutDir=$(dirname $Assembly)
-    $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
-    done
+        for Assembly in $(ls assembly_VP/SPAdes/N.*/$Strain/filtered_contigs/contigs_min_500bp.fasta); do
+        OutDir=$(dirname $Assembly)
+        echo "$Assembly"
+        $ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/"$Strain"_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+        done
     rm tmp.txt
+    done
 ```
 
 ## Repeatmask
@@ -213,7 +219,7 @@ Rename the sequences in assembly fasta file to have simple names.
 ```bash
     for Strain in 118923 118924 226-31 227-31; do
         ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Repeat_masking
-        BestAssembly=assembly_VP/SPAdes/N.ditissima/$Strain/*renamed.fasta
+        BestAssembly=assembly_VP/SPAdes/N.ditissima/$Strain/filtered_contigs/*renamed.fasta
         OutDir=repeat_masked_VP/SPAdes_assembly/N.ditissima/$Strain/
         sbatch $ProgDir/rep_modeling.sh $BestAssembly $OutDir
         sbatch $ProgDir/transposonPSI.sh $BestAssembly $OutDir
