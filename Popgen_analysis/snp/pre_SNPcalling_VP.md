@@ -99,17 +99,15 @@ sbatch $ProgDir/GATK_SNP_calling.sh
 sbatch $ProgDir/HaplotypeCaller_GVCF.sh
 ```
 
-
-
-
 ```bash
 Reference=R0905_good/repeat_masked/filtered_contigs/R0905_good_contigs_unmasked.fa 
-for Strain in Ag02; do
+#for Strain in 118923 226-31 Ag02 Ag05 Ag08 Ag11_A Ag11_C Hg199 ND9 P112 R37-15 R41-15 R45-15 R6-17-3 R68-17-C3; do
+for Strain in SVK2 118924 227-31 Ag04 Ag06 Ag09_A Ag11_B BGV344 ND8 OPC304 R0905 R39-15 R42-15 R6-17-2 R68-17-C2 SVK1 NMaj; do
 for Bam in $(ls Home/analysis_vAG/genome_alignment/bowtie/vs_R0905/*/R0905/$Strain/"$Strain"_unmasked.fa_aligned_nomulti_proper_sorted_nodup_rg.bam); do
 echo $Strain
-Outdir=test_SNP
+Outdir=/projects/neonectria_ditissima/HaplotypeCaller/$Strain
 ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/SNP_calling
-sbatch -p himem $ProgDir/HaplotypeCaller_GVCF.sh $Reference $Strain $Bam $Outdir
+sbatch -p long $ProgDir/HaplotypeCaller_GVCF.sh $Reference $Strain $Bam $Outdir
 done 
 done  
 ```
