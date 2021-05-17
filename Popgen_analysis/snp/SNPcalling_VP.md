@@ -112,6 +112,29 @@ done
 done  
 ```
 
+# Combine all .gvcf files 
+
+```bash
+cp /data/scratch/gomeza/R0905_good/repeat_masked/filtered_contigs/R0905_good_contigs_unmasked.fa analysis_VP/SNP_calling/HaplotypeCaller
+cp /data/scratch/gomeza/R0905_good/repeat_masked/filtered_contigs/R0905_good_contigs_unmasked.fa.fai analysis_VP/SNP_calling/HaplotypeCaller
+cp /data/scratch/gomeza/R0905_good/repeat_masked/filtered_contigs/R0905_good_contigs_unmasked.dict analysis_VP/SNP_calling/HaplotypeCaller
+
+
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/SNP_calling
+sbatch $ProgDir/CombineGVCFs.sh 
+```
+
+# Genotype VCFs
+
+```bash
+Reference=analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked.fa 
+VCF=analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_cohort.g.vcf.gz
+OutDir=analysis_VP/SNP_calling/HaplotypeCaller
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/SNP_calling
+sbatch $ProgDir/GenotypeGVCFs.sh $VCF $Reference $OutDir
+```
+
+
 # SNP calling analysis
 
 
