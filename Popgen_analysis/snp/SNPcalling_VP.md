@@ -135,16 +135,102 @@ sbatch $ProgDir/GenotypeGVCFs.sh $VCF $Reference $OutDir
 ```
 
 
+
+VCF_file=analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped.vcf
+Error_call_file=analysis_VP/SNP_calling/HaplotypeCaller/R0905_SNP_calls.g.vcf
+OutDir=analysis_VP/SNP_calling/HaplotypeCaller/errors_filtered/error_corrected.vcf  
+ProgDir=/home/connellj/git_repos/emr_repos/Fv_C-variants/SNP_calling_pileup
+$ProgDir/python_remove_sequencing_errors.py --VCF_file $VCF_file --error_SNPs $Error_call_file --outfile $OutDir
+
 # SNP calling analysis
 
 
 ### Filter vcf outputs, only retain biallelic high-quality SNPS with no missing data for genetic analyses.
 
 ```bash
-for vcf in $(ls analysis/popgen/SNP_calling/*_contigs_unmasked.vcf)
+for vcf in $(ls analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped.vcf)
+do
+echo $vcf
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/SNP_calling
+sbatch $ProgDir/vcf_parser.sh $vcf
+done
+
+
+less analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped_filtered.vcf | grep '^#' | wc -l
+
+cat analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped_filtered.vcf | grep '^#' > head.txt
+
+cat head.txt analysis_VP/SNP_calling/HaplotypeCaller/errors_filtered/error_corrected.vcf > error_corrected_head.vcf
+
+for vcf in $(ls error_corrected_head.vcf)
 do
 echo $vcf
 ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/SNP_calling
 sbatch $ProgDir/vcf_parser.sh $vcf
 done
 ```
+
+
+
+
+Only one of these can be run at a time!
+
+# General VCF stats (remember that vcftools needs to have the PERL library exported)
+
+```bash
+vcfstats analysis_VP/SNP_calling/HaplotypeCaller/errors_filtered/error_corrected_head_filtered.vcf > analysis_VP/SNP_calling/HaplotypeCaller/errors_filtered/error_corrected_head_filtered.stats
+vcfstats analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped_filtered.vcf > analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped_filtered.stats
+
+vcfstats analysis_VP/SNP_calling/HaplotypeCaller/errors_filtered/error_corrected_head.vcf > analysis_VP/SNP_calling/HaplotypeCaller/errors_filtered/error_corrected_head.stats
+vcfstats analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped.vcf > analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped.stats
+```
+
+#Calculate the index for percentage of shared SNP alleles between the individuals.
+
+```bash
+for vcf in $(ls analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped_filtered.vcf)
+do
+  scripts=/home/gomeza/git_repos/scripts/bioinformatics_tools/SNP_calling
+  echo $vcf
+  $scripts/similarity_percentage.py $vcf
+done
+```
+
+
+#Visualise the output as heatmap and clustering dendrogram
+
+```bash
+for log in $(ls analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped_filtered_distance.log)
+do
+scripts=/home/gomeza/git_repos/scripts/bioinformatics_tools/SNP_calling
+Rscript --vanilla $scripts/distance_matrix.R $log
+done
+```
+
+
+
+
+#Remove monomorphic sites (minor allele count minimum 1). Argument --vcf is the filtered VCF file, and --out is the suffix to be used for the output file.
+
+```bash
+for vcf in $(ls SNP_calling3/*_filtered.vcf)
+do
+    echo $vcf
+    out=$(basename $vcf .vcf)
+    echo $out
+    $vcftools/vcftools --vcf $vcf --mac 1 --recode --out SNP_calling3/$out
+done
+
+#After filtering, kept 593720 out of a possible 758934 Sites
+
+for vcf in $(ls SNP_calling_R0905/*_filtered.vcf)
+do
+    echo $vcf
+    out=$(basename $vcf .vcf)
+    echo $out
+    $vcftools/vcftools --vcf $vcf --mac 1 --recode --out SNP_calling_R0905/$out
+done
+
+#After filtering, kept 626425 out of a possible 800178 Sites
+```
+
