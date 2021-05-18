@@ -72,6 +72,6 @@ AlignDir=analysis_VP/popgen/busco_phylogeny/alignments
 CurDir=$PWD
 cd $AlignDir
 ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Phylogenetics
-squeue $ProgDir/mafft.sh
+sbatch $ProgDir/mafft.sh
 cd $CurDir
 ```
