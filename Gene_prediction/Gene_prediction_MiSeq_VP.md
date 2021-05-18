@@ -98,20 +98,61 @@ Before braker predictiction was performed, I double checked that I had the genem
 
 ```bash
 ls ~/.gm_key
-cp /home/armita/prog/genemark/2018/gm_key_64 ~/.gm_key
+cp /home/gomeza/prog/genemark/gm_key_Nov2020/gm_key_64 ~/.gm_key_64
 ```
 
 ```bash
-for Strain in 118923 118924 226-31 227-31; do
-for Assembly in $(ls repeat_masked_VP/SPAdes_assembly/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) # Edit to set your ouput directory
-Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev) # Edit to set your ouput directory
-echo "$Organism - $Strain"
-OutDir=gene_pred_VP/braker/$Organism/$Strain
-AcceptedHits=alignment_VP/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam 
-GeneModelName="$Organism"_"$Strain"_braker 
-ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
-sbatch -p himem $ProgDir/braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
-done
+    for Strain in 118924 226-31 227-31; do
+        for Assembly in $(ls repeat_masked_VP/SPAdes_assembly/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+        Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) # Edit to set your ouput directory
+        Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev) # Edit to set your ouput directory
+        echo "$Organism - $Strain"
+        OutDir=gene_pred_VP/braker/$Organism/$Strain
+        AcceptedHits=alignment_VP/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam 
+        GeneModelName="$Organism"_"$Strain"_braker 
+        ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+        sbatch -p himem $ProgDir/braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
+        done
+    done
+```
+
+## Cufflinks RNA-seq alignments assembler
+
+```bash
+    for Strain in 118923 118924 226-31 227-31; do
+        for Assembly in $(ls repeat_masked_VP/SPAdes_assembly/N.ditissima/$Strain/*_contigs_unmasked.fa); do
+        Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) 
+        Organism=$(echo $Assembly| rev | cut -d '/' -f3 | rev) 
+        echo "$Organism - $Strain"
+        OutDir=gene_pred_VP/cufflinks/$Organism/$Strain/concatenated_prelim
+        mkdir -p $OutDir
+        AcceptedHits=alignment_VP/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam
+        ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+        sbatch -p himem $ProgDir/cufflinks.sh $AcceptedHits $OutDir
+        done
+    done
+```
+
+
+
+
+
+
+
+
+## Codingquarry 
+
+```bash
+conda activate antismash_py27
+
+for Assembly in $(ls assembly/previous_versions/F.venenatum/WT/*_contigs_unmasked.fa); do
+  Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) 
+  Organism=$(echo $Assembly| rev | cut -d '/' -f3 | rev) 
+  echo "$Organism - $Strain"
+  OutDir=gene_pred/codingquarry/$Organism/$Strain
+  mkdir -p $OutDir
+  GTF=gene_pred/cufflinks/F.venenatum/WT/concatenated_prelim/transcripts.gtf
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+  sbatch $ProgDir/codingquarry2.sh $Assembly $GTF $OutDir
 done
 ```
