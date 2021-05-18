@@ -102,15 +102,16 @@ cp /home/armita/prog/genemark/2018/gm_key_64 ~/.gm_key
 ```
 
 ```bash
-  for Assembly in $(ls assembly_vAG/canu_1step/N.ditissima/R0905/polished/repeat_masked/filtered_contigs/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-    Strain=$(echo $Assembly| rev | cut -d '/' -f5 | rev)
-    Organism=$(echo $Assembly | rev | cut -d '/' -f6 | rev)
-    echo "$Organism - $Strain"
-    OutDir=gene_pred_vAG/braker/Ref_Genomes/$Organism/$Strain
-    AcceptedHits=alignment_vAG/star/N.ditissima/Ref_Genomes/R0905/Hg199_reads/mycelium/concatenated/concatenated.bam
-    GeneModelName="$Organism"_"$Strain"_braker
-    #rm -r /home/armita/prog/augustus-3.1/config/species/"$Organism"_"$Strain"_braker
-    ProgDir=/home/gomeza/git_repos/emr_repos/tools/gene_prediction/braker1
-    qsub $ProgDir/sub_braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
-  done
+for Strain in 118923 118924 226-31 227-31; do
+for Assembly in $(ls repeat_masked_VP/SPAdes_assembly/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) # Edit to set your ouput directory
+Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev) # Edit to set your ouput directory
+echo "$Organism - $Strain"
+OutDir=gene_pred_VP/braker/$Organism/$Strain
+AcceptedHits=alignment_VP/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam 
+GeneModelName="$Organism"_"$Strain"_braker 
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+sbatch -p himem $ProgDir/braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
+done
+done
 ```
