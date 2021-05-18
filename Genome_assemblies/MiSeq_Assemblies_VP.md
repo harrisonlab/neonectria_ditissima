@@ -225,3 +225,22 @@ Note: Old isolates were assembled before with an older version of SPAdes and mas
         sbatch $ProgDir/transposonPSI.sh $BestAssembly $OutDir
     done
 ```
+
+
+The TransposonPSI masked bases were used to mask additional bases from the
+repeatmasker / repeatmodeller softmasked and hardmasked files.
+
+
+```bash
+    for Strain in 118923 118924 226-31 227-31; do
+        for File in $(ls repeat_masked_VP/*/N.d*/$Strain/*_contigs_softmasked.fa); do
+        OutDir=$(dirname $File)
+        TPSI=$(ls $OutDir/*_contigs_unmasked.fa.TPSI.allHits.chains.gff3)
+        OutFile=$(echo $File | sed 's/_contigs_softmasked.fa/_contigs_softmasked_repeatmasker_TPSI_appended.fa/g')
+        echo "$OutFile"
+        bedtools maskfasta -soft -fi $File -bed $TPSI -fo $OutFile
+        echo "Number of masked bases:"
+        cat $OutFile | grep -v '>' | tr -d '\n' | awk '{print $0, gsub("[a-z]", ".")}' | cut -f2 -d ' '
+        done
+    done
+```
