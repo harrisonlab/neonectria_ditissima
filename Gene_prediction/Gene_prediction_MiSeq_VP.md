@@ -133,26 +133,19 @@ cp /home/gomeza/prog/genemark/gm_key_Nov2020/gm_key_64 ~/.gm_key_64
     done
 ```
 
-
-
-
-
-
-
-
 ## Codingquarry 
 
 ```bash
 conda activate antismash_py27
 
-for Assembly in $(ls assembly/previous_versions/F.venenatum/WT/*_contigs_unmasked.fa); do
-  Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) 
-  Organism=$(echo $Assembly| rev | cut -d '/' -f3 | rev) 
-  echo "$Organism - $Strain"
-  OutDir=gene_pred/codingquarry/$Organism/$Strain
-  mkdir -p $OutDir
-  GTF=gene_pred/cufflinks/F.venenatum/WT/concatenated_prelim/transcripts.gtf
-  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
-  sbatch $ProgDir/codingquarry2.sh $Assembly $GTF $OutDir
-done
+    for Assembly in $(ls repeat_masked_VP/SPAdes_assembly/N.ditissima/*/*_contigs_unmasked.fa); do
+        Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) 
+        Organism=$(echo $Assembly| rev | cut -d '/' -f3 | rev) 
+        echo "$Organism - $Strain"
+        OutDir=gene_pred_VP/codingquarry/$Organism/$Strain
+        mkdir -p $OutDir
+        GTF=gene_pred_VP/cufflinks/N.ditissima/$Strain/concatenated_prelim/transcripts.gtf
+        ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+        sbatch $ProgDir/codingquarry.sh $Assembly $GTF $OutDir
+    done
 ```
