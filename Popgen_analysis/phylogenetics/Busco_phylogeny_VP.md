@@ -127,10 +127,8 @@ mkdir -p $OutDir
 
 #Concatenate best trees
 #cat analysis_VP/popgen/busco_phylogeny/RAxML/*/RAxML_bestTree.*  | sed -r "s/CTG.\w+:/:/g" > $OutDir/Nd_phylogeny.appended2.tre
-cat analysis_VP/popgen/busco_phylogeny/RAxML/*/RAxML_bestTree.*  > $OutDir/Nd_phylogeny.appended3.tre
+cat analysis_VP/popgen/busco_phylogeny/RAxML/*/RAxML_bestTree.*  > $OutDir/Nd_phylogeny.appended.tre
 
-
-US24192
 # Contract low support brances (below 10% bootsrap support)
 nw_ed $OutDir/Nd_phylogeny.appended.tre 'i & b<=10' o > $OutDir/Nd_phylogeny.appended.trimmed.tre
 
@@ -139,20 +137,151 @@ ProgDir=/scratch/software/ASTRAL/ASTRAL-5.7.1/Astral
 java -jar $ProgDir/astral.5.7.1.jar -i $OutDir/Nd_phylogeny.appended.tre -o $OutDir/Nd_phylogeny.consensus.tre 2> $OutDir/Nd_phylogeny.consensus.log
 # Score the resulting tree
 java -jar $ProgDir/astral.5.7.1.jar -q $OutDir/Nd_phylogeny.consensus.tre -i $OutDir/Nd_phylogeny.appended.tre -o $OutDir/Nd_phylogeny.consensus.scored.tre 2> $OutDir/Nd_phylogeny.consensus.scored.log
+
+# Calculate combined tree
+ProgDir=/scratch/software/ASTRAL/ASTRAL-5.7.1/Astral
+java -jar $ProgDir/astral.5.7.1.jar -i $OutDir/Nd_phylogeny.appended.trimmed.tre -o $OutDir/Nd_phylogeny.trimmed.consensus.tre 2> $OutDir/Nd_phylogeny.trimmed.consensus.log
+# Score the resulting tree
+java -jar $ProgDir/astral.5.7.1.jar -q $OutDir/Nd_phylogeny.trimmed.consensus.tre -i $OutDir/Nd_phylogeny.appended.trimmed.tre -o $OutDir/Nd_phylogeny.consensus.trimmed.scored.tre 2> $OutDir/Nd_phylogeny.consensus.trimmed.scored.log
 ```
 
+Manual edition of the final consensus tree is needed 
 
+```
+Step 1: Download consensus tree to local machine
 
+Step 2: Import into geneious and export again in newick format to get around polytomy branches having no branch length.
 
-GGtree was used to make a plot.
-
-* Note- Tips can be found here: https://bioconnector.org/r-ggtree.html
-
-The consensus tree was downloaded to my local machine
-
-* Note - I had to import into geneious and export again in newick format to get around polytomy branches having no branch length.
-* Terminal branch lengths are meanlingless from ASTRAL and should all be set to an arbitrary value. This will be done by geneious (set to 1), but it also introduces a branch length of 2 for one isolate that needs to be corrected with sed
-
+Step 3: Terminal branch lengths are meanlingless from ASTRAL and should all be set to an arbitrary value. This will be done by geneious (set to 1), but it also introduces a branch length of 2 for one isolate that needs to be corrected with sed
+```
 ```bash
-cat Alt_phylogeny.consensus.scored.geneious.tre | sed 's/:2/:1/g' > Alt_phylogeny.consensus.scored.geneious2.tre
+cat Desktop/Astral_tree/Nd_phylogeny.consensus.scored_newick.tre | sed 's/:2/:1/g' > Desktop/Astral_tree/Nd_phylogeny.consensus.scored_newick2.tre
 ```
+
+
+## Plot best scored tree
+
+GGtree was used to make a plot. Tutorial tips: https://bioconnector.org/r-ggtree.html
+
+R version > 4.0
+
+```r
+setwd("~/Desktop/Astral_tree")
+#===============================================================================
+#       Load libraries
+#===============================================================================
+
+library(ape)
+library(ggplot2)
+library(ggtree)
+library(phangorn)
+library(treeio)
+
+packageurl <- "http://cran.r-project.org/src/contrib/Archive/dplyr/dplyr_1.0.5.tar.gz"
+install.packages(packageurl, repos=NULL, type="source")
+
+remotes::install_github("YuLab-SMU/tidytree")
+
+
+tree <- read.tree("~/Desktop/Astral_tree/Nd_phylogeny.consensus.scored_newick2.tre")
+# Basic tree
+t<-ggplot(tree, aes(x, y)) + geom_tree() + theme_tree()
+# Load table with ID, Country, Host and Specie
+mydata <- read.csv("~/Desktop/Astral_tree/traits.csv", stringsAsFactors=FALSE)
+rownames(mydata) <- mydata$ID
+# Sample name should match in tree and csv
+mydata <- mydata[match(tree$tip.label,rownames(mydata)),]
+# Format nodes by values
+nodes <- data.frame(t$data)
+# Core tree
+t <- ggtree(tree, aes(linetype=nodes$support))
+# Add scalebar
+t <- t + geom_treescale(offset=-1.0, fontsize = 3) 
+
+
+
+
+
+
+
+
+
+# Adjust terminal branch lengths:
+# branches <- t$data
+# tree$edge.length[branches$isTip] <- 0.1
+
+
+#nodes <- nodes[!nodes$isTip,]
+nodes$label <- as.numeric(nodes[nodes$label,])
+as.numeric(nodes$label)
+#nodes$label[nodes$label < 0.80] <- ''
+nodes$support[nodes$isTip] <- 'supported'
+nodes$support[(!nodes$isTip) & (nodes$label > 0.80)] <- 'supported'
+nodes$support[(!nodes$isTip) & (nodes$label < 0.80)] <- 'unsupported'
+nodes$support[(!nodes$isTip) & (nodes$label == '')] <- 'supported'
+t <- t + aes(linetype=nodes$support)
+nodes$label[nodes$label > 0.80] <- ''
+t <- t + geom_nodelab(data=nodes, size=2, hjust=-0.05) # colours as defined by col2rgb
+
+
+
+#51 is the node of your outgroup?
+tree$edge.length[tree$edge.length == 1] <- 0
+tree$edge.length[51] <- 0
+
+
+t <- ggtree(tree, aes(linetype=nodes$support)) # Core tree
+
+
+# Adjust terminal branch lengths:
+branches <- t$data
+
+branches <- t$data
+tree$edge.length[branches$isTip] <- 1.0
+# tree$edge.length[tree$edge.length == 1] <- 0
+# t <- ggtree(tree, aes(linetype=nodes$support))
+#Tree <- branches$branch.length
+
+t <- t + geom_treescale(offset=-1.0, fontsize = 3) # Add scalebar
+# t <- t + xlim(0, 0.025) # Add more space for labels
+
+
+# Colouring labels by values in another df
+t <- t %<+% mydata # Allow colouring of nodes by another df
+#t <- t + geom_tiplab(aes(color=Source), size=3, hjust=0) +
+scale_color_manual(values=c("gray39","black")) # colours as defined by col2rgb
+
+tips <- data.frame(t$data)
+tips$label <- tips$ID
+t <- t + geom_tiplab(data=tips, aes(color=Source), size=3, hjust=0, align=T, offset = +0.1) +
+scale_color_manual(values=c("gray39","black")) # colours as defined by col2rgb
+
+# Add in a further set of labels
+tree_mod <- data.frame(t$data)
+tree_mod$label <- tips$pathotype
+t <- t + geom_tiplab(data=tree_mod, aes(label=label, color=Source), align=T, linetype = NULL, size=3, hjust=0, offset = +5.0) +
+scale_color_manual(values=c("gray39","black"))
+
+tips$MAT <- factor(tips$MAT)
+# t <- t + geom_tippoint(data=tips, aes(shape=MAT), size=2)
+t <- t + geom_tiplab(data=tips, aes(label=MAT, color=Source), align=T, linetype = NULL, size=3, hjust=0, offset = +3.5) +
+scale_color_manual(values=c("gray39","black"))
+
+
+
+# Annotate a clade with a bar line
+# t <- t + geom_cladelabel(node=42, label='sect. Alternaria', align=T, colour='black', offset=-1.5)
+# t <- t + geom_cladelabel(node=70, label='gaisen clade', align=T, colour='black', offset=-4.5)
+# t <- t + geom_cladelabel(node=51, label='tenuissima clade', align=T, colour='black', offset=-4.5)
+# t <- t + geom_cladelabel(node=45, label='arborescens clade', align=T, colour='black', offset=-4.5)
+t <- t + geom_cladelabel(node=43, label='sect. Alternaria', align=T, colour='black', offset=9.5)
+t <- t + geom_cladelabel(node=70, label='gaisen clade', align=T, colour='black', offset=6.5)
+t <- t + geom_cladelabel(node=46, label='tenuissima clade', align=T, colour='black', offset=6.5)
+t <- t + geom_cladelabel(node=65, label='arborescens clade', align=T, colour='black', offset=6.5)
+t <- t + geom_cladelabel(node=65, label='', colour='NA', offset=17.5)
+
+# Save as PDF and force a 'huge' size plot
+# t <- ggsave("expanded/Fig3_busco_phylogeny.pdf", width =30, height = 30, units = "cm", limitsize = FALSE)
+t <- ggsave("expanded/Fig3_busco_phylogeny.tiff", width =30, height = 30, units = "cm", limitsize = FALSE)
+
+````
