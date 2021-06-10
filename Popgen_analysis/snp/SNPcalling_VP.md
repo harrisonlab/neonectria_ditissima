@@ -156,7 +156,7 @@ sbatch $ProgDir/vcf_parser.sh $vcf
 done
 
 
-less analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped_filtered.vcf | grep '^#' | wc -l
+less analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped_filtered.vcf | grep -v '^#' | wc -l
 
 cat analysis_VP/SNP_calling/HaplotypeCaller/R0905_good_contigs_unmasked_genotyped_filtered.vcf | grep '^#' > head.txt
 
