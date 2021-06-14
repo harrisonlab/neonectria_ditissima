@@ -58,19 +58,22 @@ mkdir -p structure
 # inputs are struc file, ploidy, K and number of reps
 sbatch -p himem $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 1 10 structure
 sbatch -p long $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 2 10 structure
-
+sbatch -p himem $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 3 10 structure
+sbatch -p himem $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 4 10 structure
+sbatch -p himem $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 5 10 structure
+sbatch -p long $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 6 10 structure
 sbatch -p long $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 7 10 structure
 sbatch -p long $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 8 10 structure
 sbatch -p himem $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 9 10 structure
 sbatch -p himem $scripts/execute_structure.sh R0905_good_contigs_unmasked_FINAL_filtered.recode_annotated.subsampled.struc 1 10 10 structure
-
-
-
-
-
-
-
 ```
+
+
+
+
+
+
+
 
 #Analyze STRUCTURE output
 # Generate a folder containing all STRUCTURE output files for all K analyzed
