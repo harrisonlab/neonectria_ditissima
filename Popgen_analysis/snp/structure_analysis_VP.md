@@ -94,11 +94,15 @@ $harvester --dir=structureHarvester --out=structureHarvester --evanno --clumpp
 ```
 
 # CLUMPP - permute the results
+
 ```bash
+# This will take a few days. It is recommended to run ind and pop in separated runs
+
 cd structureHarvester
 clumpp=/home/gomeza/prog/CLUMPP_Linux64.1.1.2
 cp $clumpp/paramfile_ind ./
 mv paramfile_ind paramfile
+
 #Options fed to CLUMPP
 #-i: indfile from StructureHarvester output
 #-p: popfile from StructureHarvester output
@@ -119,21 +123,43 @@ do
 $clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.indivq -k $i -c $c -r $r
 done
 
+# Going to run this in a separate screen!!
+screen -a
+srun --partition himem --mem-per-cpu 12G --cpus-per-task 24 --pty bash
+
+mkdir CLUMPP_pop
+cp *indfile CLUMPP_pop
+cp *popfile CLUMPP_pop/
+cd CLUMPP_pop/
 
 cp $clumpp/paramfile_pop ./
 mv paramfile_pop paramfile
 
-
+c=11
+r=10
+s=1
+f=10
 for i in $(seq $s $f) #input range of K values tested
 do
 $clumpp/CLUMPP -i K$i.indfile -p K$i.popfile -o K$i.popq -k $i -c $c -r $r
 done
+
+```
+
+
+
+
+
+
+
+
+
 #Key options in the paramfile
 # DISTRUCT to visualise the results
 ###!!!! Options to be changed in each analysis manually
 #-M number of populations assigned in the Structure input file
 #-N number of individuals
-m=30???????
+m=11
 n=30
 #-K K value
 #-p input file (population q's)
@@ -141,7 +167,7 @@ n=30
 #-a input file (labels atop figure)
 #-b input file (labels below figure)
 #-o output file
-distruct=/home/sobczm/bin/distruct1.1
+distruct=/home/gomeza/prog/distruct1.1
 cp $distruct/drawparams ./
 for i in $(seq $s $f) #input range of K values tested
 do
