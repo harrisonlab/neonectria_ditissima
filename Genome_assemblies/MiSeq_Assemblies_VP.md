@@ -213,6 +213,19 @@ Note: Old isolates were assembled before with an older version of SPAdes and mas
     rm tmp.txt
     done
 ```
+## Quast
+
+```bash
+    for Strain in 118923 118924 226-31 227-31; do
+        ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+        for Assembly in $(ls assembly/SPAdes/N.ditissima/$Strain/filtered_contigs/*renamed.fasta); do
+        Strain=$(echo $Assembly | rev | cut -f3 -d '/' | rev)
+        Organism=$(echo $Assembly | rev | cut -f4 -d '/' | rev)
+        OutDir=$(dirname $Assembly)
+        sbatch $ProgDir/quast.sh $Assembly $OutDir
+        done
+    done
+```
 
 ## Repeatmask
 
