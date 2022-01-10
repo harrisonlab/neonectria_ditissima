@@ -459,4 +459,50 @@ conda activate medaka
   done
 ```
 
+## Repeatmask
+
+```bash
+#R0905 best assembly
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+touch tmp.txt
+for Assembly in $(ls assembly/canu/N.ditissima/R0905/medaka/medaka/pilon/pilon_10.fasta); do
+OutDir=$(dirname $Assembly)
+echo "$Assembly"
+$ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/R0905_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+done
+rm tmp.txt
+
+# Hg199 best assembly
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Assembly_qc
+touch tmp.txt
+for Assembly in $(ls assembly/flye/N.ditissima/Hg199/racon_10/medaka/medaka/pilon/pilon_10.fasta); do
+OutDir=$(dirname $Assembly)
+echo "$Assembly"
+$ProgDir/remove_contaminants.py --inp $Assembly --out $OutDir/Hg199_renamed.fasta --coord_file tmp.txt > $OutDir/log.txt
+done
+rm tmp.txt
+```
+```bash
+#R0905
+for Assembly in $(ls assembly/canu/N.ditissima/R0905/medaka/medaka/pilon/R0905_renamed.fasta); do
+Strain=R0905
+Organism=N.ditissima
+echo "$Organism - $Strain"
+OutDir=$(dirname $Assembly)/repeat_masked
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Repeat_masking
+sbatch $ProgDir/rep_modeling.sh $Assembly $OutDir
+sbatch $ProgDir/transposonPSI.sh $Assembly $OutDir
+done
+#Hg199
+for Assembly in $(ls assembly/flye/N.ditissima/Hg199/racon_10/medaka/medaka/pilon/Hg199_renamed.fasta); do
+Strain=Hg199
+Organism=N.ditissima
+echo "$Organism - $Strain"
+OutDir=$(dirname $Assembly)/repeat_masked
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Repeat_masking
+sbatch $ProgDir/rep_modeling.sh $Assembly $OutDir
+sbatch $ProgDir/transposonPSI.sh $Assembly $OutDir
+done
+```
+
 
