@@ -11,7 +11,8 @@ sequence and functional information for annotated gene models.
 # -----------------------------------------------------
 
 import argparse
-from sets import Set
+my_set = set()
+#from sets import Set
 from collections import defaultdict
 from operator import itemgetter
 import numpy as np
@@ -144,7 +145,8 @@ for line in InterPro_lines:
     line = line.rstrip("\n")
     split_line = line.split("\t")
     interpro_columns = []
-    index_list = [0, 4, 5, 11, 12]
+    index_list = [0, 1, 2, 3, 8]
+    #index_list = [0, 4, 5, 11, 12]
     for x in index_list:
         if len(split_line) > x:
             interpro_columns.append(split_line[x])
@@ -298,4 +300,4 @@ for line in transcript_lines:
     outline.extend(DEG_out)
     outline.append(prot_seq)
     outline.append(interpro_col)
-    print "\t".join(outline)
+    print ("\t".join(outline))
