@@ -102,19 +102,47 @@ cp /home/gomeza/prog/genemark/gm_key_Nov2020/gm_key_64 ~/.gm_key_64
 ```
 
 ```bash
-    for Strain in 118924 226-31 227-31; do
-        for Assembly in $(ls repeat_masked_VP/SPAdes_assembly/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-        Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) # Edit to set your ouput directory
-        Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev) # Edit to set your ouput directory
+    for Strain in 118923 118924 226-31 227-31; do
+        for Assembly in $(ls repeat_masked/SPAdes_assembly/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+        Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) 
+        Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
         echo "$Organism - $Strain"
-        OutDir=gene_pred_VP/braker/$Organism/$Strain
-        AcceptedHits=alignment_VP/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam 
+        OutDir=gene_pred/braker/$Organism/$Strain
+        AcceptedHits=alignment/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam 
         GeneModelName="$Organism"_"$Strain"_braker 
         ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
         sbatch -p himem $ProgDir/braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
         done
     done
+#rm -r /home/gomeza/miniconda3/envs/gene_pred/config/species/N.ditissima_*
+# Braker needs to be fixed in out HPC
 ```
+
+Data was copied into the Crop diversity HPC. Braker was installed there in the gene_pred env
+
+```bash
+# Scripts and files in CropDiversity
+    for Strain in 118923 118924 226-31 227-31; do
+        for Assembly in $(ls neonectria_ditissima_WD/repeat_masked/SPAdes_assembly/N.ditissima/$Strain/"$Strain"_contigs_softmasked_repeatmasker_TPSI_appended.fa ); do
+        Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev) 
+        echo "$Organism - $Strain"
+        OutDir=neonectria_ditissima_WD/gene_pred/braker/$Organism/$Strain
+        AcceptedHits=neonectria_ditissima_WD/alignment/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam
+        GeneModelName="$Organism"_"$Strain"_braker 
+        ProgDir=apps/scripts/Gene_pred
+        sbatch -p long $ProgDir/braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
+        done
+    done
+```
+
+
+
+
+
+
+
+
+
 
 ## Cufflinks RNA-seq alignments assembler
 
