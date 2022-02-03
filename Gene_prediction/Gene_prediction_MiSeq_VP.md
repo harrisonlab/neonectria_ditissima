@@ -102,18 +102,20 @@ cp /home/gomeza/prog/genemark/gm_key_Nov2020/gm_key_64 ~/.gm_key_64
 ```
 
 ```bash
-    for Strain in 118923 118924 226-31 227-31; do
-        for Assembly in $(ls repeat_masked/SPAdes_assembly/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
-        Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) 
-        Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
-        echo "$Organism - $Strain"
-        OutDir=gene_pred/braker/$Organism/$Strain
-        AcceptedHits=alignment/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam 
-        GeneModelName="$Organism"_"$Strain"_braker 
-        ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
-        sbatch -p himem $ProgDir/braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
-        done
-    done
+# If running on a conda env
+perl change_path_in_perl_scripts.pl "/usr/bin/env perl" 
+for Strain in 118923 118924 226-31 227-31; do
+for Assembly in $(ls repeat_masked/SPAdes_assembly/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa); do
+Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) 
+Organism=$(echo $Assembly | rev | cut -d '/' -f3 | rev)
+echo "$Organism - $Strain"
+OutDir=gene_pred/braker/$Organism/$Strain
+AcceptedHits=alignment/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam 
+GeneModelName="$Organism"_"$Strain"_braker 
+ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+sbatch -p himem $ProgDir/braker_fungi.sh $Assembly $OutDir $AcceptedHits $GeneModelName
+done
+done
 #rm -r /home/gomeza/miniconda3/envs/gene_pred/config/species/N.ditissima_*
 # Braker needs to be fixed in out HPC
 ```
@@ -121,6 +123,8 @@ cp /home/gomeza/prog/genemark/gm_key_Nov2020/gm_key_64 ~/.gm_key_64
 Data was copied into the Crop diversity HPC. Braker was installed there in the gene_pred env
 
 ```bash
+# If running on a conda env
+perl change_path_in_perl_scripts.pl "/usr/bin/env perl" 
 # Scripts and files in CropDiversity
     for Strain in 118923 118924 226-31 227-31; do
         for Assembly in $(ls neonectria_ditissima_WD/repeat_masked/SPAdes_assembly/N.ditissima/$Strain/"$Strain"_contigs_softmasked_repeatmasker_TPSI_appended.fa ); do
@@ -135,31 +139,28 @@ Data was copied into the Crop diversity HPC. Braker was installed there in the g
     done
 ```
 
-
-
-
-
-
-
-
-
-
 ## Cufflinks RNA-seq alignments assembler
 
 ```bash
     for Strain in 118923 118924 226-31 227-31; do
-        for Assembly in $(ls repeat_masked_VP/SPAdes_assembly/N.ditissima/$Strain/*_contigs_unmasked.fa); do
+        for Assembly in $(ls repeat_masked/SPAdes_assembly/N.ditissima/$Strain/*_contigs_unmasked.fa); do
         Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) 
         Organism=$(echo $Assembly| rev | cut -d '/' -f3 | rev) 
         echo "$Organism - $Strain"
-        OutDir=gene_pred_VP/cufflinks/$Organism/$Strain/concatenated_prelim
+        OutDir=gene_pred/cufflinks/$Organism/$Strain/concatenated_prelim
         mkdir -p $OutDir
-        AcceptedHits=alignment_VP/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam
+        AcceptedHits=alignment/star/N.ditissima/$Strain/Hg199_reads/concatenated/concatenated.bam
         ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
         sbatch -p himem $ProgDir/cufflinks.sh $AcceptedHits $OutDir
         done
     done
 ```
+
+
+
+
+
+
 
 ## Codingquarry 
 
