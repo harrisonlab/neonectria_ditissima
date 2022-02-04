@@ -162,8 +162,8 @@ txi.genes <- summarizeToGene(txi.reps,tx2gene)
 # set the sample names for txi.genes
 invisible(sapply(seq(1,3), function(i) {colnames(txi.genes[[i]])<<-mysamples}))
 
-# write.table(txi.genes,"alignment/salmon/48DD_experiment/V.dahliae/JR2/DeSeq2/txigenes.txt",sep="\t",na="",quote=F)
-# write.table(txi.reps,"alignment/salmon/48DD_experiment/V.dahliae/JR2/DeSeq2/txireps.txt",sep="\t",na="",quote=F)
+write.table(txi.genes,"alignment/salmon/Malus/txigenes.txt",sep="\t",na="",quote=F)
+write.table(txi.reps,"alignment/salmon/Malus/txireps.txt",sep="\t",na="",quote=F)
 
 # Read sample metadata
 # Data is unordered as it is read in. This means data must be set into the same
