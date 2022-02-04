@@ -156,24 +156,19 @@ perl change_path_in_perl_scripts.pl "/usr/bin/env perl"
     done
 ```
 
-
-
-
-
-
-
 ## Codingquarry 
 
 ```bash
 conda activate antismash_py27
 
-    for Assembly in $(ls repeat_masked_VP/SPAdes_assembly/N.ditissima/*/*_contigs_unmasked.fa); do
+    for Strain in 118923 118924 226-31 227-31; do
+        for Assembly in $(ls repeat_masked/SPAdes_assembly/N.ditissima/$Strain/*_contigs_unmasked.fa); do
         Strain=$(echo $Assembly| rev | cut -d '/' -f2 | rev) 
         Organism=$(echo $Assembly| rev | cut -d '/' -f3 | rev) 
         echo "$Organism - $Strain"
-        OutDir=gene_pred_VP/codingquarry/$Organism/$Strain
+        OutDir=gene_pred/codingquarry/$Organism/$Strain
         mkdir -p $OutDir
-        GTF=gene_pred_VP/cufflinks/N.ditissima/$Strain/concatenated_prelim/transcripts.gtf
+        GTF=gene_pred/cufflinks/N.ditissima/$Strain/concatenated_prelim/transcripts.gtf
         ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
         sbatch $ProgDir/codingquarry.sh $Assembly $GTF $OutDir
     done
