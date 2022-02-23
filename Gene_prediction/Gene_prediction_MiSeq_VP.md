@@ -173,3 +173,224 @@ conda activate antismash_py27
         sbatch $ProgDir/codingquarry.sh $Assembly $GTF $OutDir
     done
 ```
+
+
+### Add additional transcripts to Braker gene models.
+
+
+Additional transcripts predicted by CodingQuarry are added to the final gene models.
+
+```bash
+for Strain in 118923 118924 226-31 227-31; do
+    for BrakerGff in $(ls gene_pred/braker/N.ditissima/$Strain/augustus.hints.gff3); do
+        Strain=$(echo $BrakerGff| rev | cut -d '/' -f2 | rev)
+        Organism=$(echo $BrakerGff | rev | cut -d '/' -f3 | rev)
+        echo "$Organism - $Strain"
+        Assembly=$(ls repeat_masked/SPAdes_assembly/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+        CodingQuarryGff=gene_pred/codingquarry/N.ditissima/$Strain/out/PredictedPass.gff3
+        PGNGff=gene_pred/codingquarry/N.ditissima/$Strain/out/PGN_predictedPass.gff3
+        AddDir=gene_pred/codingquary/$Organism/$Strain/additional # Additional transcripts directory
+        FinalDir=gene_pred/codingquarry/$Organism/$Strain/final # Final directory
+        AddGenesList=$AddDir/additional_genes.txt
+        AddGenesGff=$AddDir/additional_genes.gff
+        FinalGff=$AddDir/combined_genes.gff
+        mkdir -p $AddDir
+        mkdir -p $FinalDir
+        echo "$CodingQuarryGff - $BrakerGff"
+        # Create a list with the additional transcripts in CondingQuarry gff (and CQPM) vs Braker gene models
+        bedtools intersect -v -a $CodingQuarryGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' > $AddGenesList
+        bedtools intersect -v -a $PGNGff -b $BrakerGff | grep 'gene'| cut -f2 -d'=' | cut -f1 -d';' >> $AddGenesList
+
+        # Creat Gff file with the additional transcripts
+        ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+        $ProgDir/gene_list_to_gff.pl $AddGenesList $CodingQuarryGff CodingQuarry_v2.0 ID CodingQuary > $AddGenesGff
+        $ProgDir/gene_list_to_gff.pl $AddGenesList $PGNGff PGNCodingQuarry_v2.0 ID CodingQuary >> $AddGenesGff
+
+        # Create a final Gff file with gene features
+        $ProgDir/add_CodingQuary_features.pl $AddGenesGff $Assembly > $FinalDir/final_genes_CodingQuarry.gff3
+
+        # Create fasta files from each gene feature in the CodingQuarry gff3
+        $ProgDir/gff2fasta.pl $Assembly $FinalDir/final_genes_CodingQuarry.gff3 $FinalDir/final_genes_CodingQuarry
+
+        # Create fasta files from each gene feature in the Braker gff3
+        cp $BrakerGff $FinalDir/final_genes_Braker.gff3
+        $ProgDir/gff2fasta.pl $Assembly $FinalDir/final_genes_Braker.gff3 $FinalDir/final_genes_Braker
+
+        # Combine both fasta files
+        cat $FinalDir/final_genes_Braker.pep.fasta $FinalDir/final_genes_CodingQuarry.pep.fasta | sed -r 's/\*/X/g' > $FinalDir/final_genes_combined.pep.fasta
+        cat $FinalDir/final_genes_Braker.cdna.fasta $FinalDir/final_genes_CodingQuarry.cdna.fasta > $FinalDir/final_genes_combined.cdna.fasta
+        cat $FinalDir/final_genes_Braker.gene.fasta $FinalDir/final_genes_CodingQuarry.gene.fasta > $FinalDir/final_genes_combined.gene.fasta
+        cat $FinalDir/final_genes_Braker.upstream3000.fasta $FinalDir/final_genes_CodingQuarry.upstream3000.fasta > $FinalDir/final_genes_combined.upstream3000.fasta
+
+        # Combine both gff3 files
+        GffBraker=$FinalDir/final_genes_CodingQuarry.gff3
+        GffQuarry=$FinalDir/final_genes_Braker.gff3
+        GffAppended=$FinalDir/final_genes_appended.gff3
+        cat $GffBraker $GffQuarry > $GffAppended
+    done
+done
+
+  # Check the final number of genes
+for Strain in 118923 118924 226-31 227-31; do
+for DirPath in $(ls -d gene_pred/codingquarry/N.ditissima/$Strain/final); do
+echo $DirPath;
+cat $DirPath/final_genes_Braker.pep.fasta | grep '>' | wc -l;
+cat $DirPath/final_genes_CodingQuarry.pep.fasta | grep '>' | wc -l;
+cat $DirPath/final_genes_combined.pep.fasta | grep '>' | wc -l;
+echo "";
+done
+  ```
+
+  ### Remove duplicate and rename genes.
+
+  ```bash
+    for Strain in 118923 118924 226-31 227-31; do
+    for GffAppended in $(ls gene_pred/codingquarry/N.ditissima/$Strain/final/final_genes_appended.gff3);
+    do
+    Strain=$(echo $GffAppended | rev | cut -d '/' -f3 | rev)
+    Organism=$(echo $GffAppended | rev | cut -d '/' -f4 | rev)
+    echo "$Organism - $Strain"
+    FinalDir=gene_pred/codingquarry/$Organism/$Strain/final
+    # Remove duplicated genes
+    GffFiltered=gene_pred/codingquarry/N.ditissima/$Strain/final/filtered_duplicates.gff
+    ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Gene_prediction
+    $ProgDir/remove_dup_features.py --inp_gff $GffAppended --out_gff $GffFiltered
+    # Rename genes
+    GffRenamed=gene_pred/codingquarry/N.ditissima/$Strain/final/final_genes_appended_renamed.gff3
+    LogFile=gene_pred/codingquarry/N.ditissima/$Strain/final/final_genes_appended_renamed.log
+    $ProgDir/gff_rename_genes.py --inp_gff $GffFiltered --conversion_log $LogFile > $GffRenamed
+    rm $GffFiltered
+    # Create renamed fasta files from each gene feature   
+    Assembly=$(ls repeat_masked/SPAdes_assembly/N.ditissima/$Strain/*_contigs_softmasked_repeatmasker_TPSI_appended.fa)
+    $ProgDir/gff2fasta.pl $Assembly $GffRenamed $FinalDir/final_genes_appended_renamed
+    # The proteins fasta file contains * instead of Xs for stop codons, these should be changed
+    sed -i 's/\*/X/g' $FinalDir/final_genes_appended_renamed.pep.fasta
+    done 
+    done
+```
+
+
+### SignalP and tmhmm 
+
+This section needs to run on gruff
+```bash
+conda activate annotation
+```
+```bash
+    for Strain in 118923 118924 226-31 227-31; do
+    ProgDir=/home/agomez/scratch/apps/scripts/Feature_annotation
+    CurPath=$PWD
+        for Proteome in $(ls gene_pred/$Strain/final/final_genes_appended_renamed.pep.fasta); do
+        Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+        Organism=N.ditissima
+        SplitDir=gene_pred/final_genes_split/$Organism/$Strain
+        mkdir -p $SplitDir
+        BaseName="$Organism""_$Strain"_final_preds
+        $ProgDir/splitfile_500.py --inp_fasta $Proteome --out_dir $SplitDir --out_base $BaseName 
+        for File in $(ls $SplitDir/*_final_preds_*); do
+        sbatch $ProgDir/pred_signalP.sh $File signalp-4.1 
+        done
+        done
+    done
+```
+
+
+The batch files of predicted secreted proteins needed to be combined into a single file for each strain. This was done with the following commands:
+
+ ```bash
+for Strain in 118923 118924 226-31 227-31; do
+  for SplitDir in $(ls -d gene_pred/final_genes_split/*/$Strain); do
+    Strain=$(echo $SplitDir | rev |cut -d '/' -f1 | rev)
+    Organism=$(echo $SplitDir | rev |cut -d '/' -f2 | rev)
+    InStringAA=''
+    InStringNeg=''
+    InStringTab=''
+    InStringTxt=''
+    SigpDir=final_genes_signalp-4.1
+    for GRP in $(ls -l $SplitDir/*_final_preds_*.fa | rev | cut -d '_' -f1 | rev | sort -n); do
+      InStringAA="$InStringAA gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.aa";
+      InStringNeg="$InStringNeg gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp_neg.aa";
+      InStringTab="$InStringTab gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.tab";
+      InStringTxt="$InStringTxt gene_pred/$SigpDir/$Organism/$Strain/split/"$Organism"_"$Strain"_final_preds_$GRP""_sp.txt";
+    done
+    cat $InStringAA > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.aa
+    cat $InStringNeg > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_neg_sp.aa
+    tail -n +2 -q $InStringTab > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.tab
+    cat $InStringTxt > gene_pred/$SigpDir/$Organism/$Strain/"$Strain"_final_sp.txt
+  done
+done
+```
+
+Proteins containing a transmembrane domain were identified:
+
+```bash
+for Strain in 118923 118924 226-31 227-31; do 
+for Proteome in $(ls gene_pred/$Strain/final/final_genes_appended_renamed.pep.fasta); do
+Strain=$(echo $Proteome | rev | cut -f3 -d '/' | rev)
+Organism=$(echo $Proteome | rev | cut -f4 -d '/' | rev)
+ProgDir=/home/agomez/scratch/apps/scripts/Feature_annotation
+sbatch $ProgDir/TMHMM.sh $Proteome
+done
+done
+ ```
+
+ Those proteins with transmembrane domains were removed from lists of Signal peptide containing proteins
+
+ ```bash
+for File in $(ls gene_pred/trans_mem/$Organism/$Strain/*_TM_genes_neg.txt); do
+  Strain=$(echo $File | rev | cut -f2 -d '/' | rev)
+  Organism=$(echo $File | rev | cut -f3 -d '/' | rev)
+  echo "$Organism - $Strain"
+  TmHeaders=$(echo "$File" | sed 's/neg.txt/neg_headers.txt/g')
+  cat $File | cut -f1 > $TmHeaders
+  SigP=$(ls gene_pred/final_genes_signalp-4.1/$Organism/$Strain/*_final_sp.aa)
+  OutDir=$(dirname $SigP)
+  ProgDir=/home/gomeza/git_repos/scripts/bioinformatics_tools/Feature_annotation
+  $ProgDir/extract_from_fasta.py --fasta $SigP --headers $TmHeaders > $OutDir/"$Strain"_final_sp_no_trans_mem.aa
+  cat $OutDir/"$Strain"_final_sp_no_trans_mem.aa | grep '>' | wc -l
+done
+```
+
+
+
+echo "Running using SignalP version: $SigP_Version"
+  $SigP_Version -t euk -f summary -c 70 "proteins.fa" > "$OutFile"_sp.txt
+  echo '----------------------------------------------------------------------' >> "$OutFile"_sp.txt
+  PathToAnnotateSigP=/home/gomeza/git_repos/scripts/bioinformatics_tools/Feature_annotation
+  $PathToAnnotateSigP/sigP_4.1_parser.py --inp_sigP "$OutFile"_sp.txt --out_tab "$OutFile"_sp.tab --out_fasta "$OutFile"_sp.aa --out_neg "$OutFile"_sp_neg.aa --inp_fasta "proteins.fa"
+  OutDir=$CurPath/gene_pred/"${Source}_${SigP_Version}"/$Organism/$Strain/split
+
+perl -d:Trace /scratch/software/signalp-4.1/signalp -t euk -f summary -c 70 N.ditissima_118923_final_preds_10000.fa sp.txt >trace 2>&1
+  perl -d:Trace /data/scratch/gomeza/prog/signalp/signalp-4.1/signalp-4.1 -t euk -f summary -c 70  sp.txt >trace 2>&1
+  perl -d:Trace /scratch/software/signalp-4.1/signalp -t euk -f summary -c 70  sp.txt >trace 2>&1
+perl -d:Trace /data/scratch/gomeza/prog/signalp/signalp-4.1/signalp-4.1 -t euk -f summary -c 70 N.ditissima_118923_final_preds_10000.fa sp.txt >trace 2>&1
+
+  scp -r test_sigp/ agomez@gruffalo.cropdiversity.ac.uk:/home/agomez/scratch/neonectria_ditissima_WD
+scp -r /data/scratch/gomeza/prog/signalp/signalp-4.1 agomez@gruffalo.cropdiversity.ac.uk:/home/agomez/scratch/apps/prog
+```
+perl -d:Trace signalp-4.1 -t euk -f summary -c 70  sp.txt >trace 2>&1
+ sed -i "s&SIGNALP=.*&SIGNALP=$PWD/signalp-4.1&g" signalp-4.1
+  sed -i 's&AWK=nawk&AWK=/usr/bin/awk&g' signalp-4.1
+  sed -i 's&AWK=/usr/bin/gawk&AWK=/usr/bin/awk&g' signalp-4.1
+
+srun --partition long --mem-per-cpu 10G --cpus-per-task 10 --pty bash
+
+
+/home/gomeza/.local/bin/signalp6
+
+
+perl -d:Trace signalp-4.1 -t euk -f summary -c 70  sp.txt >trace 2>&1
+
+
+mamba install pytorch torchvision cudatoolkit=10.2 -c pytorch
+pip install signalp-6-package
+SIGNALP_DIR=$(python3 -c "import signalp; import os; print(os.path.dirname(signalp.__file__))" )
+cp -r signalp-6-package/models/* $SIGNALP_DIR/model_weights/
+
+
+signalp6 --fastafile N.ditissima_118923_final_preds_10000.fa --organism eukarya --output_dir ./ --format txt --mode fast
+
+
+../../apps/prog/signalp-4.1/signalp-4.1 -t euk -f summary -c 70 N.ditissima_118923_final_preds_10000.fa sp.txt
+
+../../apps/scripts/Feature_annotation/sigP_4.1_parser.py --inp_sigP sp.txt --out_tab sp.tab --out_fasta sp.aa --out_neg sp_neg.aa --inp_fasta N.ditissima_118923_final_preds_10000.fa
